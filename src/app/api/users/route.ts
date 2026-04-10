@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 import { JWT_COOKIE_NAME, verifyAuthToken } from "@/shared/lib/auth";
-import { prisma } from "@/shared/lib/prisma";
+import { prisma } from "@/shared/lib/prisma"; 
 
 const ALLOWED_USER_TYPES = ["OWNER", "CUSTOMER", "ADMIN", "ADMINISTRATION"] as const;
 const DASHBOARD_USER_TYPES = ["ADMIN", "ADMINISTRATION", "OWNER"] as const;
