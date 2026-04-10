@@ -70,7 +70,7 @@ export default function CustomerPage() {
       )),
     [shops],
   );
-
+//
   const handleLogout = async () => {
     setIsLoggingOut(true);
 

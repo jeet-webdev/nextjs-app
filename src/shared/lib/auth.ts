@@ -47,7 +47,7 @@ export async function verifyAuthToken(token: string): Promise<AuthTokenPayload |
     ) {
       return null;
     }
-
+//
     return payload as AuthTokenPayload;
   } catch {
     return null;

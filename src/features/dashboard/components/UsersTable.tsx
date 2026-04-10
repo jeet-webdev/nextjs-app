@@ -5,7 +5,7 @@ type UsersTableProps = {
   isLoadingUsers: boolean;
   title: string;
   emptyMessage: string;
-};
+};//
 
 export default function UsersTable({
   users,

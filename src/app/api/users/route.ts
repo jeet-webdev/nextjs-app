@@ -1,6 +1,6 @@
 // @ts-nocheck
 import bcrypt from "bcryptjs";
-import { cookies } from "next/headers";
+import { cookies } from "next/headers"; //
 import { NextResponse } from "next/server";
 
 import { JWT_COOKIE_NAME, verifyAuthToken } from "@/shared/lib/auth";
@@ -23,7 +23,7 @@ async function getSessionUser() {
   const session = await verifyAuthToken(token);
 
   if (!session) {
-    return null;
+    return null;//
   }
 
   return prisma.user.findUnique({

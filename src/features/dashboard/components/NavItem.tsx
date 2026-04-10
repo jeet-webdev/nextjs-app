@@ -17,3 +17,4 @@ export default function NavItem({ icon, label, active = false }: NavItemProps) {
     </div>
   );
 }
+//

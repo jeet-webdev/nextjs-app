@@ -20,4 +20,4 @@ export default function Home() {
       <HomeFooter />
     </div>
   );
-}
+}//

@@ -42,7 +42,7 @@ export function getCreatableUserTypes(userType: UserType | null | undefined): Us
 
   return [];
 }
-
+//
 export function getDashboardPathForUserType(userType: UserType): string {
   if (userType === "ADMIN") {
     return "/dashboard/admin";

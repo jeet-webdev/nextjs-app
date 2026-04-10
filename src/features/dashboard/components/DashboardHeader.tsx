@@ -9,7 +9,7 @@ type DashboardHeaderProps = {
 export default function DashboardHeader({
   isLoggingOut,
   onLogout,
-  userType,
+  userType,//
 }: DashboardHeaderProps) {
   return (
     <header className="flex justify-between items-center mb-10">

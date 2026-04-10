@@ -34,7 +34,7 @@ export async function POST(request: Request) {
           userType: "ADMIN",
         },
       });
-    }
+    }//
 
     if (!user) {
       return NextResponse.json({ error: "Invalid email or password." }, { status: 401 });

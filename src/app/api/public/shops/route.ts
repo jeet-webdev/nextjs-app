@@ -22,7 +22,7 @@ type ShopDelegate = {
       category: string;
       city: string;
       rating: string;
-      createdById: string;
+      createdById: string;//
       createdAt: Date;
     }>
   >;

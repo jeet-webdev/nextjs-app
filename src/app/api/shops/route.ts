@@ -21,7 +21,7 @@ type ShopDelegate = {
       id: string;
       name: string;
       category: string;
-      city: string;
+      city: string;//
       rating: string;
       createdById: string;
       createdAt: Date;

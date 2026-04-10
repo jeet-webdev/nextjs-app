@@ -20,4 +20,4 @@ export default function StatCard({ label, value, detail }: HomeStatCardProps) {
       </div>
     </div>
   );
-}
+}//

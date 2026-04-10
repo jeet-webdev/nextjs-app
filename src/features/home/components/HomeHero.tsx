@@ -15,7 +15,7 @@ export default function HomeHero() {
         One Platform for <br />
         <span className="text-white">Every Shop.</span>
       </h1>
-
+{/* // */}
       <p className="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto mb-12 leading-relaxed">
         Discover trusted shops across categories, compare listings instantly,
         and manage your marketplace experience from one unified platform.

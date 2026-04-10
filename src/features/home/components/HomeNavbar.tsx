@@ -19,6 +19,7 @@ export default function HomeNavbar() {
           <a href="#" className="hover:text-white transition-colors">
             Cities
           </a>
+          {/* // */}
           <Link
             href="/login"
             className="bg-white text-black px-6 py-2.5 rounded-full font-semibold hover:bg-gray-200 transition-all active:scale-95"
