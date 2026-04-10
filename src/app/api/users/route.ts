@@ -23,7 +23,7 @@ async function getSessionUser() {
   const session = await verifyAuthToken(token);
 
   if (!session) {
-    return null;//
+    return null;
   }
 
   return prisma.user.findUnique({
