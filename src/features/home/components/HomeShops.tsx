@@ -46,10 +46,10 @@ export default function HomeShops() {
           <h2 className="mt-2 text-3xl font-black tracking-tight text-white">
             Multiple Shops, One Platform
           </h2>
-          <p className="mt-2 max-w-2xl text-sm text-gray-300">
+          {/* <p className="mt-2 max-w-2xl text-sm text-gray-300">
             Discover stores from different categories in one place, compare options quickly,
             and shop with confidence.
-          </p>
+          </p> */}
         </div>
         <div className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2 text-sm text-gray-200">
           Live shops: <span className="font-semibold text-white">{shops.length}</span>
