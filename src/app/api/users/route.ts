@@ -1,6 +1,5 @@
 import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
-import { Prisma } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 import { JWT_COOKIE_NAME, verifyAuthToken } from "@/shared/lib/auth";
@@ -145,8 +144,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ user }, { status: 201 });
   } catch (error: unknown) {
     if (
-      error instanceof Prisma.PrismaClientKnownRequestError &&
-      error.code === "P2002"
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      (error as { code: unknown }).code === "P2002"
     ) {
       return NextResponse.json({ error: "Email already exists." }, { status: 409 });
     }
