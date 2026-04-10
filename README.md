@@ -18,6 +18,46 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
+## Prisma Setup
+
+This project is configured with Prisma and Neon PostgreSQL.
+
+1. Ensure your env file contains:
+
+```bash
+DATABASE_URL="postgresql://USER:PASSWORD@HOST/DB_NAME?sslmode=require&channel_binding=require"
+JWT_SECRET="replace-with-a-64-char-random-secret"
+ADMIN_EMAIL="admin@example.com"
+ADMIN_PASSWORD="change-this-password"
+```
+
+2. Run migration:
+
+```bash
+npm run prisma:migrate -- --name init
+```
+
+3. Regenerate client after schema changes:
+
+```bash
+npm run prisma:generate
+```
+
+4. Open Prisma Studio:
+
+```bash
+npm run prisma:studio
+```
+
+Use the shared Prisma client from `lib/prisma.ts`.
+
+## Auth Flow
+
+- Login is handled by `POST /api/auth/login`.
+- On success, the server sets an `httpOnly` JWT cookie.
+- `proxy.ts` checks the JWT for `/dashboard` routes and redirects unauthenticated users to `/login`.
+- Logout is handled by `POST /api/auth/logout`, which clears the auth cookie.
+
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
 ## Learn More

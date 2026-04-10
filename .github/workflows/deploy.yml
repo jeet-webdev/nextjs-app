@@ -21,6 +21,11 @@ jobs:
       - name: Install deps
         run: npm install
 
+      - name: Create .env from secrets
+        run: |
+          echo "DATABASE_URL=\"${{ secrets.DATABASE_URL }}\"" > .env
+          echo "JWT_SECRET=\"${{ secrets.JWT_SECRET }}\"" >> .env
+
       - name: Build
         run: npm run build
 
@@ -39,6 +44,12 @@ jobs:
           script: |
             cd ${{ secrets.VPS_PATH }}
             git pull origin main
+
+       
+            echo "DATABASE_URL=\"${{ secrets.DATABASE_URL }}\"" > .env
+            echo "JWT_SECRET=\"${{ secrets.JWT_SECRET }}\"" >> .env
+
             npm install
+            npx prisma generate
             npm run build
             pm2 restart nextjs-app
