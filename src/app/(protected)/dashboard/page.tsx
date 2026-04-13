@@ -16,7 +16,7 @@ export default function DashboardRoleRouterPage() {
     const resolveRoleRoute = async () => {
       try {
         const response = await fetch("/api/users", { method: "GET" });
-//
+
         if (response.status === 401) {
           router.push("/login");
           router.refresh();

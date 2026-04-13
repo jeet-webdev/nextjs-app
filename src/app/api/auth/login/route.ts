@@ -87,7 +87,7 @@ export async function POST(request: Request) {
         : user.userType === "OWNER"
           ? "/dashboard/owner"
           : user.userType === "ADMINISTRATION"
-            ? "/dashboard/administration"
+            ? "/dashboard/administrator"
             : "/dashboard/admin";
 
     const response = NextResponse.json({

@@ -20,6 +20,7 @@ import DashboardHeader from "@/features/dashboard/components/DashboardHeader";
 import StatsGrid from "@/features/dashboard/components/StatsGrid";
 import AddUserForm from "@/features/dashboard/components/AddUserForm";
 import UsersTable from "@/features/dashboard/components/UsersTable";
+import ShopsForm from "@/features/dashboard/components/ShopsForm";
 
 type RoleDashboardPageProps = {
   expectedRole: "ADMIN" | "ADMINISTRATION" | "OWNER";
@@ -265,7 +266,7 @@ export default function RoleDashboardPage({ expectedRole }: RoleDashboardPagePro
           onLogout={handleLogout}
           userType={currentUser?.userType ?? null}
         />
-{/* // */}
+
         <StatsGrid
           total={stats.total}
           administrators={stats.administrators}
@@ -293,74 +294,15 @@ export default function RoleDashboardPage({ expectedRole }: RoleDashboardPagePro
         ) : null}
 
         {expectedRole === "OWNER" ? (
-          <>
-            <div className="bg-white/5 rounded-xl border border-white/10 p-6 mb-8">
-              <h2 className="text-lg font-semibold mb-4">My Shops</h2>
-              {ownerShops.length === 0 ? (
-                <p className="text-sm text-gray-400">You have not published any shops yet.</p>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                  {ownerShops.map((shop) => (
-                    <div
-                      key={shop.id}
-                      className="rounded-xl border border-white/10 bg-black/30 p-4"
-                    >
-                      <p className="font-semibold text-white">{shop.name}</p>
-                      <p className="text-sm text-sky-300 mt-1">{shop.category}</p>
-                      <div className="mt-3 flex items-center justify-between text-xs text-gray-300">
-                        <span>{shop.city}</span>
-                        <span className="px-2 py-1 rounded-full bg-sky-500/20 text-sky-200">
-                          {shop.rating}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className="bg-white/5 rounded-xl border border-white/10 p-6 mb-8">
-              <h2 className="text-lg font-semibold mb-4">Create Shop For Customers</h2>
-              <form className="grid grid-cols-1 md:grid-cols-2 gap-4" onSubmit={handleCreateShop}>
-                <input
-                  className="p-3 bg-black/40 border border-white/10 rounded-lg"
-                  placeholder="Shop Name"
-                  value={shopForm.name}
-                  onChange={(e) => setShopForm((prev) => ({ ...prev, name: e.target.value }))}
-                />
-                <input
-                  className="p-3 bg-black/40 border border-white/10 rounded-lg"
-                  placeholder="Category"
-                  value={shopForm.category}
-                  onChange={(e) => setShopForm((prev) => ({ ...prev, category: e.target.value }))}
-                />
-                <input
-                  className="p-3 bg-black/40 border border-white/10 rounded-lg"
-                  placeholder="City"
-                  value={shopForm.city}
-                  onChange={(e) => setShopForm((prev) => ({ ...prev, city: e.target.value }))}
-                />
-                <input
-                  className="p-3 bg-black/40 border border-white/10 rounded-lg"
-                  placeholder="Rating"
-                  value={shopForm.rating}
-                  onChange={(e) => setShopForm((prev) => ({ ...prev, rating: e.target.value }))}
-                />
-                <button
-                  type="submit"
-                  disabled={isSubmittingShop}
-                  className="p-3 bg-sky-600 hover:bg-sky-700 rounded-lg font-semibold disabled:opacity-60"
-                >
-                  {isSubmittingShop ? "Publishing..." : "Publish Shop"}
-                </button>
-              </form>
-              {shopError && <p className="text-rose-400 text-sm mt-3">{shopError}</p>}
-
-              <div className="mt-4 text-sm text-gray-300">
-                Live shops available to customers: <span className="font-semibold text-white">{shops.length}</span>
-              </div>
-            </div>
-          </>
+          <ShopsForm
+            ownerShops={ownerShops}
+            allShopsCount={shops.length}
+            shopForm={shopForm}
+            setShopForm={setShopForm}
+            onSubmit={handleCreateShop}
+            isSubmittingShop={isSubmittingShop}
+            shopError={shopError}
+          />
         ) : null}
 
         <UsersTable

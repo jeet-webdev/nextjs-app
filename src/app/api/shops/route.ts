@@ -16,12 +16,13 @@ type ShopDelegate = {
       createdAt: true;
     };
     orderBy: { createdAt: "desc" };
+    take?: number;
   }) => Promise<
     Array<{
       id: string;
       name: string;
       category: string;
-      city: string;//
+      city: string;
       rating: string;
       createdById: string;
       createdAt: Date;
@@ -88,13 +89,7 @@ async function getSessionUser() {
   });
 }
 
-export async function GET() {
-  const currentUser = await getSessionUser();
-
-  if (!currentUser) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
+export async function GET(request: Request) {
   const shopDelegate = getShopDelegate();
 
   if (!shopDelegate) {
@@ -108,6 +103,17 @@ export async function GET() {
   }
 
   try {
+    const { searchParams } = new URL(request.url);
+    const isPublicRequest = searchParams.get("public") === "true";
+
+    if (!isPublicRequest) {
+      const currentUser = await getSessionUser();
+
+      if (!currentUser) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
+    }
+
     const shops = await shopDelegate.findMany({
       select: {
         id: true,
@@ -121,6 +127,7 @@ export async function GET() {
       orderBy: {
         createdAt: "desc",
       },
+      ...(isPublicRequest ? { take: 12 } : {}),
     });
 
     return NextResponse.json({ shops });

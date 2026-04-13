@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+
+import ShopGrid from "@/features/shops/components/ShopGrid";
 import { type ShopRecord } from "@/features/shops/types";
 
-export default function CustomerPage() {
+export default function CustomerDashboardPage() {
   const [totalUsers, setTotalUsers] = useState<number | null>(null);
   const [shops, setShops] = useState<ShopRecord[]>([]);
   const [error, setError] = useState("");
@@ -63,26 +65,6 @@ export default function CustomerPage() {
     void loadShops();
   }, [router]);
 
-  const shopCards = useMemo(
-    () =>
-      shops.map((shop) => (
-        <article
-          key={shop.id}
-          className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 backdrop-blur transition hover:-translate-y-1 hover:bg-white/[0.06]"
-        >
-          <h3 className="text-lg font-semibold text-white">{shop.name}</h3>
-          <p className="mt-2 text-sm text-sky-300">{shop.category}</p>
-          <div className="mt-4 flex items-center justify-between text-sm text-gray-300">
-            <span>{shop.city}</span>
-            <span className="rounded-full bg-sky-500/20 px-2 py-1 text-sky-200">
-              {shop.rating}
-            </span>
-          </div>
-        </article>
-      )),
-    [shops],
-  );
-//
   const handleLogout = async () => {
     setIsLoggingOut(true);
 
@@ -127,15 +109,7 @@ export default function CustomerPage() {
           {error && <p className="mt-4 text-sm text-rose-300">{error}</p>}
         </header>
 
-        <section className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
-          {shopCards.length > 0 ? (
-            shopCards
-          ) : (
-            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 text-gray-300">
-              No shops published yet.
-            </div>
-          )}
-        </section>
+        <ShopGrid shops={shops} emptyMessage="No shops published yet." />
       </main>
     </div>
   );

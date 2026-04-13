@@ -1,10 +1,10 @@
-// @ts-nocheck
 import bcrypt from "bcryptjs";
-import { cookies } from "next/headers"; //
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 
 import { JWT_COOKIE_NAME, verifyAuthToken } from "@/shared/lib/auth";
-import { prisma } from "@/shared/lib/prisma"; 
+import { prisma } from "@/shared/lib/prisma";
 
 const ALLOWED_USER_TYPES = ["OWNER", "CUSTOMER", "ADMIN", "ADMINISTRATION"] as const;
 const DASHBOARD_USER_TYPES = ["ADMIN", "ADMINISTRATION", "OWNER"] as const;
@@ -144,12 +144,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ user }, { status: 201 });
   } catch (error: unknown) {
-    if (
-      typeof error === "object" &&
-      error !== null &&
-      "code" in error &&
-      (error as { code: unknown }).code === "P2002"
-    ) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
       return NextResponse.json({ error: "Email already exists." }, { status: 409 });
     }
 

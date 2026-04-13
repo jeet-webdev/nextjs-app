@@ -49,7 +49,7 @@ export function getDashboardPathForUserType(userType: UserType): string {
   }
 
   if (userType === "ADMINISTRATION") {
-    return "/dashboard/administration";
+    return "/dashboard/administrator";
   }
 
   if (userType === "OWNER") {
