@@ -15,7 +15,11 @@ export default function DashboardRoleRouterPage() {
   useEffect(() => {
     const resolveRoleRoute = async () => {
       try {
-        const response = await fetch("/api/users", { method: "GET" });
+        const response = await fetch("/api/users", {
+          method: "GET",
+          credentials: "include",
+          cache: "no-store",
+        });
 
         if (response.status === 401) {
           router.push("/login");

@@ -1,13 +1,11 @@
 "use client";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,6 +15,8 @@ export default function LoginForm() {
     try {
       const response = await fetch("/api/auth/login", {
         method: "POST",
+        credentials: "include",
+        cache: "no-store",
         headers: {
           "Content-Type": "application/json",
         },
@@ -30,8 +30,7 @@ export default function LoginForm() {
       }
 
       const data = (await response.json()) as { redirectPath?: string };
-      router.push(data.redirectPath ?? "/dashboard");
-      router.refresh();
+      window.location.assign(data.redirectPath ?? "/dashboard");
     } catch {
       setError("Unable to login right now. Please try again.");
     } finally {
@@ -83,4 +82,3 @@ export default function LoginForm() {
     </div>
   );
 }
-//

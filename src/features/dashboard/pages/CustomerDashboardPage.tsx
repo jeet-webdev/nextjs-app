@@ -16,7 +16,11 @@ export default function CustomerDashboardPage() {
   useEffect(() => {
     const loadCounts = async () => {
       try {
-        const response = await fetch("/api/users/count", { method: "GET" });
+        const response = await fetch("/api/users/count", {
+          method: "GET",
+          credentials: "include",
+          cache: "no-store",
+        });
 
         if (response.status === 401) {
           router.push("/login");
@@ -43,7 +47,11 @@ export default function CustomerDashboardPage() {
   useEffect(() => {
     const loadShops = async () => {
       try {
-        const response = await fetch("/api/shops", { method: "GET" });
+        const response = await fetch("/api/shops", {
+          method: "GET",
+          credentials: "include",
+          cache: "no-store",
+        });
 
         if (response.status === 401) {
           router.push("/login");
