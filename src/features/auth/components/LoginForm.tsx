@@ -43,7 +43,7 @@ export default function LoginForm() {
     <div className="w-full max-w-md space-y-8">
       <div>
         <h1 className="text-3xl font-bold text-white">Sign In</h1>
-        <p className="text-gray-400 mt-2">Enter your admin credentials</p>
+        <p className="mt-2 text-gray-400">Enter your email and password</p>
       </div>
 
       <form onSubmit={handleLogin} className="space-y-6">
@@ -54,7 +54,7 @@ export default function LoginForm() {
           <input
             type="email"
             className="w-full mt-2 p-3 bg-white/5 border border-white/10 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-white"
-            placeholder="admin@example.com"
+            placeholder="you@example.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />

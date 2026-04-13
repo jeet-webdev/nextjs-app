@@ -1,7 +1,12 @@
 import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
 
-import { signAuthToken, JWT_COOKIE_NAME, shouldUseSecureCookie } from "@/shared/lib/auth";
+import {
+  getDashboardPathForUserType,
+  signAuthToken,
+  JWT_COOKIE_NAME,
+  shouldUseSecureCookie,
+} from "@/shared/lib/auth";
 import { prisma } from "@/shared/lib/prisma";
 
 const ONE_WEEK_IN_SECONDS = 60 * 60 * 24 * 7;
@@ -34,7 +39,7 @@ export async function POST(request: Request) {
           userType: "ADMIN",
         },
       });
-    }//
+    }
 
     if (!user) {
       return NextResponse.json({ error: "Invalid email or password." }, { status: 401 });
@@ -81,18 +86,9 @@ export async function POST(request: Request) {
       userType: user.userType,
     });
 
-    const redirectPath =
-      user.userType === "CUSTOMER"
-        ? "/dashboard/customer"
-        : user.userType === "OWNER"
-          ? "/dashboard/owner"
-          : user.userType === "ADMINISTRATION"
-            ? "/dashboard/administrator"
-            : "/dashboard/admin";
-
     const response = NextResponse.json({
       success: true,
-      redirectPath,
+      redirectPath: getDashboardPathForUserType(user.userType),
     });
     response.cookies.set({
       name: JWT_COOKIE_NAME,

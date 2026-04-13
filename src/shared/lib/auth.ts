@@ -4,7 +4,7 @@ export const JWT_COOKIE_NAME = "auth_token";
 
 const AUTH_USER_TYPES = ["OWNER", "CUSTOMER", "ADMIN", "ADMINISTRATION"] as const;
 
-type AuthUserType = (typeof AUTH_USER_TYPES)[number];
+export type AuthUserType = (typeof AUTH_USER_TYPES)[number];
 
 type AuthTokenPayload = JWTPayload & {
   sub: string;
@@ -47,11 +47,27 @@ export async function verifyAuthToken(token: string): Promise<AuthTokenPayload |
     ) {
       return null;
     }
-//
+
     return payload as AuthTokenPayload;
   } catch {
     return null;
   }
+}
+
+export function getDashboardPathForUserType(userType: AuthUserType) {
+  if (userType === "OWNER") {
+    return "/dashboard/owner";
+  }
+
+  if (userType === "ADMINISTRATION") {
+    return "/dashboard/administrator";
+  }
+
+  if (userType === "ADMIN") {
+    return "/dashboard/admin";
+  }
+
+  return "/dashboard/customer";
 }
 
 export function shouldUseSecureCookie(request?: Request) {

@@ -40,7 +40,7 @@ export default function HomeShops() {
   );
 
   return (
-    <section className="mx-auto w-full max-w-7xl px-6 pb-16">
+    <section id="shops" className="mx-auto w-full max-w-7xl px-6 pb-16">
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
           <p className="text-xs uppercase tracking-[0.2em] text-indigo-300">Marketplace</p>

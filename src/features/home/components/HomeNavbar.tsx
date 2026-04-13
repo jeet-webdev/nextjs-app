@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import CustomerSignupModal from "./CustomerSignupModal";
 
 export default function HomeNavbar() {
   return (
@@ -9,7 +12,7 @@ export default function HomeNavbar() {
           <span className="tracking-tight">ShopPlatform</span>
         </div>
 
-        <div className="hidden md:flex gap-10 items-center text-sm font-medium text-gray-400">
+        <div className="hidden md:flex gap-6 items-center text-sm font-medium text-gray-400">
           <a href="#" className="hover:text-white transition-colors">
             Shops
           </a>
@@ -19,7 +22,7 @@ export default function HomeNavbar() {
           <a href="#" className="hover:text-white transition-colors">
             Cities
           </a>
-          {/* // */}
+          <CustomerSignupModal />
           <Link
             href="/login"
             className="bg-white text-black px-6 py-2.5 rounded-full font-semibold hover:bg-gray-200 transition-all active:scale-95"

@@ -1,34 +1,44 @@
+import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 export default function HomeHero() {
   return (
-    <header className="relative max-w-7xl mx-auto px-6 pt-32 pb-24 text-center">
-      <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-indigo-400 text-xs font-semibold mb-8 animate-fade-in">
-        <span className="relative flex h-2 w-2">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75" />
-          <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500" />
-        </span>
-        Multi-shop marketplace is live
+    <header className="relative mx-auto max-w-7xl gap-14 px-6 pb-24 pt-24  lg:items-center">
+      <div className="text-center ">
+        <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-indigo-400 animate-fade-in">
+          <span className="relative flex h-2 w-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-indigo-400 opacity-75" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-indigo-500" />
+          </span>
+          Multi-shop marketplace is live
+        </div>
+
+        <h1 className="mb-8 text-5xl font-black leading-[1.02] tracking-tighter text-transparent bg-gradient-to-b from-white to-gray-500 bg-clip-text md:text-7xl xl:text-8xl">
+          One Platform for
+          <br />
+          <span className="text-white">Every Shop.</span>
+        </h1>
+<p className="mx-auto text-center mb-10 max-w-2xl text-lg leading-relaxed text-gray-400 md:text-xl">
+  Discover trusted shops across categories, compare listings instantly, and create
+  your customer account directly from the home page when you are new here.
+</p>
+
+        <div className="flex flex-col gap-4 sm:flex-row sm:justify-center ">
+          <a
+            href="#shops"
+            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-indigo-600 px-8 py-4 font-bold transition-all hover:bg-indigo-500 hover:shadow-xl hover:shadow-indigo-500/20 active:scale-95 sm:w-auto"
+          >
+            Explore Shops <ArrowRight size={20} />
+          </a>
+          <Link
+            href="/login"
+            className="w-full rounded-2xl px-8 py-4 text-center font-bold text-gray-300 transition-colors hover:bg-white/5 sm:w-auto"
+          >
+            Open Dashboard
+          </Link>
+        </div>
       </div>
 
-      <h1 className="text-6xl md:text-8xl font-black mb-8 tracking-tighter leading-[1.05] bg-gradient-to-b from-white to-gray-500 bg-clip-text text-transparent">
-        One Platform for <br />
-        <span className="text-white">Every Shop.</span>
-      </h1>
-{/* // */}
-      <p className="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto mb-12 leading-relaxed">
-        Discover trusted shops across categories, compare listings instantly,
-        and manage your marketplace experience from one unified platform.
-      </p>
-
-      <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-        <button className="w-full sm:w-auto bg-indigo-600 px-8 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-indigo-500 hover:shadow-xl hover:shadow-indigo-500/20 transition-all active:scale-95">
-          Explore Shops <ArrowRight size={20} />
-        </button>
-        <button className="w-full sm:w-auto px-8 py-4 rounded-2xl font-bold text-gray-300 hover:bg-white/5 transition-colors">
-          Open Dashboard
-        </button>
-      </div>
     </header>
   );
 }
