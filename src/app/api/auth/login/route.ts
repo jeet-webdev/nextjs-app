@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
 
-import { signAuthToken, JWT_COOKIE_NAME } from "@/shared/lib/auth";
+import { signAuthToken, JWT_COOKIE_NAME, shouldUseSecureCookie } from "@/shared/lib/auth";
 import { prisma } from "@/shared/lib/prisma";
 
 const ONE_WEEK_IN_SECONDS = 60 * 60 * 24 * 7;
@@ -98,7 +98,7 @@ export async function POST(request: Request) {
       name: JWT_COOKIE_NAME,
       value: token,
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: shouldUseSecureCookie(request),
       sameSite: "strict",
       path: "/",
       maxAge: ONE_WEEK_IN_SECONDS,

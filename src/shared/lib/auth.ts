@@ -53,3 +53,31 @@ export async function verifyAuthToken(token: string): Promise<AuthTokenPayload |
     return null;
   }
 }
+
+export function shouldUseSecureCookie(request?: Request) {
+  const override = process.env.AUTH_COOKIE_SECURE;
+
+  if (override === "true") {
+    return true;
+  }
+
+  if (override === "false") {
+    return false;
+  }
+
+  if (!request) {
+    return process.env.NODE_ENV === "production";
+  }
+
+  const forwardedProto = request.headers.get("x-forwarded-proto");
+
+  if (forwardedProto) {
+    return forwardedProto.split(",")[0].trim() === "https";
+  }
+
+  try {
+    return new URL(request.url).protocol === "https:";
+  } catch {
+    return process.env.NODE_ENV === "production";
+  }
+}

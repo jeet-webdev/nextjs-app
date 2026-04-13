@@ -29,7 +29,10 @@ DATABASE_URL="postgresql://USER:PASSWORD@HOST/DB_NAME?sslmode=require&channel_bi
 JWT_SECRET="replace-with-a-64-char-random-secret"
 ADMIN_EMAIL="admin@example.com"
 ADMIN_PASSWORD="change-this-password"
+AUTH_COOKIE_SECURE="true"
 ```
+
+Set `AUTH_COOKIE_SECURE="false"` only when your production host is HTTP (for example direct IP without TLS).
 
 2. Run migration:
 
@@ -55,7 +58,7 @@ Use the shared Prisma client from `lib/prisma.ts`.
 
 - Login is handled by `POST /api/auth/login`.
 - On success, the server sets an `httpOnly` JWT cookie.
-- `proxy.ts` checks the JWT for `/dashboard` routes and redirects unauthenticated users to `/login`.
+- `middleware.ts` checks the JWT for `/dashboard` routes and redirects unauthenticated users to `/login`.
 - Logout is handled by `POST /api/auth/logout`, which clears the auth cookie.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.

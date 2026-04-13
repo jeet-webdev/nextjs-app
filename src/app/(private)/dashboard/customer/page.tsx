@@ -16,6 +16,12 @@ export default function CustomerPage() {
       try {
         const response = await fetch("/api/users/count", { method: "GET" });
 
+        if (response.status === 401) {
+          router.push("/login");
+          router.refresh();
+          return;
+        }
+
         if (!response.ok) {
           const data = (await response.json()) as { error?: string };
           setError(data.error ?? "Unable to load user count.");
@@ -30,12 +36,18 @@ export default function CustomerPage() {
     };
 
     void loadCounts();
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     const loadShops = async () => {
       try {
         const response = await fetch("/api/shops", { method: "GET" });
+
+        if (response.status === 401) {
+          router.push("/login");
+          router.refresh();
+          return;
+        }
 
         if (!response.ok) {
           return;
@@ -49,7 +61,7 @@ export default function CustomerPage() {
     };
 
     void loadShops();
-  }, []);
+  }, [router]);
 
   const shopCards = useMemo(
     () =>
