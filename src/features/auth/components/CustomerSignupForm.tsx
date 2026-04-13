@@ -12,6 +12,7 @@ type CustomerSignupFormProps = {
   onSuccess?: () => void;
 };
 
+
 const INITIAL_FORM = {
   name: "",
   email: "",

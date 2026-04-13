@@ -4,6 +4,7 @@ type FeatureItemProps = {
   desc: string;
 };
 
+
 export default function FeatureItem({ icon, title, desc }: FeatureItemProps) {
   return (
     <div className="flex flex-col items-start text-left group">
