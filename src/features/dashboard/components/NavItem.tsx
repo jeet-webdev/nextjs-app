@@ -2,11 +2,14 @@ type NavItemProps = {
   icon: React.ReactNode;
   label: string;
   active?: boolean;
+  onClick?: () => void;
 };
 
-export default function NavItem({ icon, label, active = false }: NavItemProps) {
+export default function NavItem({ icon, label, active = false, onClick }: NavItemProps) {
   return (
-    <div
+    <button
+      type="button"
+      onClick={onClick}
       className={`flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition ${
         active
           ? "bg-indigo-600 text-white"
@@ -14,7 +17,7 @@ export default function NavItem({ icon, label, active = false }: NavItemProps) {
       }`}
     >
       {icon} <span>{label}</span>
-    </div>
+    </button>
   );
 }
 //

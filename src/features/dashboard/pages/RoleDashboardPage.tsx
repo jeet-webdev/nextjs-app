@@ -21,10 +21,13 @@ import StatsGrid from "@/features/dashboard/components/StatsGrid";
 import AddUserForm from "@/features/dashboard/components/AddUserForm";
 import UsersTable from "@/features/dashboard/components/UsersTable";
 import ShopsForm from "@/features/dashboard/components/ShopsForm";
+import RestaurantsSection from "@/features/dashboard/components/RestaurantsSection";
 
 type RoleDashboardPageProps = {
   expectedRole: "ADMIN" | "ADMINISTRATION" | "OWNER";
 };
+
+type DashboardSection = "overview" | "users" | "restaurants";
 
 const EMPTY_FORM: FormState = {
   name: "",
@@ -43,6 +46,7 @@ export default function RoleDashboardPage({ expectedRole }: RoleDashboardPagePro
   const [shopError, setShopError] = useState("");
   const [users, setUsers] = useState<UserRecord[]>([]);
   const [shops, setShops] = useState<ShopRecord[]>([]);
+  const [activeSection, setActiveSection] = useState<DashboardSection>("overview");
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [shopForm, setShopForm] = useState<ShopFormState>(EMPTY_SHOP_FORM);
@@ -84,6 +88,9 @@ export default function RoleDashboardPage({ expectedRole }: RoleDashboardPagePro
     expectedRole === "OWNER" ? "No customers yet." : "No users found.";
   const formTitle = expectedRole === "OWNER" ? "Create Customer" : "Create User";
   const submitLabel = expectedRole === "OWNER" ? "Create Customer" : "Create Account";
+  const adminCanCreateAnyUserType =
+    currentUser?.userType === "ADMIN" || currentUser?.userType === "ADMINISTRATION";
+  const restaurantsForSection = expectedRole === "OWNER" ? ownerShops : shops;
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -264,61 +271,81 @@ export default function RoleDashboardPage({ expectedRole }: RoleDashboardPagePro
     }
   };
 
+  const handleTopCreateUserClick = () => {
+    setActiveSection("users");
+
+    const formElement = document.getElementById("add-user-form");
+    formElement?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
   return (
     <div className="flex min-h-screen bg-[#020205] text-gray-100">
-      <Sidebar />
+      <Sidebar activeSection={activeSection} onSectionChange={setActiveSection} />
 
       <main className="flex-1 p-8 overflow-y-auto">
         <DashboardHeader
           isLoggingOut={isLoggingOut}
           onLogout={handleLogout}
           userType={currentUser?.userType ?? null}
+          onCreateUser={adminCanCreateAnyUserType ? handleTopCreateUserClick : undefined}
         />
 
-        <StatsGrid
-          total={stats.total}
-          administrators={stats.administrators}
-          admins={stats.admins}
-          owners={stats.owners}
-          customers={stats.customers}
-          shops={shops.length}
-        />
-
-        {creatableUserTypes.length > 0 ? (
-          <AddUserForm
-            form={form}
-            isSubmitting={isSubmitting}
-            error={error}
-            userTypeOptions={creatableUserTypes}
-            title={formTitle}
-            submitLabel={submitLabel}
-            onSubmit={handleCreateUser}
-            onChange={setForm}
-          />
-        ) : error ? (
-          <div className="bg-white/5 rounded-xl border border-white/10 p-6 mb-8">
-            <p className="text-rose-400 text-sm">{error}</p>
-          </div>
-        ) : null}
-
-        {expectedRole === "OWNER" ? (
-          <ShopsForm
-            ownerShops={ownerShops}
-            allShopsCount={shops.length}
-            shopForm={shopForm}
-            setShopForm={setShopForm}
-            onSubmit={handleCreateShop}
-            isSubmittingShop={isSubmittingShop}
-            shopError={shopError}
+        {activeSection === "overview" ? (
+          <StatsGrid
+            total={stats.total}
+            administrators={stats.administrators}
+            admins={stats.admins}
+            owners={stats.owners}
+            customers={stats.customers}
+            shops={shops.length}
           />
         ) : null}
 
-        <UsersTable
-          users={visibleUsers}
-          isLoadingUsers={isLoadingUsers}
-          title={tableTitle}
-          emptyMessage={emptyMessage}
-        />
+        {activeSection === "users" ? (
+          <>
+            {creatableUserTypes.length > 0 ? (
+              <div id="add-user-form">
+                <AddUserForm
+                  form={form}
+                  isSubmitting={isSubmitting}
+                  error={error}
+                  userTypeOptions={creatableUserTypes}
+                  title={formTitle}
+                  submitLabel={submitLabel}
+                  onSubmit={handleCreateUser}
+                  onChange={setForm}
+                />
+              </div>
+            ) : error ? (
+              <div className="bg-white/5 rounded-xl border border-white/10 p-6 mb-8">
+                <p className="text-rose-400 text-sm">{error}</p>
+              </div>
+            ) : null}
+
+            <UsersTable
+              users={visibleUsers}
+              isLoadingUsers={isLoadingUsers}
+              title={tableTitle}
+              emptyMessage={emptyMessage}
+            />
+          </>
+        ) : null}
+
+        {activeSection === "restaurants" ? (
+          expectedRole === "OWNER" ? (
+            <ShopsForm
+              ownerShops={ownerShops}
+              allShopsCount={shops.length}
+              shopForm={shopForm}
+              setShopForm={setShopForm}
+              onSubmit={handleCreateShop}
+              isSubmittingShop={isSubmittingShop}
+              shopError={shopError}
+            />
+          ) : (
+            <RestaurantsSection shops={restaurantsForSection} />
+          )
+        ) : null}
       </main>
     </div>
   );

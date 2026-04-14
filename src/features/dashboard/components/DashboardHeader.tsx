@@ -4,12 +4,14 @@ type DashboardHeaderProps = {
   isLoggingOut: boolean;
   onLogout: () => void;
   userType: string | null;
+  onCreateUser?: () => void;
 };
 
 export default function DashboardHeader({
   isLoggingOut,
   onLogout,
-  userType,//
+  userType,
+  onCreateUser,
 }: DashboardHeaderProps) {
   return (
     <header className="flex justify-between items-center mb-10">
@@ -20,6 +22,15 @@ export default function DashboardHeader({
         </p>
       </div>
       <div className="flex items-center gap-4">
+        {onCreateUser ? (
+          <button
+            type="button"
+            onClick={onCreateUser}
+            className="px-4 py-2 text-sm rounded-lg bg-indigo-600 hover:bg-indigo-700 font-semibold"
+          >
+            Create User
+          </button>
+        ) : null}
         <button
           type="button"
           onClick={onLogout}
