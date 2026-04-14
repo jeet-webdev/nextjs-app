@@ -11,6 +11,7 @@ type ShopDelegate = {
       name: true;
       category: true;
       city: true;
+      slug: true;
       rating: true;
       createdById: true;
       createdAt: true;
@@ -23,6 +24,7 @@ type ShopDelegate = {
       name: string;
       category: string;
       city: string;
+      slug: string;
       rating: string;
       createdById: string;
       createdAt: Date;
@@ -33,6 +35,7 @@ type ShopDelegate = {
       name: string;
       category: string;
       city: string;
+      slug: string;
       rating: string;
       createdById: string;
     };
@@ -41,6 +44,7 @@ type ShopDelegate = {
       name: true;
       category: true;
       city: true;
+      slug: true;
       rating: true;
       createdById: true;
       createdAt: true;
@@ -50,6 +54,7 @@ type ShopDelegate = {
     name: string;
     category: string;
     city: string;
+    slug: string;
     rating: string;
     createdById: string;
     createdAt: Date;
@@ -96,7 +101,7 @@ export async function GET(request: Request) {
     return NextResponse.json(
       {
         error:
-          "Shop model is not ready. Restart dev server and run prisma generate if needed.",
+          "Restaurant model is not ready. Restart dev server and run prisma generate if needed.",
       },
       { status: 500 },
     );
@@ -120,6 +125,7 @@ export async function GET(request: Request) {
         name: true,
         category: true,
         city: true,
+        slug: true,
         rating: true,
         createdById: true,
         createdAt: true,
@@ -132,7 +138,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ shops });
   } catch {
-    return NextResponse.json({ error: "Unable to load shops." }, { status: 500 });
+    return NextResponse.json({ error: "Unable to load restaurants." }, { status: 500 });
   }
 }
 
@@ -144,7 +150,7 @@ export async function POST(request: Request) {
   }
 
   if (currentUser.userType !== "OWNER") {
-    return NextResponse.json({ error: "Only owner can create shops." }, { status: 403 });
+    return NextResponse.json({ error: "Only owner can create restaurants." }, { status: 403 });
   }
 
   const shopDelegate = getShopDelegate();
@@ -153,7 +159,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         error:
-          "Shop model is not ready. Restart dev server and run prisma generate if needed.",
+          "Restaurant model is not ready. Restart dev server and run prisma generate if needed.",
       },
       { status: 500 },
     );
@@ -164,6 +170,7 @@ export async function POST(request: Request) {
   const category = typeof body.category === "string" ? body.category.trim() : "";
   const city = typeof body.city === "string" ? body.city.trim() : "";
   const rating = typeof body.rating === "string" ? body.rating.trim() : "";
+  let slug = typeof body.slug === "string" ? body.slug.trim() : "";
 
   if (!name || !category || !city || !rating) {
     return NextResponse.json(
@@ -172,12 +179,29 @@ export async function POST(request: Request) {
     );
   }
 
+  // If slug not provided, generate from name
+  if (!slug) {
+    slug = name
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-");
+  } else {
+    // Validate and normalize provided slug
+    slug = slug
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-");
+  }
+
   try {
     const shop = await shopDelegate.create({
       data: {
         name,
         category,
         city,
+        slug,
         rating,
         createdById: currentUser.id,
       },
@@ -186,6 +210,7 @@ export async function POST(request: Request) {
         name: true,
         category: true,
         city: true,
+        slug: true,
         rating: true,
         createdById: true,
         createdAt: true,
@@ -194,6 +219,6 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ shop }, { status: 201 });
   } catch {
-    return NextResponse.json({ error: "Unable to create shop." }, { status: 500 });
+    return NextResponse.json({ error: "Unable to create restaurant." }, { status: 500 });
   }
 }

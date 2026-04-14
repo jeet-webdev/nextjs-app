@@ -251,14 +251,14 @@ export default function RoleDashboardPage({ expectedRole }: RoleDashboardPagePro
       })();
 
       if (!response.ok || !data.shop) {
-        setShopError(data.error ?? "Unable to create shop.");
+        setShopError(data.error ?? "Unable to create restaurant.");
         return;
       }
 
       setShops((prev) => [data.shop as ShopRecord, ...prev]);
       setShopForm(EMPTY_SHOP_FORM);
     } catch {
-      setShopError("Unable to create shop.");
+      setShopError("Unable to create restaurant.");
     } finally {
       setIsSubmittingShop(false);
     }

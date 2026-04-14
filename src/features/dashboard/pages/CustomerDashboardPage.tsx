@@ -66,7 +66,7 @@ export default function CustomerDashboardPage() {
         const data = (await response.json()) as { shops: ShopRecord[] };
         setShops(data.shops);
       } catch {
-        // Keep the page visible even when shops are unavailable.
+        // Keep the page visible even when restaurants are unavailable.
       }
     };
 
@@ -102,9 +102,9 @@ export default function CustomerDashboardPage() {
             </button>
           </div>
           <p className="text-sm uppercase tracking-[0.2em] text-sky-300">Customer Space</p>
-          <h1 className="mt-3 text-4xl font-black tracking-tight">Discover Shops</h1>
+          <h1 className="mt-3 text-4xl font-black tracking-tight">Discover Restaurants</h1>
           <p className="mt-3 max-w-2xl text-gray-300">
-            Explore curated shops and view live community size.
+            Explore curated restaurants and view live community size.
           </p>
 
           <div className="mt-8 inline-flex min-w-[220px] flex-col rounded-2xl border border-sky-300/30 bg-sky-400/10 px-6 py-4">
@@ -117,7 +117,7 @@ export default function CustomerDashboardPage() {
           {error && <p className="mt-4 text-sm text-rose-300">{error}</p>}
         </header>
 
-        <ShopGrid shops={shops} emptyMessage="No shops published yet." />
+        <ShopGrid shops={shops} emptyMessage="No restaurants published yet." />
       </main>
     </div>
   );

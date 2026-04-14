@@ -73,7 +73,7 @@ export default function CustomerSignupForm({ onSuccess }: CustomerSignupFormProp
           Create your account
         </h2>
         <p className="mt-2 text-sm text-gray-300">
-          Sign up as a customer to explore shops and manage your marketplace experience.
+          Sign up as a customer to explore restaurants and manage your marketplace experience.
         </p>
       </div>
 

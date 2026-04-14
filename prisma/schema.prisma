@@ -30,6 +30,7 @@ model Shop {
   name        String
   category    String
   city        String
+  slug        String @unique @default(uuid())
   rating      String
   createdById String
   createdBy   User     @relation(fields: [createdById], references: [id], onDelete: Cascade)

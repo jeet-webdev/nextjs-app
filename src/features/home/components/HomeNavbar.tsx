@@ -9,12 +9,12 @@ export default function HomeNavbar() {
       <div className="flex justify-between items-center p-5 max-w-7xl mx-auto w-full">
         <div className="text-xl font-bold flex items-center gap-2 group cursor-pointer">
           <div className="w-9 h-9 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl shadow-lg shadow-indigo-500/20 group-hover:scale-110 transition-transform" />
-          <span className="tracking-tight">ShopPlatform</span>
+          <span className="tracking-tight">RestaurantPlatform</span>
         </div>
 
         <div className="hidden md:flex gap-6 items-center text-sm font-medium text-gray-400">
           <a href="#" className="hover:text-white transition-colors">
-            Shops
+            Restaurants
           </a>
           <a href="#" className="hover:text-white transition-colors">
             Categories

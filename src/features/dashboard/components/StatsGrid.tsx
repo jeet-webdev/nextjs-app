@@ -24,7 +24,7 @@ export default function StatsGrid({
       <StatCard title="Admins" value={String(admins)} />
       <StatCard title="Owners" value={String(owners)} />
       <StatCard title="Customers" value={String(customers)} />
-      <StatCard title="Shops" value={String(shops)} />
+      <StatCard title="Restaurants" value={String(shops)} />
     </div>
   );
 }

@@ -7,17 +7,17 @@ export default function HomeFeatures() {
       <FeatureItem
         icon={<Shield size={26} />}
         title="Trusted Marketplace"
-        desc="Every listing is managed through role-based flows so shop data remains consistent."
+        desc="Every listing is managed through role-based flows so restaurant data remains consistent."
       />
       <FeatureItem
         icon={<Zap size={26} />}
         title="Fast Discovery"
-        desc="Customers can browse multiple shops, compare categories, and find what they need quickly."
+        desc="Customers can browse multiple restaurants, compare categories, and find what they need quickly."
       />
       <FeatureItem
         icon={<BarChart3 size={26} />}
         title="Scalable Growth"
-        desc="Owners publish shops while administrators maintain platform quality at scale."
+        desc="Owners publish restaurants while administrators maintain platform quality at scale."
       />
     </section>
   );

@@ -23,21 +23,21 @@ export default function ShopsForm({
   return (
     <>
       <div className="bg-white/5 rounded-xl border border-white/10 p-6 mb-8">
-        <h2 className="text-lg font-semibold mb-4">My Shops</h2>
+        <h2 className="text-lg font-semibold mb-4">My Restaurants</h2>
         <ShopGrid
           shops={ownerShops}
           compact
-          emptyMessage="You have not published any shops yet."
+          emptyMessage="You have not published any restaurants yet."
           className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"
         />
       </div>
 
       <div className="bg-white/5 rounded-xl border border-white/10 p-6 mb-8">
-        <h2 className="text-lg font-semibold mb-4">Create Shop For Customers</h2>
+        <h2 className="text-lg font-semibold mb-4">Create Restaurant For Customers</h2>
         <form className="grid grid-cols-1 md:grid-cols-2 gap-4" onSubmit={onSubmit}>
           <input
             className="p-3 bg-black/40 border border-white/10 rounded-lg"
-            placeholder="Shop Name"
+            placeholder="Restaurant Name"
             value={shopForm.name}
             onChange={(e) => setShopForm((prev) => ({ ...prev, name: e.target.value }))}
           />
@@ -55,6 +55,12 @@ export default function ShopsForm({
           />
           <input
             className="p-3 bg-black/40 border border-white/10 rounded-lg"
+            placeholder="Slug (URL-friendly name)"
+            value={shopForm.slug}
+            onChange={(e) => setShopForm((prev) => ({ ...prev, slug: e.target.value }))}
+          />
+          <input
+            className="p-3 bg-black/40 border border-white/10 rounded-lg"
             placeholder="Rating"
             value={shopForm.rating}
             onChange={(e) => setShopForm((prev) => ({ ...prev, rating: e.target.value }))}
@@ -64,13 +70,13 @@ export default function ShopsForm({
             disabled={isSubmittingShop}
             className="p-3 bg-sky-600 hover:bg-sky-700 rounded-lg font-semibold disabled:opacity-60"
           >
-            {isSubmittingShop ? "Publishing..." : "Publish Shop"}
+            {isSubmittingShop ? "Publishing..." : "Publish Restaurant"}
           </button>
         </form>
         {shopError && <p className="text-rose-400 text-sm mt-3">{shopError}</p>}
 
         <div className="mt-4 text-sm text-gray-300">
-          Live shops available to customers: <span className="font-semibold text-white">{allShopsCount}</span>
+          Live restaurants available to customers: <span className="font-semibold text-white">{allShopsCount}</span>
         </div>
       </div>
     </>

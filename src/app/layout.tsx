@@ -18,7 +18,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Multi-shop marketplace platform",
+  title: "Multi-restaurant marketplace platform",
 };
 
 export default function RootLayout({
