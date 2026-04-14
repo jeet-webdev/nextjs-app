@@ -16,6 +16,7 @@
 
 import type { Metadata } from "next";
 import "./globals.css";
+import ThemeToggle from "@/shared/components/ThemeToggle";
 
 export const metadata: Metadata = {
   title: "Multi-restaurant marketplace platform",
@@ -27,8 +28,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="en" className="dark" suppressHydrationWarning>
+      <body>
+        <ThemeToggle />
+        <div id="theme-root">{children}</div>
+      </body>
     </html>
   );
 }
