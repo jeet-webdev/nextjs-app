@@ -10,8 +10,8 @@ type SidebarProps = {
 
 export default function Sidebar({ activeSection, onSectionChange }: SidebarProps) {
   return (
-    <aside className="w-64 border-r border-white/5 p-6 space-y-8">
-      <div className="text-xl font-bold text-indigo-500 px-2">AdminOS</div>
+    <aside className="hidden lg:block w-64 border-r border-white/5 p-6 space-y-8">
+      <div className="text-xl font-bold text-indigo-500 px-2">RestroAdminOS</div>
       <nav className="space-y-2">
         <NavItem
           icon={<LayoutDashboard size={20} />}

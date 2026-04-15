@@ -39,42 +39,42 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="w-full max-w-md space-y-8">
+    <div className="w-full max-w-md space-y-6 sm:space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-white">Sign In</h1>
-        <p className="mt-2 text-gray-400">Enter your email and password</p>
+        <h1 className="text-2xl sm:text-3xl font-bold text-white">Sign In</h1>
+        <p className="mt-2 text-sm sm:text-base text-gray-400">Enter your email and password</p>
       </div>
 
-      <form onSubmit={handleLogin} className="space-y-6">
+      <form onSubmit={handleLogin} className="space-y-4 sm:space-y-6">
         <div>
-          <label className="block text-sm font-medium text-gray-300">
+          <label className="block text-xs sm:text-sm font-medium text-gray-300">
             Email Address
           </label>
           <input
             type="email"
-            className="w-full mt-2 p-3 bg-white/5 border border-white/10 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-white"
+            className="w-full mt-2 p-2 sm:p-3 bg-white/5 border border-white/10 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-white text-sm"
             placeholder="you@example.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-300">
+          <label className="block text-xs sm:text-sm font-medium text-gray-300">
             Password
           </label>
           <input
             type="password"
-            className="w-full mt-2 p-3 bg-white/5 border border-white/10 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-white"
+            className="w-full mt-2 p-2 sm:p-3 bg-white/5 border border-white/10 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-white text-sm"
             placeholder="••••••••"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
         </div>
-        {error && <p className="text-sm text-rose-400">{error}</p>}
+        {error && <p className="text-xs sm:text-sm text-rose-400">{error}</p>}
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold py-3 rounded-lg transition"
+          className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold py-2 sm:py-3 rounded-lg transition text-sm sm:text-base"
         >
           {isLoading ? "Signing in..." : "Log In"}
         </button>

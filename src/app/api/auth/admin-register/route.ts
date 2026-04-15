@@ -3,10 +3,10 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 
-import { JWT_COOKIE_NAME, verifyAuthToken, type AuthUserType } from "@/shared/lib/auth";
+import { JWT_COOKIE_NAME, verifyAuthToken } from "@/shared/lib/auth";
 import { prisma } from "@/shared/lib/prisma";
 
-const ADMIN_USER_TYPES = ["ADMIN", "ADMINISTRATION"] as const;
+const ADMIN_USER_TYPES = ["ADMIN"] as const;
 
 type AdminUserType = (typeof ADMIN_USER_TYPES)[number];
 
@@ -47,7 +47,7 @@ export async function POST(request: Request) {
 
     if (!isAdminUser) {
       return NextResponse.json(
-        { error: "You do not have permission to create administrator accounts." },
+        { error: "You do not have permission to create admin accounts." },
         { status: 403 },
       );
     }
@@ -105,6 +105,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Email already exists." }, { status: 409 });
     }
 
-    return NextResponse.json({ error: "Unable to create administrator account." }, { status: 500 });
+    return NextResponse.json({ error: "Unable to create admin account." }, { status: 500 });
   }
 }

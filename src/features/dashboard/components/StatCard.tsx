@@ -11,4 +11,3 @@ export default function StatCard({ title, value }: DashboardStatCardProps) {
     </div>
   );
 }
-//

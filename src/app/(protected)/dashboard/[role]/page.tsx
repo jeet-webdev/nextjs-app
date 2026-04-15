@@ -14,14 +14,6 @@ export default async function DashboardRolePage({ params }: DashboardRolePagePro
     return <RoleDashboardPage expectedRole="ADMIN" />;
   }
 
-  if (role === "administrator") {
-    return <RoleDashboardPage expectedRole="ADMINISTRATION" />;
-  }
-
-  if (role === "administration") {
-    return <RoleDashboardPage expectedRole="ADMINISTRATION" />;
-  }
-
   if (role === "owner") {
     return <RoleDashboardPage expectedRole="OWNER" />;
   }

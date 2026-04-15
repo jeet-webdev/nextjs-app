@@ -1,24 +1,25 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { type ShopRecord } from "@/features/shops/types";
-import ShopGrid from "@/features/shops/components/ShopGrid";
 
-export default function HomeShops() {
-  const [shops, setShops] = useState<ShopRecord[]>([]);
+import RestaurantGrid from "@/features/restaurants/components/RestaurantGrid";
+import { type RestaurantRecord } from "@/features/restaurants/types";
+
+export default function HomeRestaurants() {
+  const [restaurants, setRestaurants] = useState<RestaurantRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const loadShops = async () => {
+    const loadRestaurants = async () => {
       try {
-        const response = await fetch("/api/shops?public=true", { method: "GET" });
+        const response = await fetch("/api/restaurants?public=true", { method: "GET" });
 
         if (!response.ok) {
           return;
         }
 
-        const data = (await response.json()) as { shops: ShopRecord[] };
-        setShops(data.shops);
+        const data = (await response.json()) as { restaurants: RestaurantRecord[] };
+        setRestaurants(data.restaurants);
       } catch {
         // Keep home page usable even if restaurants API is unavailable.
       } finally {
@@ -26,17 +27,17 @@ export default function HomeShops() {
       }
     };
 
-    void loadShops();
+    void loadRestaurants();
   }, []);
 
   const categoriesCount = useMemo(
-    () => new Set(shops.map((shop) => shop.category.toLowerCase())).size,
-    [shops],
+    () => new Set(restaurants.map((restaurant) => restaurant.category.toLowerCase())).size,
+    [restaurants],
   );
 
   const citiesCount = useMemo(
-    () => new Set(shops.map((shop) => shop.city.toLowerCase())).size,
-    [shops],
+    () => new Set(restaurants.map((restaurant) => restaurant.city.toLowerCase())).size,
+    [restaurants],
   );
 
   return (
@@ -49,14 +50,14 @@ export default function HomeShops() {
           </h2>
         </div>
         <div className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2 text-sm text-gray-200">
-          Live restaurants: <span className="font-semibold text-white">{shops.length}</span>
+          Live restaurants: <span className="font-semibold text-white">{restaurants.length}</span>
         </div>
       </div>
 
-      <div className="mb-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4">
         <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
           <p className="text-xs uppercase tracking-[0.16em] text-gray-400">Active Restaurants</p>
-          <p className="mt-1 text-2xl font-black text-white">{shops.length}</p>
+          <p className="mt-1 text-2xl font-black text-white">{restaurants.length}</p>
         </div>
         <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
           <p className="text-xs uppercase tracking-[0.16em] text-gray-400">Categories</p>
@@ -72,11 +73,10 @@ export default function HomeShops() {
         </div>
       </div>
 
-      <ShopGrid
-        shops={shops}
+      <RestaurantGrid
+        restaurants={restaurants}
         emptyMessage={isLoading ? "Loading restaurants..." : "No restaurants published yet."}
       />
     </section>
   );
 }
-//

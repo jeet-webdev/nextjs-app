@@ -12,7 +12,6 @@ function matchesDashboardRole(pathname: string, role: string) {
 
 function getDashboardPathForRole(userType: string) {
   if (userType === "OWNER") return "/dashboard/owner";
-  if (userType === "ADMINISTRATION") return "/dashboard/administrator";
   if (userType === "ADMIN") return "/dashboard/admin";
   return "/dashboard/customer";
 }
@@ -27,11 +26,6 @@ export async function middleware(request: NextRequest) {
     // Not logged in → go to login
     if (!session) {
       return NextResponse.redirect(new URL("/login", request.url));
-    }
-
-    // Legacy alias
-    if (pathname === "/dashboard/administration") {
-      return NextResponse.redirect(new URL("/dashboard/administrator", request.url));
     }
 
     // CUSTOMER users can only access /dashboard/customer
@@ -50,14 +44,6 @@ export async function middleware(request: NextRequest) {
     // /dashboard/admin
     if (matchesDashboardRole(pathname, "admin")) {
       if (session.userType !== "ADMIN") {
-        return NextResponse.redirect(new URL(getDashboardPathForRole(session.userType), request.url));
-      }
-      return NextResponse.next();
-    }
-
-    // /dashboard/administrator
-    if (matchesDashboardRole(pathname, "administrator")) {
-      if (session.userType !== "ADMINISTRATION") {
         return NextResponse.redirect(new URL(getDashboardPathForRole(session.userType), request.url));
       }
       return NextResponse.next();

@@ -6,8 +6,8 @@ import { Prisma } from "@prisma/client";
 import { JWT_COOKIE_NAME, verifyAuthToken } from "@/shared/lib/auth";
 import { prisma } from "@/shared/lib/prisma";
 
-const ALLOWED_USER_TYPES = ["OWNER", "CUSTOMER", "ADMIN", "ADMINISTRATION"] as const;
-const DASHBOARD_USER_TYPES = ["ADMIN", "ADMINISTRATION", "OWNER"] as const;
+const ALLOWED_USER_TYPES = ["OWNER", "CUSTOMER", "ADMIN"] as const;
+const DASHBOARD_USER_TYPES = ["ADMIN", "OWNER"] as const;
 
 type AllowedUserType = (typeof ALLOWED_USER_TYPES)[number];
 type DashboardUserType = (typeof DASHBOARD_USER_TYPES)[number];
@@ -73,7 +73,7 @@ export async function POST(request: Request) {
   }
 
   const creatableUserTypes: AllowedUserType[] =
-    currentUser.userType === "ADMIN" || currentUser.userType === "ADMINISTRATION"
+    currentUser.userType === "ADMIN"
       ? [...ALLOWED_USER_TYPES]
       : currentUser.userType === "OWNER"
         ? ["CUSTOMER"]
@@ -114,8 +114,8 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           error:
-            currentUser.userType === "ADMIN" || currentUser.userType === "ADMINISTRATION"
-              ? "Admin and administrator can create any user type."
+            currentUser.userType === "ADMIN"
+              ? "Admin can create any user type."
               : "Owner can only create users.",
         },
         { status: 403 },

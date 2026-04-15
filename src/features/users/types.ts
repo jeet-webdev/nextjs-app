@@ -1,4 +1,4 @@
-export type UserType = "OWNER" | "CUSTOMER" | "ADMIN" | "ADMINISTRATION";
+export type UserType = "OWNER" | "CUSTOMER" | "ADMIN";
 
 export type UserRecord = {
   id: string;
@@ -28,11 +28,10 @@ export const USER_TYPE_OPTIONS: UserType[] = [
   "OWNER",
   "CUSTOMER",
   "ADMIN",
-  "ADMINISTRATION",
 ];
 
 export function getCreatableUserTypes(userType: UserType | null | undefined): UserType[] {
-  if (userType === "ADMIN" || userType === "ADMINISTRATION") {
+  if (userType === "ADMIN") {
     return [...USER_TYPE_OPTIONS];
   }
 
@@ -46,10 +45,6 @@ export function getCreatableUserTypes(userType: UserType | null | undefined): Us
 export function getDashboardPathForUserType(userType: UserType): string {
   if (userType === "ADMIN") {
     return "/dashboard/admin";
-  }
-
-  if (userType === "ADMINISTRATION") {
-    return "/dashboard/administrator";
   }
 
   if (userType === "OWNER") {

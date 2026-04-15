@@ -7,14 +7,12 @@ import CustomerSignupForm from "@/features/auth/components/CustomerSignupForm";
 
 export default function CustomerSignupModal() {
   const [isOpen, setIsOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
-  
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
+    if (typeof document === "undefined") {
+      return;
+    }
+
     if (isOpen) {
       document.body.style.overflow = "hidden";
     } else {
@@ -25,7 +23,7 @@ export default function CustomerSignupModal() {
     };
   }, [isOpen]);
 
-  const modal = mounted
+  const modal = typeof document !== "undefined"
     ? createPortal(
         <div
           className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"

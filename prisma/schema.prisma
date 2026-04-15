@@ -10,33 +10,121 @@ enum UserType {
   OWNER
   CUSTOMER
   ADMIN
-  ADMINISTRATION
+}
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
+
+enum RestaurantStatus{
+  OPEN
+  CLOSED
 }
 
 model User {
-  id        String   @id @default(cuid())
-  name      String   @default("")
-  email     String   @unique
-  password  String
-  phone     String   @default("")
-  userType  UserType @default(CUSTOMER)
-  shops     Shop[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  name        String   @default("")
+  email       String   @unique
+  password    String
+  phone       String   @default("")
+  userType    UserType @default(CUSTOMER)
+  
+ 
+  restaurants   Restaurant[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
-model Shop {
-  id          String   @id @default(cuid())
+model Restaurant {
+  id          String @id @default(cuid())
   name        String
   category    String
+  status      RestaurantStatus  @default(OPEN)
   city        String
   slug        String @unique @default(uuid())
-  rating      String
-  createdById String
-  createdBy   User     @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  Address     String
+  logo        String?
+  content     Json?
+  contactInfo Json?
+  seoTitle    String?
+  seoDescription String?
+
+  userId            String
+  user              User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  menuItems         MenuItem[]
+  tableBookings     TableBooking[] 
+    
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  @@index([createdById])
   @@index([createdAt])
+  @@unique([userId, slug])
+  @@index([slug])
+  @@index([userId])
+  @@map("restaurants")
+}
+
+
+
+model MenuItem {
+  id                String            @id @default(uuid())
+  restaurantId      String
+  restaurant        Restaurant        @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  
+  name              String
+  description       String?
+  price             Decimal           @db.Decimal(10,2)
+  discountedPrice   Decimal?          @db.Decimal(10,2)
+  currency          String            @default("USD")
+  
+  category          String
+  subCategory       String?
+  image             String?
+  
+  dietary           Json?           
+  isAvailable       Boolean           @default(true)
+  preparationTime   Int?
+  ingredients       String?
+  modifiers         Modifier[] @relation("MenuItemToModifier")
+  
+  order             Int               @default(0)
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  
+  @@index([restaurantId, category])
+  @@map("menu_items")
+}
+
+
+
+model Modifier{
+  id          String     @id @default(uuid())
+  name        String
+  price       Decimal    @default(0) @db.Decimal(10,2)
+  menuContent Json?
+  menuItems   MenuItem[] @relation("MenuItemToModifier")
+
+  @@map("modifiers")
+}
+
+model TableBooking{
+  id           String        @id @default(uuid())
+  restaurantId String
+  restaurant   Restaurant    @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  name         String
+  email        String?
+  phone        String?
+  date         String
+  time         String
+  guests       Int
+  message      String?
+  status       BookingStatus @default(PENDING)
+
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@index([restaurantId])
+  @@map("table_bookings")
 }

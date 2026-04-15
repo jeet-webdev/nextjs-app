@@ -14,17 +14,18 @@ function applyTheme(theme: Theme) {
 }
 
 export default function ThemeToggle() {
-  const [theme, setTheme] = useState<Theme>("dark");
-  const [mounted, setMounted] = useState(false);
+  const [theme, setTheme] = useState<Theme>(() => {
+    if (typeof window === "undefined") {
+      return "dark";
+    }
+
+    return window.localStorage.getItem(STORAGE_KEY) === "light" ? "light" : "dark";
+  });
 
   useEffect(() => {
-    const savedTheme = window.localStorage.getItem(STORAGE_KEY);
-    const initialTheme: Theme = savedTheme === "light" ? "light" : "dark";
-
-    setTheme(initialTheme);
-    applyTheme(initialTheme);
-    setMounted(true);
-  }, []);
+    applyTheme(theme);
+    window.localStorage.setItem(STORAGE_KEY, theme);
+  }, [theme]);
 
   const toggleTheme = () => {
     const nextTheme: Theme = theme === "dark" ? "light" : "dark";
@@ -39,7 +40,7 @@ export default function ThemeToggle() {
       aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
       className="fixed right-4 bottom-4 z-[100] rounded-full border border-white/25 bg-black/40 p-2.5 text-white shadow-lg backdrop-blur transition hover:scale-105 hover:bg-black/60"
     >
-      {mounted && theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+      {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
     </button>
   );
 }

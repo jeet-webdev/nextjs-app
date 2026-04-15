@@ -23,10 +23,10 @@ export default function AddUserForm({
   onChange,
 }: AddUserFormProps) {
   return (
-    <div className="bg-white/5 rounded-xl border border-white/10 p-6 mb-8">
-      <h2 className="text-lg font-semibold mb-4">{title}</h2>
+    <div className="bg-white/5 rounded-xl border border-white/10 p-4 sm:p-6 mb-8">
+      <h2 className="text-base sm:text-lg font-semibold mb-4">{title}</h2>
       <form
-        className="grid grid-cols-1 md:grid-cols-2 gap-4"
+        className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4"
         onSubmit={onSubmit}
       >
         <input
@@ -75,7 +75,7 @@ export default function AddUserForm({
         >
           {userTypeOptions.map((option) => (
             <option key={option} value={option}>
-              {option}
+              {option.toLowerCase()}
             </option>
           ))}
         </select>

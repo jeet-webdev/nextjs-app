@@ -17,8 +17,8 @@ export default function HomeFeatures() {
       <FeatureItem
         icon={<BarChart3 size={26} />}
         title="Scalable Growth"
-        desc="Owners publish restaurants while administrators maintain platform quality at scale."
+        desc="Owners publish restaurants while admins keep the platform organized as it grows."
       />
     </section>
   );
-}//
+}

@@ -2,7 +2,7 @@ import { SignJWT, jwtVerify, type JWTPayload } from "jose";
 
 export const JWT_COOKIE_NAME = "auth_token";
 
-const AUTH_USER_TYPES = ["OWNER", "CUSTOMER", "ADMIN", "ADMINISTRATION"] as const;
+const AUTH_USER_TYPES = ["OWNER", "CUSTOMER", "ADMIN"] as const;
 
 export type AuthUserType = (typeof AUTH_USER_TYPES)[number];
 
@@ -57,10 +57,6 @@ export async function verifyAuthToken(token: string): Promise<AuthTokenPayload |
 export function getDashboardPathForUserType(userType: AuthUserType) {
   if (userType === "OWNER") {
     return "/dashboard/owner";
-  }
-
-  if (userType === "ADMINISTRATION") {
-    return "/dashboard/administrator";
   }
 
   if (userType === "ADMIN") {

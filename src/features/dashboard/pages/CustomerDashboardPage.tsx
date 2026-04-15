@@ -3,12 +3,12 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import ShopGrid from "@/features/shops/components/ShopGrid";
-import { type ShopRecord } from "@/features/shops/types";
+import RestaurantGrid from "@/features/restaurants/components/RestaurantGrid";
+import { type RestaurantRecord } from "@/features/restaurants/types";
 
 export default function CustomerDashboardPage() {
   const [totalUsers, setTotalUsers] = useState<number | null>(null);
-  const [shops, setShops] = useState<ShopRecord[]>([]);
+  const [restaurants, setRestaurants] = useState<RestaurantRecord[]>([]);
   const [error, setError] = useState("");
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const router = useRouter();
@@ -45,9 +45,9 @@ export default function CustomerDashboardPage() {
   }, [router]);
 
   useEffect(() => {
-    const loadShops = async () => {
+    const loadRestaurants = async () => {
       try {
-        const response = await fetch("/api/shops", {
+        const response = await fetch("/api/restaurants", {
           method: "GET",
           credentials: "include",
           cache: "no-store",
@@ -63,14 +63,14 @@ export default function CustomerDashboardPage() {
           return;
         }
 
-        const data = (await response.json()) as { shops: ShopRecord[] };
-        setShops(data.shops);
+        const data = (await response.json()) as { restaurants: RestaurantRecord[] };
+        setRestaurants(data.restaurants);
       } catch {
         // Keep the page visible even when restaurants are unavailable.
       }
     };
 
-    void loadShops();
+    void loadRestaurants();
   }, [router]);
 
   const handleLogout = async () => {
@@ -79,7 +79,7 @@ export default function CustomerDashboardPage() {
     try {
       await fetch("/api/auth/logout", { method: "POST" });
     } finally {
-      router.push("/login");
+      router.push("/");
       router.refresh();
       setIsLoggingOut(false);
     }
@@ -89,35 +89,39 @@ export default function CustomerDashboardPage() {
     <div className="min-h-screen bg-[#06131f] text-white">
       <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_20%_15%,rgba(56,189,248,0.22),transparent_38%),radial-gradient(circle_at_80%_0%,rgba(14,116,144,0.24),transparent_34%),linear-gradient(180deg,#06131f_0%,#071a27_100%)]" />
 
-      <main className="mx-auto w-full max-w-7xl px-6 py-12">
-        <header className="mb-10 rounded-3xl border border-white/10 bg-white/[0.04] p-8">
+      <main className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        <header className="mb-10 rounded-2xl sm:rounded-3xl border border-white/10 bg-white/[0.04] p-4 sm:p-6 lg:p-8">
           <div className="mb-6 flex justify-end">
             <button
               type="button"
               onClick={handleLogout}
               disabled={isLoggingOut}
-              className="rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
+              className="rounded-xl border border-white/20 bg-white/5 px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold text-white transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isLoggingOut ? "Logging out..." : "Logout"}
             </button>
           </div>
-          <p className="text-sm uppercase tracking-[0.2em] text-sky-300">Customer Space</p>
-          <h1 className="mt-3 text-4xl font-black tracking-tight">Discover Restaurants</h1>
-          <p className="mt-3 max-w-2xl text-gray-300">
+          <p className="text-xs uppercase tracking-[0.2em] text-sky-300">Customer Space</p>
+          <h1 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight">Discover Restaurants</h1>
+          <p className="mt-3 max-w-2xl text-sm sm:text-base text-gray-300">
             Explore curated restaurants and view live community size.
           </p>
 
-          <div className="mt-8 inline-flex min-w-[220px] flex-col rounded-2xl border border-sky-300/30 bg-sky-400/10 px-6 py-4">
+          <div className="mt-8 inline-flex min-w-[200px] sm:min-w-[220px] flex-col rounded-2xl border border-sky-300/30 bg-sky-400/10 px-4 sm:px-6 py-3 sm:py-4">
             <span className="text-xs uppercase tracking-[0.2em] text-sky-200">Total Users</span>
-            <span className="mt-2 text-4xl font-black leading-none text-white">
+            <span className="mt-2 text-3xl sm:text-4xl font-black leading-none text-white">
               {totalUsers ?? "..."}
             </span>
           </div>
 
-          {error && <p className="mt-4 text-sm text-rose-300">{error}</p>}
+          {error && <p className="mt-4 text-xs sm:text-sm text-rose-300">{error}</p>}
         </header>
 
-        <ShopGrid shops={shops} emptyMessage="No restaurants published yet." />
+        <RestaurantGrid
+          restaurants={restaurants}
+          emptyMessage="No restaurants published yet."
+          className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+        />
       </main>
     </div>
   );

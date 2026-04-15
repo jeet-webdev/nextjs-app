@@ -6,50 +6,53 @@ import {
   getCreatableUserTypes,
   getDashboardPathForUserType,
   type CurrentUser,
-  type FormState,
   type UserRecord,
   type UserType,
 } from "@/features/users/types";
 import {
-  EMPTY_SHOP_FORM,
-  type ShopFormState,
-  type ShopRecord,
-} from "@/features/shops/types";
+  EMPTY_RESTAURANT_FORM,
+  type RestaurantRecord,
+  type RestaurantFormState,
+} from "@/features/restaurants/types";
 import Sidebar from "@/features/dashboard/components/Sidebar";
+import MobileNav from "@/features/dashboard/components/MobileNav";
 import DashboardHeader from "@/features/dashboard/components/DashboardHeader";
+import CreateUserModal from "@/features/home/components/CreateUserModal";
 import StatsGrid from "@/features/dashboard/components/StatsGrid";
-import AddUserForm from "@/features/dashboard/components/AddUserForm";
 import UsersTable from "@/features/dashboard/components/UsersTable";
-import ShopsForm from "@/features/dashboard/components/ShopsForm";
+import OwnerRestaurantsForm from "@/features/dashboard/components/OwnerRestaurantsForm";
 import RestaurantsSection from "@/features/dashboard/components/RestaurantsSection";
+import RestaurantsForm from "@/features/dashboard/components/RestaurantsForm";
+
+type RestaurantMutationResponse = {
+  error?: string;
+  restaurant?: RestaurantRecord;
+};
 
 type RoleDashboardPageProps = {
-  expectedRole: "ADMIN" | "ADMINISTRATION" | "OWNER";
+  expectedRole: "ADMIN" | "OWNER";
 };
 
 type DashboardSection = "overview" | "users" | "restaurants";
 
-const EMPTY_FORM: FormState = {
-  name: "",
-  email: "",
-  password: "",
-  phone: "",
-  userType: "CUSTOMER",
-};
-
 export default function RoleDashboardPage({ expectedRole }: RoleDashboardPageProps) {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isLoadingUsers, setIsLoadingUsers] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmittingShop, setIsSubmittingShop] = useState(false);
   const [error, setError] = useState("");
-  const [shopError, setShopError] = useState("");
+  const [restaurantError, setRestaurantError] = useState("");
   const [users, setUsers] = useState<UserRecord[]>([]);
-  const [shops, setShops] = useState<ShopRecord[]>([]);
+  const [restaurants, setRestaurants] = useState<RestaurantRecord[]>([]);
+  const [totalRestaurants, setTotalRestaurants] = useState(0);
+  const [ownedRestaurants, setOwnedRestaurants] = useState<number | null>(null);
   const [activeSection, setActiveSection] = useState<DashboardSection>("overview");
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
-  const [form, setForm] = useState<FormState>(EMPTY_FORM);
-  const [shopForm, setShopForm] = useState<ShopFormState>(EMPTY_SHOP_FORM);
+  const [restaurantForm, setRestaurantForm] = useState<RestaurantFormState>(
+    EMPTY_RESTAURANT_FORM,
+  );
+  const [isEditingRestaurant, setIsEditingRestaurant] = useState(false);
+  const [editingRestaurantId, setEditingRestaurantId] = useState<string | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const router = useRouter();
 
   const creatableUserTypes = useMemo(
@@ -59,12 +62,11 @@ export default function RoleDashboardPage({ expectedRole }: RoleDashboardPagePro
 
   const stats = useMemo(() => {
     const total = users.length;
-    const administrators = users.filter((user) => user.userType === "ADMINISTRATION").length;
     const admins = users.filter((user) => user.userType === "ADMIN").length;
     const owners = users.filter((user) => user.userType === "OWNER").length;
     const customers = users.filter((user) => user.userType === "CUSTOMER").length;
 
-    return { total, administrators, admins, owners, customers };
+    return { total, admins, owners, customers };
   }, [users]);
 
   const visibleUsers = useMemo(() => {
@@ -75,22 +77,10 @@ export default function RoleDashboardPage({ expectedRole }: RoleDashboardPagePro
     return users;
   }, [expectedRole, users]);
 
-  const ownerShops = useMemo(() => {
-    if (!currentUser || expectedRole !== "OWNER") {
-      return [];
-    }
-
-    return shops.filter((shop) => shop.createdById === currentUser.id);
-  }, [currentUser, expectedRole, shops]);
-
   const tableTitle = expectedRole === "OWNER" ? "Customers" : "All Users";
   const emptyMessage =
     expectedRole === "OWNER" ? "No customers yet." : "No users found.";
-  const formTitle = expectedRole === "OWNER" ? "Create Customer" : "Create User";
-  const submitLabel = expectedRole === "OWNER" ? "Create Customer" : "Create Account";
-  const adminCanCreateAnyUserType =
-    currentUser?.userType === "ADMIN" || currentUser?.userType === "ADMINISTRATION";
-  const restaurantsForSection = expectedRole === "OWNER" ? ownerShops : shops;
+  const restaurantsForSection = restaurants;
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -144,9 +134,9 @@ export default function RoleDashboardPage({ expectedRole }: RoleDashboardPagePro
   }, [expectedRole, router]);
 
   useEffect(() => {
-    const fetchShops = async () => {
+    const fetchRestaurants = async () => {
       try {
-        const response = await fetch("/api/shops", {
+        const response = await fetch("/api/restaurants", {
           method: "GET",
           credentials: "include",
           cache: "no-store",
@@ -156,36 +146,21 @@ export default function RoleDashboardPage({ expectedRole }: RoleDashboardPagePro
           return;
         }
 
-        const data = (await response.json()) as { shops: ShopRecord[] };
-        setShops(data.shops);
+        const data = (await response.json()) as {
+          restaurants: RestaurantRecord[];
+          totalRestaurants?: number;
+          ownedRestaurants?: number | null;
+        };
+        setRestaurants(data.restaurants);
+        setTotalRestaurants(data.totalRestaurants ?? data.restaurants.length);
+        setOwnedRestaurants(data.ownedRestaurants ?? null);
       } catch {
-        // Keep dashboard usable even if shops fail to load.
+        // Keep dashboard usable even if restaurants fail to load.
       }
     };
 
-    void fetchShops();
+    void fetchRestaurants();
   }, []);
-
-  useEffect(() => {
-    if (creatableUserTypes.length === 0) {
-      return;
-    }
-
-    setForm((prev) => {
-      const nextUserType = creatableUserTypes.includes(prev.userType)
-        ? prev.userType
-        : creatableUserTypes[0];
-
-      if (prev.userType === nextUserType) {
-        return prev;
-      }
-
-      return {
-        ...prev,
-        userType: nextUserType,
-      };
-    });
-  }, [creatableUserTypes]);
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
@@ -195,115 +170,192 @@ export default function RoleDashboardPage({ expectedRole }: RoleDashboardPagePro
         method: "POST",
       });
     } finally {
-      router.push("/login");
+      router.push("/");
       router.refresh();
       setIsLoggingOut(false);
     }
   };
 
-  const handleCreateUser = async (e: React.FormEvent) => {
+  const handleCreateRestaurant = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
-    setIsSubmitting(true);
-
-    try {
-      const response = await fetch("/api/users", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(form),
-      });
-
-      const data = (await response.json()) as { error?: string; user?: UserRecord };
-
-      if (!response.ok || !data.user) {
-        setError(data.error ?? "Unable to create user.");
-        return;
-      }
-
-      setUsers((prev) => [data.user as UserRecord, ...prev]);
-      setForm({
-        ...EMPTY_FORM,
-        userType: creatableUserTypes[0] ?? "CUSTOMER",
-      });
-    } catch {
-      setError("Unable to create user.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleCreateShop = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setShopError("");
+    setRestaurantError("");
     setIsSubmittingShop(true);
 
     try {
-      const response = await fetch("/api/shops", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        isEditingRestaurant && editingRestaurantId
+          ? `/api/restaurants/${editingRestaurantId}`
+          : "/api/restaurants",
+        {
+          method: isEditingRestaurant && editingRestaurantId ? "PATCH" : "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(restaurantForm),
         },
-        body: JSON.stringify(shopForm),
-      });
-
+      );
       const responseText = await response.text();
       const data = (() => {
         try {
-          return JSON.parse(responseText) as { error?: string; shop?: ShopRecord };
+          return JSON.parse(responseText) as RestaurantMutationResponse;
         } catch {
-          return {} as { error?: string; shop?: ShopRecord };
+          return {} as RestaurantMutationResponse;
         }
       })();
 
-      if (!response.ok || !data.shop) {
-        setShopError(data.error ?? "Unable to create restaurant.");
+      if (!response.ok || !data.restaurant) {
+        setRestaurantError(data.error ?? "Unable to create restaurant.");
         return;
       }
+      // update local list: replace if editing, otherwise prepend
+      setRestaurants((prev) => {
+        const next = [...prev];
+        if (isEditingRestaurant && editingRestaurantId) {
+          const idx = next.findIndex((s) => s.id === editingRestaurantId);
+          if (idx !== -1) {
+            next[idx] = data.restaurant as RestaurantRecord;
+            return next;
+          }
+        }
 
-      setShops((prev) => [data.shop as ShopRecord, ...prev]);
-      setShopForm(EMPTY_SHOP_FORM);
+        return [data.restaurant as RestaurantRecord, ...next];
+      });
+
+      setRestaurantForm(EMPTY_RESTAURANT_FORM);
+      setIsEditingRestaurant(false);
+      setEditingRestaurantId(null);
     } catch {
-      setShopError("Unable to create restaurant.");
+      setRestaurantError("Unable to create restaurant.");
     } finally {
       setIsSubmittingShop(false);
     }
   };
+const handleEditClick = (restaurant: RestaurantRecord) => {
+  // 1. Update the form state with the restaurant's data
+  setRestaurantForm({
+    name: restaurant.name ?? "",
+    category: restaurant.category ?? "",
+    city: restaurant.city ?? "",
+    slug: restaurant.slug ?? "",
+    address: restaurant.address ?? "",
+    contactInfo: {
+      phone: restaurant.contactInfo?.phone ?? "",
+      email: restaurant.contactInfo?.email ?? "",
+      openingHours: restaurant.contactInfo?.openingHours ?? "",
+      closingHours: restaurant.contactInfo?.closingHours ?? "",
+      website: restaurant.contactInfo?.website ?? "",
+    },
+    logo: restaurant.logo ?? "",
+    seoTitle: restaurant.seoTitle ?? "",
+    seoDescription: restaurant.seoDescription ?? "",
+  });
 
-  const handleTopCreateUserClick = () => {
-    setActiveSection("users");
+  // 2. Set the editing states (This must be inside the curly braces)
+  setIsEditingRestaurant(true);
+  setEditingRestaurantId(restaurant.id);
 
-    const formElement = document.getElementById("add-user-form");
-    formElement?.scrollIntoView({ behavior: "smooth", block: "start" });
+  // 3. Navigate the UI
+  setActiveSection("restaurants");
+
+  // 4. Smooth scroll to the form
+  setTimeout(() => {
+    const el = document.querySelector("form");
+    el?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, 100); 
+};
+  // const handleEditClick = (restaurant: RestaurantRecord) => {
+  //   setRestaurantForm({
+  //     name: restaurant.name ?? "",
+  //     category: restaurant.category ?? "",
+  //     city: restaurant.city ?? "",
+  //     slug: restaurant.slug ?? "",
+  //     address: restaurant.address ?? "",
+  //     logo: restaurant.logo ?? "",
+  //     seoTitle: restaurant.seoTitle ?? "",
+  //     seoDescription: restaurant.seoDescription ?? "",
+  //   });
+
+// const handleEditClick = (restaurant: RestaurantRecord) => {
+//   setRestaurantForm({
+//     name: restaurant.name ?? "",
+//     category: restaurant.category ?? "",
+//     city: restaurant.city ?? "",
+//     slug: restaurant.slug ?? "",
+//     address: restaurant.address ?? "",
+//     // Map the nested object here
+//     contactInfo: {
+//       phone: restaurant.contactInfo?.phone ?? "",
+//       email: restaurant.contactInfo?.email ?? "",
+//       openingHours: restaurant.contactInfo?.openingHours ?? "",
+//       closingHours: restaurant.contactInfo?.closingHours ?? "",
+//       website: restaurant.contactInfo?.website ?? "",
+//     },
+//     logo: restaurant.logo ?? "",
+//     seoTitle: restaurant.seoTitle ?? "",
+//     seoDescription: restaurant.seoDescription ?? "",
+//   });
+// };
+
+
+//     setIsEditingRestaurant(true);
+//     setEditingRestaurantId(restaurant.id);
+
+//     setActiveSection("restaurants");
+//     const el = document.querySelector("form");
+//     el?.scrollIntoView({ behavior: "smooth", block: "start" });
+//   };
+
+  const handleCancelEdit = () => {
+    setIsEditingRestaurant(false);
+    setEditingRestaurantId(null);
+    setRestaurantForm(EMPTY_RESTAURANT_FORM);
   };
 
+  const [createUserModalOpen, setCreateUserModalOpen] = useState(false);
+
   return (
-    <div className="flex min-h-screen bg-[#020205] text-gray-100">
+    <div className="flex flex-col lg:flex-row min-h-screen bg-[#020205] text-gray-100">
+      <MobileNav 
+        activeSection={activeSection} 
+        onSectionChange={setActiveSection}
+        isOpen={mobileMenuOpen}
+        onToggle={() => setMobileMenuOpen(!mobileMenuOpen)}
+      />
+
       <Sidebar activeSection={activeSection} onSectionChange={setActiveSection} />
 
-      <main className="flex-1 p-8 overflow-y-auto">
+      <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
         <DashboardHeader
           isLoggingOut={isLoggingOut}
           onLogout={handleLogout}
           userType={currentUser?.userType ?? null}
-          onCreateUser={adminCanCreateAnyUserType ? handleTopCreateUserClick : undefined}
+          onCreateUser={creatableUserTypes.length > 0 ? () => setCreateUserModalOpen(true) : undefined}
+          onToggleMobileMenu={() => setMobileMenuOpen(!mobileMenuOpen)}
+        />
+
+        <CreateUserModal
+          isOpen={createUserModalOpen}
+          setIsOpen={setCreateUserModalOpen}
+          showTrigger={false}
+          userTypeOptions={creatableUserTypes}
+          onCreated={(user) => setUsers((prev) => [user, ...prev])}
         />
 
         {activeSection === "overview" ? (
           <StatsGrid
             total={stats.total}
-            administrators={stats.administrators}
             admins={stats.admins}
             owners={stats.owners}
             customers={stats.customers}
-            shops={shops.length}
+            restaurants={expectedRole === "OWNER" ? totalRestaurants : restaurants.length}
+            ownedRestaurants={expectedRole === "OWNER" ? (ownedRestaurants ?? restaurants.length) : null}
+            isOwnerView={expectedRole === "OWNER"}
           />
         ) : null}
 
         {activeSection === "users" ? (
           <>
-            {creatableUserTypes.length > 0 ? (
+            {/* {creatableUserTypes.length > 0 ? (
               <div id="add-user-form">
                 <AddUserForm
                   form={form}
@@ -320,7 +372,7 @@ export default function RoleDashboardPage({ expectedRole }: RoleDashboardPagePro
               <div className="bg-white/5 rounded-xl border border-white/10 p-6 mb-8">
                 <p className="text-rose-400 text-sm">{error}</p>
               </div>
-            ) : null}
+            ) : null} */}
 
             <UsersTable
               users={visibleUsers}
@@ -328,22 +380,39 @@ export default function RoleDashboardPage({ expectedRole }: RoleDashboardPagePro
               title={tableTitle}
               emptyMessage={emptyMessage}
             />
+            {error ? <p className="mt-4 text-sm text-rose-400">{error}</p> : null}
           </>
         ) : null}
 
         {activeSection === "restaurants" ? (
           expectedRole === "OWNER" ? (
-            <ShopsForm
-              ownerShops={ownerShops}
-              allShopsCount={shops.length}
-              shopForm={shopForm}
-              setShopForm={setShopForm}
-              onSubmit={handleCreateShop}
-              isSubmittingShop={isSubmittingShop}
-              shopError={shopError}
+            <OwnerRestaurantsForm
+              restaurants={restaurantsForSection}
+              allRestaurantsCount={restaurants.length}
+              restaurantForm={restaurantForm}
+              setRestaurantForm={setRestaurantForm}
+              onSubmit={handleCreateRestaurant}
+              isSubmitting={isSubmittingShop}
+              error={restaurantError}
+              onEdit={handleEditClick}
+              isEditing={isEditingRestaurant}
+              onCancel={handleCancelEdit}
             />
           ) : (
-            <RestaurantsSection shops={restaurantsForSection} />
+            <>
+              <RestaurantsForm
+                onSubmit={handleCreateRestaurant}
+                form={restaurantForm}
+                setForm={setRestaurantForm}
+                isSubmitting={isSubmittingShop}
+                error={restaurantError}
+                allCount={restaurants.length}
+                // allCount={restaurants.length}
+                isEditing={isEditingRestaurant}
+                onCancel={handleCancelEdit}
+              />
+              <RestaurantsSection restaurants={restaurantsForSection} onEdit={handleEditClick} />
+            </>
           )
         ) : null}
       </main>

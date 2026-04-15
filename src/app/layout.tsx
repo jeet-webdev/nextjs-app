@@ -2,6 +2,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import ThemeToggle from "@/shared/components/ThemeToggle";
+// import ChatLauncher from "@/shared/components/ChatLauncher";
 
 export const metadata: Metadata = {
   title: "Multi-restaurant marketplace platform",
@@ -25,6 +26,7 @@ export default function RootLayout({
     <html lang="en" className="dark" suppressHydrationWarning>
       <body>
         <ThemeToggle />
+        {/* <ChatLauncher /> */}
         <div id="theme-root">{children}</div>
       </body>
     </html>

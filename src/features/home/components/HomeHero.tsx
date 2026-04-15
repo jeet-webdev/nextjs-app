@@ -3,7 +3,7 @@ import { ArrowRight } from "lucide-react";
 
 export default function HomeHero() {
   return (
-    <header className="relative mx-auto max-w-7xl gap-14 px-6 pb-24 pt-24  lg:items-center">
+    <header className="relative mx-auto max-w-7xl gap-14 px-6 pb-24 pt-15  lg:items-center">
       <div className="text-center ">
         <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-indigo-400 animate-fade-in">
           <span className="relative flex h-2 w-2">
@@ -13,12 +13,12 @@ export default function HomeHero() {
             Multi-restaurant marketplace is live
         </div>
 
-        <h1 className="mb-8 text-5xl font-black leading-[1.02] tracking-tighter text-transparent bg-gradient-to-b from-white to-gray-500 bg-clip-text md:text-7xl xl:text-8xl">
+        <h1 className="mb-8 text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black leading-[1.02] tracking-tighter text-transparent bg-gradient-to-b from-white to-gray-500 bg-clip-text">
           One Platform for
           <br />
           <span className="text-white">Every Restaurant.</span>
         </h1>
-<p className="mx-auto text-center mb-10 max-w-2xl text-lg leading-relaxed text-gray-400 md:text-xl">
+<p className="mx-auto text-center mb-10 max-w-2xl text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed text-gray-400">
   Discover trusted restaurants across categories, compare listings instantly, and create
   your customer account directly from the home page when you are new here.
 </p>

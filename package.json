@@ -12,8 +12,11 @@
     "prisma:studio": "prisma studio"
   },
   "dependencies": {
+    "@ai-sdk/groq": "^3.0.35",
+    "@ai-sdk/react": "^3.0.163",
     "@prisma/adapter-pg": "^7.7.0",
     "@prisma/client": "^7.7.0",
+    "ai": "^6.0.161",
     "bcryptjs": "^3.0.3",
     "jose": "^6.2.2",
     "lucide-react": "^1.8.0",
