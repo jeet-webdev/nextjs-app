@@ -7,11 +7,11 @@ export const metadata: Metadata = {
   title: "Multi-restaurant marketplace platform",
   icons: {
     icon: [
-      { url: "/icons8-food-bubbles-16.png", sizes: "16x16", type: "image/png" },
-      { url: "/icons8-food-bubbles-32.png", sizes: "32x32", type: "image/png" },
       { url: "/icons8-food-bubbles-96.png", sizes: "96x96", type: "image/png" },
+      { url: "/icons8-food-bubbles-96.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons8-food-bubbles-96.png", sizes: "any", type: "image/png" },
     ],
-    shortcut: "/icons8-food-bubbles-32.png",
+    shortcut: "/icons8-food-bubbles-96.png",
     apple: "/icons8-food-bubbles-96.png",
   },
 };
