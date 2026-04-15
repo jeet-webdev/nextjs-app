@@ -32,7 +32,6 @@ export default function ThemeToggle() {
     applyTheme(nextTheme);
     window.localStorage.setItem(STORAGE_KEY, nextTheme);
   };
-
   return (
     <button
       type="button"
