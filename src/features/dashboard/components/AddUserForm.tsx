@@ -11,7 +11,6 @@ type AddUserFormProps = {
   onSubmit: (e: React.FormEvent) => void;
   onChange: React.Dispatch<React.SetStateAction<FormState>>;
 };
-
 export default function AddUserForm({
   form,
   isSubmitting,

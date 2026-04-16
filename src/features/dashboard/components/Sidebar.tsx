@@ -1,7 +1,7 @@
-import { LayoutDashboard, Store, Users } from "lucide-react";
+import { LayoutDashboard, Store, Users, BeerIcon, LogsIcon, HousePlus  } from "lucide-react";
 import NavItem from "./NavItem";
 
-type DashboardSection = "overview" | "users" | "restaurants";
+type DashboardSection = "overview" | "users" | "restaurants" | "create-restaurant" | "menu-items" | "table-reservations";
 
 type SidebarProps = {
   activeSection: DashboardSection;
@@ -31,6 +31,25 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
           active={activeSection === "restaurants"}
           onClick={() => onSectionChange("restaurants")}
         />
+         <NavItem
+          icon={<BeerIcon size={20} />}
+          label="Table Reservations"
+          active={activeSection === "table-reservations"}
+          onClick={() => onSectionChange("table-reservations")}
+        />
+         <NavItem
+          icon={<LogsIcon size={20} />}
+          label="Menu Items"
+          active={activeSection === "menu-items"}
+          onClick={() => onSectionChange("menu-items")}
+        />
+        <NavItem
+          icon={<HousePlus size={20} />}
+          label="Create Restaurant"
+          active={activeSection === "create-restaurant"}
+          onClick={() => onSectionChange("create-restaurant")}
+        />
+        
       </nav>
     </aside>
   );

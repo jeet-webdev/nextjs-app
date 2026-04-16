@@ -3,7 +3,23 @@ import { NextResponse } from "next/server";
 
 import { JWT_COOKIE_NAME, verifyAuthToken } from "@/shared/lib/auth";
 import { prisma } from "@/shared/lib/prisma";
-import { ContactDetails } from "@/features/restaurants/types";
+import { type ContactDetails } from "@/features/restaurants/types";
+
+function mapContactInfo(contactInfo: unknown): ContactDetails | null {
+  if (!contactInfo || typeof contactInfo !== "object") {
+    return null;
+  }
+
+  const value = contactInfo as Partial<Record<keyof ContactDetails, unknown>>;
+
+  return {
+    phone: typeof value.phone === "string" ? value.phone : "",
+    email: typeof value.email === "string" ? value.email : "",
+    openingHours: typeof value.openingHours === "string" ? value.openingHours : "",
+    closingHours: typeof value.closingHours === "string" ? value.closingHours : "",
+    website: typeof value.website === "string" ? value.website : "",
+  };
+}
 
 function mapRestaurant(restaurant: {
   id: string;
@@ -28,7 +44,7 @@ function mapRestaurant(restaurant: {
     slug: restaurant.slug,
     address: restaurant.Address,
     logo: restaurant.logo,
-    contactInfo: restaurant.contactInfo,
+    contactInfo: mapContactInfo(restaurant.contactInfo),
 
     seoTitle: restaurant.seoTitle,
     seoDescription: restaurant.seoDescription,

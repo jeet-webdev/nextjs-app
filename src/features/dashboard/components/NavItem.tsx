@@ -20,4 +20,3 @@ export default function NavItem({ icon, label, active = false, onClick }: NavIte
     </button>
   );
 }
-//

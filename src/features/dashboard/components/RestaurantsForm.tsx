@@ -1,4 +1,5 @@
 import { type RestaurantFormState } from "@/features/restaurants/types";
+import { RestaurantStatus } from "@prisma/client";
 
 type RestaurantsFormProps = {
   onSubmit: (e: React.FormEvent) => void;
@@ -73,13 +74,7 @@ export default function RestaurantsForm({ onSubmit, form, setForm, isSubmitting,
           value={form.seoDescription}
           onChange={(e) => setForm((prev) => ({ ...prev, seoDescription: e.target.value }))}
         />
-         {/* <input
-          className="p-3 bg-black/40 border border-white/10 rounded-lg"
-          placeholder="Contact Info"
-          required
-         value={form.contactInfo ?? ""} 
-         onChange={(e) => setForm((prev) => ({ ...prev, contactInfo: e.target.value }))}
-          /> */}
+          {/* Contact Info Fields */}
           <input
   className="p-3 bg-black/40 border border-white/10 rounded-lg"
   placeholder="Phone Number"
@@ -128,7 +123,22 @@ export default function RestaurantsForm({ onSubmit, form, setForm, isSubmitting,
     }))
   }
 />
-
+<div className="flex gap-3 col-span-1 sm:col-span-2">
+  <label className="flex items-center gap-2 cursor-pointer text-sm font-medium text-white">
+    <input
+      type="checkbox"
+      checked={form.status === "OPEN"} 
+      onChange={(e) =>
+        setForm((prev) => ({
+          ...prev,
+          status: e.target.checked ? "OPEN" : "CLOSED",
+        }))
+      }
+      className="h-4 w-4 rounded border-white/10 bg-white/5 text-sky-500 focus:ring-sky-500"
+    />
+    <span>Open Now</span>
+  </label>
+</div>
         <div className="flex gap-3 col-span-1 sm:col-span-2">
           <button
             type="submit"

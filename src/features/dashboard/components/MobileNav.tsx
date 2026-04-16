@@ -5,7 +5,7 @@ import { useState } from "react";
 import NavItem from "./NavItem";
 import { LayoutDashboard, Store, Users } from "lucide-react";
 
-type DashboardSection = "overview" | "users" | "restaurants";
+type DashboardSection = "overview" | "users" | "restaurants" | "create-restaurant" | "menu-items" | "table-reservations";
 
 type MobileNavProps = {
   activeSection: DashboardSection;
@@ -75,6 +75,12 @@ export default function MobileNav({ activeSection, onSectionChange, isOpen: exte
             label="Restaurants"
             active={activeSection === "restaurants"}
             onClick={() => handleSectionChange("restaurants")}
+          />
+           <NavItem
+            icon={<Store size={20} />}
+            label="Create Restaurant"
+            active={activeSection === "create-restaurant"}
+            onClick={() => handleSectionChange("create-restaurant")}
           />
         </nav>
       </aside>

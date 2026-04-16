@@ -65,7 +65,7 @@ export type RestaurantRecord = {
   id: string;
   name: string;
   category: string;
-  contactInfo?:   any; 
+  contactInfo?: ContactDetails | null;
   city: string;
   slug: string;
   address?: string | null;
@@ -83,6 +83,7 @@ export type RestaurantFormState = {
   contactInfo: ContactDetails; // Use the interface here
   city: string;
   slug: string;
+  status?: "OPEN" | "CLOSED";
   address: string;
   logo: string;
   seoTitle: string;
@@ -92,9 +93,9 @@ export type RestaurantFormState = {
 export const EMPTY_RESTAURANT_FORM: RestaurantFormState = {
   name: "",
   category: "",
-  // contactInfo: null,
   city: "",
   slug: "",
+  status: "OPEN",
   address: "",
   logo: "",
   seoTitle: "",

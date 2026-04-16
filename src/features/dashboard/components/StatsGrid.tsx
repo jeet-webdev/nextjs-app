@@ -48,12 +48,12 @@ export default function StatsGrid({
         <StatCard title="Customers" value={String(customers)} />
         {isOwnerView ? (
           <>
-            <StatCard title="Total Restaurants" value={String(restaurants)} />
+            <StatCard title="All Restaurants" value={String(restaurants)} />
             <StatCard title="My Restaurants" value={String(ownedRestaurants ?? 0)} />
           </>
         ) : (
           <>
-             <StatCard title="Restaurants" value={String(restaurants)} />
+             <StatCard title="All Restaurants" value={String(restaurants)} />
              <StatCard title="My Restaurants" value={String(ownedRestaurants ?? 0)} />
           </>
         )}

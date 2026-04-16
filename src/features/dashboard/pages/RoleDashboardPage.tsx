@@ -20,9 +20,10 @@ import DashboardHeader from "@/features/dashboard/components/DashboardHeader";
 import CreateUserModal from "@/features/home/components/CreateUserModal";
 import StatsGrid from "@/features/dashboard/components/StatsGrid";
 import UsersTable from "@/features/dashboard/components/UsersTable";
-import OwnerRestaurantsForm from "@/features/dashboard/components/OwnerRestaurantsForm";
 import RestaurantsSection from "@/features/dashboard/components/RestaurantsSection";
+import MenuSection from "@/features/dashboard/components/MenuSection";
 import RestaurantsForm from "@/features/dashboard/components/RestaurantsForm";
+import { type MenuRecord } from "@/features/menu/types/menuTypes";
 
 type RestaurantMutationResponse = {
   error?: string;
@@ -33,7 +34,7 @@ type RoleDashboardPageProps = {
   expectedRole: "ADMIN" | "OWNER";
 };
 
-type DashboardSection = "overview" | "users" | "restaurants";
+type DashboardSection = "overview" | "users" | "restaurants" | "create-restaurant" | "menu-items" | "table-reservations";
 
 export default function RoleDashboardPage({ expectedRole }: RoleDashboardPageProps) {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -50,6 +51,9 @@ export default function RoleDashboardPage({ expectedRole }: RoleDashboardPagePro
   const [restaurantForm, setRestaurantForm] = useState<RestaurantFormState>(
     EMPTY_RESTAURANT_FORM,
   );
+  // Inside RoleDashboardPage component
+const [menuItems, setMenuItems] = useState<MenuRecord[]>([]);
+const [isLoadingMenu, setIsLoadingMenu] = useState(false);
   const [isEditingRestaurant, setIsEditingRestaurant] = useState(false);
   const [editingRestaurantId, setEditingRestaurantId] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -133,6 +137,35 @@ export default function RoleDashboardPage({ expectedRole }: RoleDashboardPagePro
     void fetchUsers();
   }, [expectedRole, router]);
 
+
+useEffect(() => {
+  // Only fetch if we are in the menu-items section
+  if (activeSection !== "menu-items") return;
+
+  const fetchMenu = async () => {
+    setIsLoadingMenu(true);
+    try {
+      const response = await fetch("/api/menu?public=true", {
+        method: "GET",
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setMenuItems(data.menuItems || []);
+      }
+    } catch (err) {
+      console.error("Failed to fetch menu:", err);
+    } finally {
+      setIsLoadingMenu(false);
+    }
+  };
+
+  void fetchMenu();
+}, [activeSection]);
+
+
+
   useEffect(() => {
     const fetchRestaurants = async () => {
       try {
@@ -155,7 +188,7 @@ export default function RoleDashboardPage({ expectedRole }: RoleDashboardPagePro
         setTotalRestaurants(data.totalRestaurants ?? data.restaurants.length);
         setOwnedRestaurants(data.ownedRestaurants ?? null);
       } catch {
-        // Keep dashboard usable even if restaurants fail to load.
+       
       }
     };
 
@@ -207,7 +240,7 @@ export default function RoleDashboardPage({ expectedRole }: RoleDashboardPagePro
         setRestaurantError(data.error ?? "Unable to create restaurant.");
         return;
       }
-      // update local list: replace if editing, otherwise prepend
+      
       setRestaurants((prev) => {
         const next = [...prev];
         if (isEditingRestaurant && editingRestaurantId) {
@@ -230,8 +263,7 @@ export default function RoleDashboardPage({ expectedRole }: RoleDashboardPagePro
       setIsSubmittingShop(false);
     }
   };
-const handleEditClick = (restaurant: RestaurantRecord) => {
-  // 1. Update the form state with the restaurant's data
+  const handleEditClick = (restaurant: RestaurantRecord) => {
   setRestaurantForm({
     name: restaurant.name ?? "",
     category: restaurant.category ?? "",
@@ -250,60 +282,16 @@ const handleEditClick = (restaurant: RestaurantRecord) => {
     seoDescription: restaurant.seoDescription ?? "",
   });
 
-  // 2. Set the editing states (This must be inside the curly braces)
   setIsEditingRestaurant(true);
   setEditingRestaurantId(restaurant.id);
 
-  // 3. Navigate the UI
-  setActiveSection("restaurants");
+  setActiveSection("create-restaurant");
 
-  // 4. Smooth scroll to the form
   setTimeout(() => {
     const el = document.querySelector("form");
     el?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }, 100); 
-};
-  // const handleEditClick = (restaurant: RestaurantRecord) => {
-  //   setRestaurantForm({
-  //     name: restaurant.name ?? "",
-  //     category: restaurant.category ?? "",
-  //     city: restaurant.city ?? "",
-  //     slug: restaurant.slug ?? "",
-  //     address: restaurant.address ?? "",
-  //     logo: restaurant.logo ?? "",
-  //     seoTitle: restaurant.seoTitle ?? "",
-  //     seoDescription: restaurant.seoDescription ?? "",
-  //   });
-
-// const handleEditClick = (restaurant: RestaurantRecord) => {
-//   setRestaurantForm({
-//     name: restaurant.name ?? "",
-//     category: restaurant.category ?? "",
-//     city: restaurant.city ?? "",
-//     slug: restaurant.slug ?? "",
-//     address: restaurant.address ?? "",
-//     // Map the nested object here
-//     contactInfo: {
-//       phone: restaurant.contactInfo?.phone ?? "",
-//       email: restaurant.contactInfo?.email ?? "",
-//       openingHours: restaurant.contactInfo?.openingHours ?? "",
-//       closingHours: restaurant.contactInfo?.closingHours ?? "",
-//       website: restaurant.contactInfo?.website ?? "",
-//     },
-//     logo: restaurant.logo ?? "",
-//     seoTitle: restaurant.seoTitle ?? "",
-//     seoDescription: restaurant.seoDescription ?? "",
-//   });
-// };
-
-
-//     setIsEditingRestaurant(true);
-//     setEditingRestaurantId(restaurant.id);
-
-//     setActiveSection("restaurants");
-//     const el = document.querySelector("form");
-//     el?.scrollIntoView({ behavior: "smooth", block: "start" });
-//   };
+  }, 100);
+  };
 
   const handleCancelEdit = () => {
     setIsEditingRestaurant(false);
@@ -329,7 +317,23 @@ const handleEditClick = (restaurant: RestaurantRecord) => {
           isLoggingOut={isLoggingOut}
           onLogout={handleLogout}
           userType={currentUser?.userType ?? null}
+          user={currentUser ? { name: currentUser.name } : null}
           onCreateUser={creatableUserTypes.length > 0 ? () => setCreateUserModalOpen(true) : undefined}
+          onCreateRestaurant={currentUser && (currentUser.userType === "ADMIN" || currentUser.userType === "OWNER") ? () => {
+            setRestaurantForm(EMPTY_RESTAURANT_FORM);
+            setRestaurantError("");
+            setIsEditingRestaurant(false);
+            setEditingRestaurantId(null);
+            setActiveSection("create-restaurant");
+          } : undefined}
+          onCreateTableReservation={currentUser && (currentUser.userType === "ADMIN" || currentUser.userType === "OWNER") ? () => {
+            setActiveSection("table-reservations");
+          } : undefined}
+          onCreateMenuItem={currentUser && (currentUser.userType === "ADMIN" || currentUser.userType === "OWNER") ? () => {
+            setActiveSection("menu-items");
+          } : undefined}
+
+
           onToggleMobileMenu={() => setMobileMenuOpen(!mobileMenuOpen)}
         />
 
@@ -385,35 +389,26 @@ const handleEditClick = (restaurant: RestaurantRecord) => {
         ) : null}
 
         {activeSection === "restaurants" ? (
-          expectedRole === "OWNER" ? (
-            <OwnerRestaurantsForm
-              restaurants={restaurantsForSection}
-              allRestaurantsCount={restaurants.length}
-              restaurantForm={restaurantForm}
-              setRestaurantForm={setRestaurantForm}
-              onSubmit={handleCreateRestaurant}
-              isSubmitting={isSubmittingShop}
-              error={restaurantError}
-              onEdit={handleEditClick}
-              isEditing={isEditingRestaurant}
-              onCancel={handleCancelEdit}
-            />
-          ) : (
-            <>
-              <RestaurantsForm
-                onSubmit={handleCreateRestaurant}
-                form={restaurantForm}
-                setForm={setRestaurantForm}
-                isSubmitting={isSubmittingShop}
-                error={restaurantError}
-                allCount={restaurants.length}
-                // allCount={restaurants.length}
-                isEditing={isEditingRestaurant}
-                onCancel={handleCancelEdit}
-              />
-              <RestaurantsSection restaurants={restaurantsForSection} onEdit={handleEditClick} />
-            </>
-          )
+          <RestaurantsSection restaurants={restaurantsForSection} onEdit={handleEditClick} />
+        ) : null}
+
+       {activeSection === "menu-items" ? (
+  <MenuSection 
+    menuItems={menuItems} 
+  />
+) : null}
+
+        {activeSection === "create-restaurant" ? (
+          <RestaurantsForm
+            onSubmit={handleCreateRestaurant}
+            form={restaurantForm}
+            setForm={setRestaurantForm}
+            isSubmitting={isSubmittingShop}
+            error={restaurantError}
+            allCount={expectedRole === "OWNER" ? totalRestaurants : restaurants.length}
+            isEditing={isEditingRestaurant}
+            onCancel={handleCancelEdit}
+          />
         ) : null}
       </main>
     </div>

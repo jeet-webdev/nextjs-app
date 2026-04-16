@@ -4,6 +4,8 @@ import HomeStats from "@/features/home/components/HomeStats";
 import HomeFeatures from "@/features/home/components/HomeFeatures";
 import HomeRestaurants from "@/features/home/components/HomeRestaurants";
 import HomeFooter from "@/features/home/components/HomeFooter";
+import MenuCard from "@/features/menu/component/MenuCard";
+import HomeMenu from "@/features/home/components/HomeMenu";
 
 export default function Home() {
   return (
@@ -15,8 +17,9 @@ export default function Home() {
       <HomeHero />
       <HomeRestaurants />
       <HomeStats />
+      <HomeMenu />
       <HomeFeatures />
       <HomeFooter />
     </div>
   );
-}//
+}

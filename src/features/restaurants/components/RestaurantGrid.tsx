@@ -16,6 +16,9 @@ export default function RestaurantGrid({
   className = "grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3",
   onEdit,
 }: RestaurantGridProps) {
+
+
+  console.log("RestaurantGrid received restaurants:", restaurants);
   if (restaurants.length === 0) {
     return (
       <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 text-gray-300">

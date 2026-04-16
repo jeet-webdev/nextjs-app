@@ -1,6 +1,23 @@
 import { NextResponse } from "next/server";
 
+import { type ContactDetails } from "@/features/restaurants/types";
 import { prisma } from "@/shared/lib/prisma";
+
+function mapContactInfo(contactInfo: unknown): ContactDetails | null {
+  if (!contactInfo || typeof contactInfo !== "object") {
+    return null;
+  }
+
+  const value = contactInfo as Partial<Record<keyof ContactDetails, unknown>>;
+
+  return {
+    phone: typeof value.phone === "string" ? value.phone : "",
+    email: typeof value.email === "string" ? value.email : "",
+    openingHours: typeof value.openingHours === "string" ? value.openingHours : "",
+    closingHours: typeof value.closingHours === "string" ? value.closingHours : "",
+    website: typeof value.website === "string" ? value.website : "",
+  };
+}
 
 export async function GET(
   _request: Request,
@@ -23,6 +40,7 @@ export async function GET(
         slug: true,
         Address: true,
         logo: true,
+        contactInfo: true,
         seoTitle: true,
         seoDescription: true,
         status: true,
@@ -44,6 +62,7 @@ export async function GET(
         slug: restaurant.slug,
         address: restaurant.Address,
         logo: restaurant.logo,
+        contactInfo: mapContactInfo(restaurant.contactInfo),
         seoTitle: restaurant.seoTitle,
         seoDescription: restaurant.seoDescription,
         status: restaurant.status,
