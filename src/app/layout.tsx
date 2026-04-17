@@ -1,4 +1,4 @@
-
+import { ToastContainer, toast } from "react-toastify";
 import type { Metadata } from "next";
 import "./globals.css";
 import ThemeToggle from "@/shared/components/ThemeToggle";
@@ -28,6 +28,7 @@ export default function RootLayout({
         <ThemeToggle />
         {/* <ChatLauncher /> */}
         <div id="theme-root">{children}</div>
+        <ToastContainer />
       </body>
     </html>
   );

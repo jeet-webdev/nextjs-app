@@ -21,7 +21,7 @@ export default function CreateUserModal({
   showTrigger = true,
   userTypeOptions,
   onCreated,
-}: CreateUserModalProps) {  //CustomerSignupModal() {
+}: CreateUserModalProps) {  
   const [internalOpen, setInternalOpen] = useState(false);
   const isControlled = typeof externalIsOpen === "boolean" && typeof externalSetIsOpen === "function";
   const isOpen = isControlled ? externalIsOpen! : internalOpen;
@@ -50,7 +50,7 @@ export default function CreateUserModal({
             if (e.target === e.currentTarget) setIsOpen(false);
           }}
         >
-          <div className="relative w-full max-w-xl rounded-[2rem] border border-white/10 bg-[#0a0a0a] p-6 shadow-2xl md:p-8">
+          <div className="relative w-full max-w-xl rounded-[2rem] border border-white/90 bg-[#0a0a0a] p-6 shadow-2xl md:p-8">
             <button
               onClick={() => setIsOpen(false)}
               className="absolute right-5 top-5 rounded-full p-2 text-gray-400 hover:bg-white/10 hover:text-white transition"

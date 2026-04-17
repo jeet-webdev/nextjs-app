@@ -87,7 +87,7 @@ export default function CustomerSignupForm({ onSuccess }: CustomerSignupFormProp
               value={form.name}
               onChange={(event) => handleChange("name", event.target.value)}
               placeholder="Customer name"
-              className="mt-2 w-full rounded-2xl border border-white/10 bg-black/30 px-3 sm:px-4 py-2 sm:py-3 text-sm text-white outline-none transition focus:border-emerald-400/50 focus:ring-2 focus:ring-emerald-400/30"
+              className="mt-2 w-full rounded-2xl border border-white/90 bg-black/30 px-3 sm:px-4 py-2 sm:py-3 text-sm text-white outline-none transition focus:border-emerald-400/50 focus:ring-2 focus:ring-emerald-400/30"
             />
           </label>
 
@@ -97,7 +97,7 @@ export default function CustomerSignupForm({ onSuccess }: CustomerSignupFormProp
               type="tel"
               value={form.phone}
               onChange={(event) => handleChange("phone", event.target.value)}
-              placeholder="Optional phone"
+              placeholder="Phone"
               className="mt-2 w-full rounded-2xl border border-white/10 bg-black/30 px-3 sm:px-4 py-2 sm:py-3 text-sm text-white outline-none transition focus:border-emerald-400/50 focus:ring-2 focus:ring-emerald-400/30"
             />
           </label>

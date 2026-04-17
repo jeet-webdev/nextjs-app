@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
   getCreatableUserTypes,
@@ -51,7 +51,8 @@ export default function RoleDashboardPage({ expectedRole }: RoleDashboardPagePro
   const [restaurantForm, setRestaurantForm] = useState<RestaurantFormState>(
     EMPTY_RESTAURANT_FORM,
   );
-  // Inside RoleDashboardPage component
+   const [isLoading, setIsLoading] = useState(true);
+ 
 const [menuItems, setMenuItems] = useState<MenuRecord[]>([]);
 const [isLoadingMenu, setIsLoadingMenu] = useState(false);
   const [isEditingRestaurant, setIsEditingRestaurant] = useState(false);
@@ -136,8 +137,7 @@ const [isLoadingMenu, setIsLoadingMenu] = useState(false);
 
     void fetchUsers();
   }, [expectedRole, router]);
-
-
+  
 useEffect(() => {
   // Only fetch if we are in the menu-items section
   if (activeSection !== "menu-items") return;
@@ -163,8 +163,23 @@ useEffect(() => {
 
   void fetchMenu();
 }, [activeSection]);
+const fetchUsers = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/users"); // This hits your GET api
+      if (!res.ok) throw new Error("Failed to fetch");
+      const data = await res.json();
+      
+      // Based on your GET API response structure: { currentUser, users }
+      setUsers(data.users);
+    } catch (error) {
+      console.error("Fetch error:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
-
+useEffect(() => { fetchUsers(); }, [fetchUsers]);
 
   useEffect(() => {
     const fetchRestaurants = async () => {
@@ -317,7 +332,7 @@ useEffect(() => {
           isLoggingOut={isLoggingOut}
           onLogout={handleLogout}
           userType={currentUser?.userType ?? null}
-          user={currentUser ? { name: currentUser.name } : null}
+          user={currentUser ? { name: currentUser.name, email: currentUser.email } : null}
           onCreateUser={creatableUserTypes.length > 0 ? () => setCreateUserModalOpen(true) : undefined}
           onCreateRestaurant={currentUser && (currentUser.userType === "ADMIN" || currentUser.userType === "OWNER") ? () => {
             setRestaurantForm(EMPTY_RESTAURANT_FORM);
@@ -329,9 +344,9 @@ useEffect(() => {
           onCreateTableReservation={currentUser && (currentUser.userType === "ADMIN" || currentUser.userType === "OWNER") ? () => {
             setActiveSection("table-reservations");
           } : undefined}
-          onCreateMenuItem={currentUser && (currentUser.userType === "ADMIN" || currentUser.userType === "OWNER") ? () => {
-            setActiveSection("menu-items");
-          } : undefined}
+          // allMenuItem={currentUser && (currentUser.userType === "ADMIN" || currentUser.userType === "OWNER") ? () => {
+          //   setActiveSection("menu-items");
+          // } : undefined}
 
 
           onToggleMobileMenu={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -383,7 +398,8 @@ useEffect(() => {
               isLoadingUsers={isLoadingUsers}
               title={tableTitle}
               emptyMessage={emptyMessage}
-            />
+              onRefresh={fetchUsers}
+              />
             {error ? <p className="mt-4 text-sm text-rose-400">{error}</p> : null}
           </>
         ) : null}

@@ -8,7 +8,14 @@ export type UserRecord = {
   userType: UserType;
   createdAt: string;
 };
-
+export const INITIAL_FORM = {
+  name: "",
+  email: "",
+  phone: "",
+  password: "",
+  confirmPassword: "",
+  userType: "CUSTOMER" as UserType, 
+};
 export type CurrentUser = {
   id: string;
   name: string;
@@ -41,7 +48,7 @@ export function getCreatableUserTypes(userType: UserType | null | undefined): Us
 
   return [];
 }
-//
+
 export function getDashboardPathForUserType(userType: UserType): string {
   if (userType === "ADMIN") {
     return "/dashboard/admin";

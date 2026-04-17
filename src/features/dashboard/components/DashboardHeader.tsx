@@ -1,11 +1,12 @@
 "use client";
 
 import { Menu } from "lucide-react";
+import CornerProfile from "./CornerProfile";
 
 type DashboardHeaderProps = {
   isLoggingOut: boolean;
   onLogout: () => void;
-  user: { name: string } | null;
+  user: { name: string, email?: string } | null;
   userType: string | null;
     onCreateMenuItem?: () => void; //create Menu Item button only for owners and admins
   onCreateUser?: () => void;
@@ -42,7 +43,10 @@ export default function DashboardHeader({
           <p className="text-xs sm:text-sm text-gray-400 mt-1">
             Signed in as {userType}
           </p>
-          <p className="text-xs sm:text-sm text-gray-400 mt-1">Hello, {user?.name}</p>
+          {/* <p className="text-xs sm:text-sm text-gray-400 mt-1">Hello, {user?.name}</p>
+          {user?.email && (
+            <p className="text-xs sm:text-sm text-gray-400 mt-1">Email: {user.email}</p>
+          )} */}
         </div>
       </div>
       <div className="flex items-center gap-2 sm:gap-4 w-full sm:w-auto flex-wrap">
@@ -68,7 +72,7 @@ export default function DashboardHeader({
           <button
             type="button"
             onClick={onCreateUser}
-            className="hidden px-3 sm:px-4 py-2 text-xs sm:text-sm rounded-lg bg-indigo-600 hover:bg-indigo-700 font-semibold whitespace-nowrap"
+            className=" px-3 sm:px-4 py-2 text-xs sm:text-sm rounded-lg bg-indigo-600 hover:bg-indigo-700 font-semibold whitespace-nowrap"
           >
             Create User
           </button>
@@ -92,7 +96,8 @@ export default function DashboardHeader({
           {isLoggingOut ? "Logging out..." : "Logout"}
         </button>
         <div className="w-8 sm:w-10 h-8 sm:h-10 rounded-full bg-indigo-500 flex items-center justify-center font-bold text-xs sm:text-sm">
-          AD
+          {/* {user?.name ? user.name.substring(0, 2).toUpperCase() : "AD"} */}
+<CornerProfile />
         </div>
       </div>
     </header>
