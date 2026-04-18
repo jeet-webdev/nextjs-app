@@ -1,4 +1,4 @@
-import { type UserRecord } from "@/features/users/types";
+import { type UserRecord, type UserType } from "@/features/users/types";
 import CommonTablePagination from "@/shared/components/CommonTablePagination";
 import { useState } from "react";
 import EditIcon from '@mui/icons-material/Edit';
@@ -11,6 +11,7 @@ type UsersTableProps = {
   isLoadingUsers: boolean;
   title: string;
   emptyMessage: string;
+  userTypeOptions?: UserType[];
   onRefresh?: () => void | Promise<void>;
 };
 
@@ -19,6 +20,7 @@ export default function UsersTable({
   isLoadingUsers,
   title,
   emptyMessage,
+  userTypeOptions,
   onRefresh
 }: UsersTableProps) {
   const [page, setPage] = useState(0);
@@ -70,6 +72,7 @@ export default function UsersTable({
         setIsOpen={setIsEditModalOpen}
         showTrigger={false}
         userToEdit={userToEdit}
+        userTypeOptions={userTypeOptions}
         onUpdated={() => {
           if (onRefresh) onRefresh();
           setIsEditModalOpen(false);

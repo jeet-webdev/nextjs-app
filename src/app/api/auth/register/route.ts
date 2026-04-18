@@ -9,6 +9,7 @@ import {
   signAuthToken,
 } from "@/shared/lib/auth";
 import { prisma } from "@/shared/lib/prisma";
+import { normalizePhoneInput, parsePhoneForStorage } from "@/shared/lib/user-phone";
 
 const ONE_WEEK_IN_SECONDS = 60 * 60 * 24 * 7;
 
@@ -17,7 +18,8 @@ export async function POST(request: Request) {
     const body = await request.json();
     const name = typeof body.name === "string" ? body.name.trim() : "";
     const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
-    const phone = typeof body.phone === "string" ? body.phone.trim() : "";
+    const phoneInput = normalizePhoneInput(body.phone);
+    const phone = phoneInput ? parsePhoneForStorage(body.phone) : null;
     const password = typeof body.password === "string" ? body.password : "";
     const confirmPassword = typeof body.confirmPassword === "string" ? body.confirmPassword : "";
 
@@ -36,13 +38,17 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Passwords do not match." }, { status: 400 });
     }
 
+    if (phoneInput && !phone) {
+      return NextResponse.json({ error: "Invalid phone number format." }, { status: 400 });
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await prisma.user.create({
       data: {
         name,
         email,
-        phone,
+        ...(phone ? { phone } : {}),
         password: hashedPassword,
         userType: "CUSTOMER",
       },

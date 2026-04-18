@@ -41,14 +41,14 @@ export default function RestaurantsForm({ onSubmit, form, setForm, isSubmitting,
         />
         <input
           className="p-3 bg-black/40 border border-white/10 rounded-lg"
-          placeholder="Slug (optional)"
+          placeholder="Slug (unique identifier for URL)"
           value={form.slug}
           onChange={(e) => setForm((prev) => ({ ...prev, slug: e.target.value }))}
         />
 
         <input
           className="p-3 bg-black/40 border border-white/10 rounded-lg"
-          placeholder="Address"
+          placeholder="Restaurant Address"
           required
           value={form.address}
           onChange={(e) => setForm((prev) => ({ ...prev, address: e.target.value }))}

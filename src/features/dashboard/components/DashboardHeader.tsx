@@ -20,6 +20,7 @@ export default function DashboardHeader({
   onLogout,
   userType,
   user,
+ 
   onCreateUser,
   onCreateTableReservation, //create Table Reservation button only for owners and admins
   onCreateRestaurant,  //create Restaurant button only for owners and admins
@@ -50,7 +51,7 @@ export default function DashboardHeader({
         </div>
       </div>
       <div className="flex items-center gap-2 sm:gap-4 w-full sm:w-auto flex-wrap">
-         {onCreateRestaurant ? (
+         {/* {onCreateRestaurant ? (
           <button
             type="button"
             onClick={onCreateRestaurant}
@@ -58,26 +59,26 @@ export default function DashboardHeader({
           >
             Create Restaurant
           </button>
-        ) : null}
-        { onCreateTableReservation ? (
+        ) : null} */}
+        {/* { onCreateTableReservation ? (
           <button
             type="button"         
             onClick={onCreateTableReservation}
             className="hidden px-3 sm:px-4 py-2 text-xs sm:text-sm rounded-lg bg-indigo-600 hover:bg-indigo-700 font-semibold whitespace-nowrap"
           >           Create Table Reservation        
           </button> 
-        ) : null}
+        ) : null} */}
 
-        {onCreateUser ? (
+        {/* {onCreateUser ? (
           <button
             type="button"
             onClick={onCreateUser}
-            className=" px-3 sm:px-4 py-2 text-xs sm:text-sm rounded-lg bg-indigo-600 hover:bg-indigo-700 font-semibold whitespace-nowrap"
+            className=" hidden px-3 sm:px-4 py-2 text-xs sm:text-sm rounded-lg bg-indigo-600 hover:bg-indigo-700 font-semibold whitespace-nowrap"
           >
             Create User
           </button>
-        ) : null}
-        {onCreateMenuItem ? (
+        ) : null} */}
+        {/* {onCreateMenuItem ? (
           <button
             type="button"
             onClick={onCreateMenuItem}
@@ -85,19 +86,23 @@ export default function DashboardHeader({
           >
             Create Menu Item
           </button>
-        ) : null}
+        ) : null} */}
 
-        <button
+        {/* <button
           type="button"
           onClick={onLogout}
           disabled={isLoggingOut}
           className="px-3 sm:px-4 py-2 text-xs sm:text-sm rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 disabled:opacity-60 disabled:cursor-not-allowed whitespace-nowrap"
         >
           {isLoggingOut ? "Logging out..." : "Logout"}
-        </button>
-        <div className="w-8 sm:w-10 h-8 sm:h-10 rounded-full bg-indigo-500 flex items-center justify-center font-bold text-xs sm:text-sm">
-          {/* {user?.name ? user.name.substring(0, 2).toUpperCase() : "AD"} */}
-<CornerProfile />
+        </button> */}
+        <div className="w-8 sm:w-10 h-8 ms-10 sm:h-10 rounded-full bg-indigo-500 flex items-center justify-center font-bold text-xs sm:text-sm">
+          <CornerProfile
+            user={user}
+            isLoggingOut={isLoggingOut}
+            onLogout={onLogout}
+            onCreateUser={onCreateUser}
+          />
         </div>
       </div>
     </header>

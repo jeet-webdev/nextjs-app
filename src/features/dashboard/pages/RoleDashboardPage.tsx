@@ -398,6 +398,7 @@ useEffect(() => { fetchUsers(); }, [fetchUsers]);
               isLoadingUsers={isLoadingUsers}
               title={tableTitle}
               emptyMessage={emptyMessage}
+              userTypeOptions={creatableUserTypes}    //   this was missing for usertype in patch api
               onRefresh={fetchUsers}
               />
             {error ? <p className="mt-4 text-sm text-rose-400">{error}</p> : null}

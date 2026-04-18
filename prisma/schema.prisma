@@ -27,7 +27,7 @@ model User {
   name        String   @default("")
   email       String   @unique
   password    String
-  phone       String   @default("")
+  phone       BigInt   @default(0)
   userType    UserType @default(CUSTOMER)
   
  

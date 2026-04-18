@@ -68,13 +68,13 @@ export default function OwnerRestaurantsForm({
           />
           <input
             className="rounded-lg border border-white/10 bg-black/40 p-3"
-            placeholder="Slug (optional)"
+            placeholder="Slug (unique identifier for URL)"
             value={restaurantForm.slug}
             onChange={(event) => setRestaurantForm((prev) => ({ ...prev, slug: event.target.value }))}
           />
           <input
           className="p-3 bg-black/40 border border-white/10 rounded-lg"
-          placeholder="Address"
+          placeholder="Restaurant Address"
           required
           value={restaurantForm.address}
           onChange={(e) => setRestaurantForm  ((prev) => ({ ...prev, address: e.target.value }))}

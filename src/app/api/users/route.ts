@@ -5,6 +5,7 @@ import { Prisma } from "@prisma/client";
 
 import { JWT_COOKIE_NAME, verifyAuthToken } from "@/shared/lib/auth";
 import { prisma } from "@/shared/lib/prisma";
+import { normalizePhoneInput, parsePhoneForStorage, serializeUserPhone } from "@/shared/lib/user-phone";
 
 const ALLOWED_USER_TYPES = ["OWNER", "CUSTOMER", "ADMIN"] as const;
 const DASHBOARD_USER_TYPES = ["ADMIN", "OWNER"] as const;
@@ -62,7 +63,7 @@ export async function GET() {
     },
   });
 
-  return NextResponse.json({ currentUser, users });
+  return NextResponse.json({ currentUser, users: users.map(serializeUserPhone) });
 }
 
 export async function POST(request: Request) {
@@ -92,18 +93,23 @@ export async function POST(request: Request) {
     const name = typeof body.name === "string" ? body.name.trim() : "";
     const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
     const password = typeof body.password === "string" ? body.password : "";
-    const phone = typeof body.phone === "string" ? body.phone.trim() : "";
+    const phoneInput = normalizePhoneInput(body.phone);
+    const phone = parsePhoneForStorage(body.phone);
     const userType =
       typeof body.userType === "string" &&
       ALLOWED_USER_TYPES.includes(body.userType as AllowedUserType)
         ? (body.userType as AllowedUserType)
         : null;
 
-    if (!name || !email || !password || !phone || !userType) {
+    if (!name || !email || !password || !phoneInput || !phone || !userType) {
       return NextResponse.json(
         { error: "name, email, password, phone and userType are required." },
         { status: 400 },
       );
+    }
+
+    if (!phone) {
+      return NextResponse.json({ error: "Invalid phone number format." }, { status: 400 });
     }
 
     if (password.length < 6) {
@@ -142,7 +148,7 @@ export async function POST(request: Request) {
       },
     });
 
-    return NextResponse.json({ user }, { status: 201 });
+    return NextResponse.json({ user: serializeUserPhone(user) }, { status: 201 });
   } catch (error: unknown) {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
       return NextResponse.json({ error: "Email already exists." }, { status: 409 });

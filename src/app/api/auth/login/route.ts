@@ -35,7 +35,7 @@ export async function POST(request: Request) {
           name: "System Admin",
           email,
           password: hashedPassword,
-          phone: "",
+          phone: 0,
           userType: "ADMIN",
         },
       });

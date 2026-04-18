@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { type RestaurantRecord } from "@/features/restaurants/types";
+import { Edit, EditIcon } from "lucide-react";
 
 type RestaurantCardProps = {
   restaurant: RestaurantRecord;
@@ -79,7 +80,7 @@ export default function RestaurantCard({
             }}
             className="rounded bg-white/10 px-2 py-1 text-xs text-gray-100 transition hover:bg-white/20"
           >
-            Edit
+            <EditIcon className="h-5 w-5" />
           </button>
         </div>
       ) : null}

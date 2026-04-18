@@ -5,7 +5,8 @@ import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import UserSignupForm from "@/features/auth/components/UserSignupForm";
 
-import type { UserType, UserRecord } from "@/features/users/types";
+import type { UserRecord } from "@/features/users/types";
+export type UserType = "OWNER" | "CUSTOMER" | "ADMIN";
 
 type UpdateUserModalProps = {
   isOpen?: boolean;
@@ -33,7 +34,6 @@ export default function UpdateUserModal({
     if (typeof document === "undefined") {
       return;
     }
-
     if (isOpen) {
       document.body.style.overflow = "hidden";
     } else {
@@ -45,7 +45,7 @@ export default function UpdateUserModal({
   }, [isOpen]);
   const modalContent = (
      <div
-className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
       onClick={(e) => {
         if (e.target === e.currentTarget) setIsOpen(false);
       }}
@@ -57,12 +57,10 @@ className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 p-
         >
    <X size={18} />
 </button>
-        
 <div className="mb-4">
  <h2 className="text-xl font-bold text-white">Update User</h2>
 <p className="text-sm text-gray-400">Modify details for {userToEdit?.name}</p>
         </div>
-
         <UserSignupForm
           userTypeOptions={userTypeOptions}
           apiPath={`/api/users/${userToEdit?.id}`}

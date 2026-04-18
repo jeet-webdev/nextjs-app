@@ -1,7 +1,9 @@
 import { NextResponse, NextRequest } from "next/server";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/shared/lib/prisma";
 import { cookies } from "next/headers";
 import { JWT_COOKIE_NAME, verifyAuthToken } from "@/shared/lib/auth";
+import { normalizePhoneInput, parsePhoneForStorage, serializeUserPhone } from "@/shared/lib/user-phone";
 import bcrypt from "bcryptjs";
 import { toast } from "react-toastify";
 
@@ -34,11 +36,16 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
 
         const body = await request.json();
         const { userType, name, email, phone, password } = body;
+        const phoneInput = normalizePhoneInput(phone);
+        const parsedPhone = phoneInput ? parsePhoneForStorage(phone) : null;
         
-        const updateData: any = {};
+        const updateData: Prisma.UserUpdateInput = {};
         if (name) updateData.name = name;
         if (email) updateData.email = email.toLowerCase();
-        if (phone) updateData.phone = phone;
+        if (phoneInput && !parsedPhone) {
+          return NextResponse.json({ error: "Invalid phone number format." }, { status: 400 });
+        }
+        if (parsedPhone) updateData.phone = parsedPhone;
 
        
         if (userType && currentUser.userType === "ADMIN") {
@@ -58,7 +65,7 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
             select: { id: true, name: true, email: true, phone: true, userType: true },
         });
 
-        return NextResponse.json({ message: "User updated successfully", user: updatedUser }, { status: 200 });
+        return NextResponse.json({ message: "User updated successfully", user: serializeUserPhone(updatedUser) }, { status: 200 });
     } catch (error) {
         console.error("Update Error:", error);
         toast.error('Failed to update user');

@@ -20,6 +20,7 @@ export type CurrentUser = {
   id: string;
   name: string;
   email: string;
+  phone: string;
   userType: UserType;
 };
 

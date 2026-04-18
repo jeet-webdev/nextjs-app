@@ -4,13 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { UserRecord, UserType } from "@/features/users/types";
 
-type FormUser = {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  userType: UserType;
-};
+type FormUser = Omit<UserRecord, "createdAt"> & { createdAt?: string };
 
 type UserSignupFormProps = {
   onSuccess?: () => void;
@@ -116,6 +110,10 @@ export default function UserSignupForm({
 
     if (!isUpdateMode || isChangingPassword) {
       payload.password = form.password;
+    }
+
+    if (!isUpdateMode) {
+      payload.confirmPassword = form.confirmPassword;
     }
 
     try {
