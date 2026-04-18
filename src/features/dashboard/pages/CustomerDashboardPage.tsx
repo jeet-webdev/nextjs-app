@@ -114,7 +114,7 @@ export default function CustomerDashboardPage() {
             </span>
           </div>
 
-          {error && <p className="mt-4 text-xs sm:text-sm text-rose-300">{error}</p>}
+          {error && <p className="mt-4 text-xs sm:text-sm text-red-400">{error}</p>}
         </header>
 
         <RestaurantGrid

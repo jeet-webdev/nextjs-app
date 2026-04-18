@@ -4,7 +4,18 @@ import { NextResponse } from "next/server";
 import { type ContactDetails } from "@/features/restaurants/types";
 import { JWT_COOKIE_NAME, verifyAuthToken } from "@/shared/lib/auth";
 import { prisma } from "@/shared/lib/prisma";
-
+function mapContent(content: unknown): { title: string; description: string; imageUrl: string; menuBookUrl: string } | null {
+  if (!content || typeof content !== "object") {
+    return null;
+  }
+  const value = content as Partial<{ title: unknown; description: unknown; imageUrl: unknown; menuBookUrl: unknown }>;
+  return {
+    title: typeof value.title === "string" ? value.title : "",
+    description: typeof value.description === "string" ? value.description : "",
+    imageUrl: typeof value.imageUrl === "string" ? value.imageUrl : "",
+    menuBookUrl: typeof value.menuBookUrl === "string" ? value.menuBookUrl : "",
+  };
+}
 function mapContactInfo(contactInfo: unknown): ContactDetails | null {
   if (!contactInfo || typeof contactInfo !== "object") {
     return null;
@@ -30,6 +41,8 @@ function mapRestaurant(restaurant: {
   Address: string | null;
   logo: string | null;
   contactInfo: unknown;
+  content: unknown;
+
   seoTitle: string | null;
   seoDescription: string | null;
   status: "OPEN" | "CLOSED";
@@ -45,6 +58,7 @@ function mapRestaurant(restaurant: {
     address: restaurant.Address,
     logo: restaurant.logo,
     contactInfo: mapContactInfo(restaurant.contactInfo),
+    content: mapContent(restaurant.content),
     seoTitle: restaurant.seoTitle,
     seoDescription: restaurant.seoDescription,
     status: restaurant.status,
@@ -125,6 +139,7 @@ export async function GET(request: Request) {
         Address: true,
         logo: true,
         contactInfo: true,
+        content: true,
         seoTitle: true,
         seoDescription: true,
         status: true,
@@ -172,6 +187,7 @@ export async function POST(request: Request) {
   const seoTitle = typeof body.seoTitle === "string" ? body.seoTitle.trim() : null;
   const seoDescription = typeof body.seoDescription === "string" ? body.seoDescription.trim() : null;
   const contactInfo = mapContactInfo(body.contactInfo);
+  const content = mapContent(body.content);
 
   if (!name || !category || !city || !address) {
     return NextResponse.json({ error: "name, category, city and address are required." }, { status: 400 });
@@ -195,6 +211,7 @@ export async function POST(request: Request) {
         contactInfo: contactInfo ?? undefined,
         seoTitle: seoTitle ?? undefined,
         seoDescription: seoDescription ?? undefined,
+        content: content ?? undefined,
         userId: currentUser.id,
       },
       select: {
@@ -206,6 +223,7 @@ export async function POST(request: Request) {
         Address: true,
         logo: true,
         contactInfo: true,
+        content: true,
         seoTitle: true,
         seoDescription: true,
         status: true,

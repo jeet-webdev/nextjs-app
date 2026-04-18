@@ -13,6 +13,7 @@ type UsersTableProps = {
   emptyMessage: string;
   userTypeOptions?: UserType[];
   onRefresh?: () => void | Promise<void>;
+    onCreateUser?: () => void;
 };
 
 export default function UsersTable({
@@ -20,6 +21,8 @@ export default function UsersTable({
   isLoadingUsers,
   title,
   emptyMessage,
+  onCreateUser,
+
   userTypeOptions,
   onRefresh
 }: UsersTableProps) {
@@ -30,14 +33,15 @@ export default function UsersTable({
   const [userToEdit, setUserToEdit] = useState<UserRecord | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const paginatedUsers = users.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage); 
-     
   
   const handleEditClick = (user: UserRecord) => {
     setUserToEdit(user);
     setIsEditModalOpen(true);
   };
 
-
+  const handleCreateUser = () => {
+    onCreateUser?.();
+  };
 
   const handleDelete = async (id: string) => {
     const userToDelete = users.find(u => u.id === id);
@@ -79,7 +83,18 @@ export default function UsersTable({
           setUserToEdit(null);
         }}
       />
-      <div className="p-4 sm:p-6 border-b border-white/10 font-semibold text-sm sm:text-base">{title}</div>
+      <div className="flex items-center justify-between gap-3 border-b border-white/10 p-4 text-sm font-semibold sm:p-6 sm:text-base">
+        <span>{title}</span>
+        {onCreateUser ? (
+          <button
+            type="button"
+            onClick={handleCreateUser}
+            className="rounded-lg bg-indigo-600 px-3 py-2 text-xs font-semibold whitespace-nowrap hover:bg-indigo-700 sm:px-4 sm:text-sm"
+          >
+            Create User
+          </button>
+        ) : null}
+      </div>
       <table className="w-full text-left text-sm">
         <thead className="text-xs uppercase text-gray-500 bg-white/5">
           <tr>

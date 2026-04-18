@@ -20,7 +20,18 @@ function mapContactInfo(contactInfo: unknown): ContactDetails | null {
     website: typeof value.website === "string" ? value.website : "",
   };
 }
-
+function mapContent(content: unknown): { title: string; description: string; imageUrl: string; menuBookUrl: string } | null {
+  if (!content || typeof content !== "object") {
+    return null;
+  }
+  const value = content as Partial<{ title: unknown; description: unknown; imageUrl: unknown; menuBookUrl: unknown }>;
+  return {
+    title: typeof value.title === "string" ? value.title : "",
+    description: typeof value.description === "string" ? value.description : "",
+    imageUrl: typeof value.imageUrl === "string" ? value.imageUrl : "",
+    menuBookUrl: typeof value.menuBookUrl === "string" ? value.menuBookUrl : "",
+  };
+}
 function mapRestaurant(restaurant: {
   id: string;
   name: string;
@@ -35,7 +46,9 @@ function mapRestaurant(restaurant: {
   status: "OPEN" | "CLOSED";
   userId: string;
   createdAt: Date;
-}) {
+  content?: any;
+})
+ {
   return {
     id: restaurant.id,
     name: restaurant.name,
@@ -45,6 +58,7 @@ function mapRestaurant(restaurant: {
     address: restaurant.Address,
     logo: restaurant.logo,
     contactInfo: mapContactInfo(restaurant.contactInfo),
+    content: mapContent(restaurant.content),
 
     seoTitle: restaurant.seoTitle,
     seoDescription: restaurant.seoDescription,
@@ -104,6 +118,20 @@ export async function PATCH(
     };
     data.contactInfo = contactInfo;
   }
+
+  if(body.content && typeof body.content === "object") {
+    const content = {
+      title: typeof body.content.title === "string" ? body.content.title.trim() : "",
+      description: typeof body.content.description === "string" ? body.content.description.trim() : "",
+      imageUrl: typeof body.content.imageUrl === "string" ? body.content.imageUrl.trim() : "",
+      menuBookUrl: typeof body.content.menuBookUrl === "string" ? body.content.menuBookUrl.trim() : "",
+    };
+    data.content = content;
+  }
+
+
+
+
   if (typeof body.seoTitle === "string") data.seoTitle = body.seoTitle.trim();
   if (typeof body.seoDescription === "string") data.seoDescription = body.seoDescription.trim();
 
@@ -120,6 +148,7 @@ export async function PATCH(
         Address: true,
         logo: true,
         contactInfo: true,
+        content: true,  
         seoTitle: true,
         seoDescription: true,
         status: true,

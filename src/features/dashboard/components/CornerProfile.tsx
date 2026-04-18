@@ -15,9 +15,10 @@ type CornerProfileProps = {
   isLoggingOut: boolean;
   onLogout: () => void;
   onCreateUser?: () => void;
+  userType: string | null;
 };
 
-function CornerProfile({ user, isLoggingOut, onLogout, onCreateUser }: CornerProfileProps) {
+function CornerProfile({ user, userType, isLoggingOut, onLogout, onCreateUser }: CornerProfileProps) {
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
 
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -42,8 +43,6 @@ const handleCreateUser = () => {
   };
 
   return (
-    <AppBar position="static" color="inherit" elevation={0} sx={{ borderBottom: '1px solid rgba(0, 0, 0, 0.1)' }}>
-      <Container maxWidth="xl">
         <Box sx={{ flexGrow: 0, display: 'flex', justifyContent: 'flex-end', py: 1 }}>
           <Tooltip title="Open settings">
             <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
@@ -65,6 +64,9 @@ const handleCreateUser = () => {
           >
       
             <Box sx={{ px: 2, py: 1 }}>
+               <p className="text-xs sm:text-sm text-gray-400 mt-1 mb-5">
+            Signed in as {userType}
+          </p>
               <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>
                 Name: {user?.name || "User"}
               </Typography>
@@ -77,18 +79,15 @@ const handleCreateUser = () => {
 
             <Divider />
 
-            {/* <MenuItem onClick={handleCloseUserMenu}>
-              <Typography sx={{ textAlign: 'center' }}>Profile</Typography>
-            </MenuItem>
-           */}
-  <MenuItem 
+         
+  {/* <MenuItem 
     onClick={handleCreateUser}
     sx={{ color: 'success.main' }}
   >
     <Typography sx={{ textAlign: 'center', width: '100%' }}>
       Create User
     </Typography>
-  </MenuItem>
+  </MenuItem> */}
 
             
             <MenuItem 
@@ -105,8 +104,6 @@ const handleCreateUser = () => {
             
           </Menu>
         </Box>
-      </Container>
-    </AppBar>
   );
 }
 

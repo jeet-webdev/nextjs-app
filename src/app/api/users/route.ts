@@ -103,7 +103,7 @@ export async function POST(request: Request) {
 
     if (!name || !email || !password || !phoneInput || !phone || !userType) {
       return NextResponse.json(
-        { error: "name, email, password, phone and userType are required." },
+        { error: "Invalid Details please fix and ALL Input Fields are required." },
         { status: 400 },
       );
     }

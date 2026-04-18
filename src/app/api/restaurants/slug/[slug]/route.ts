@@ -1,8 +1,20 @@
 import { NextResponse } from "next/server";
 
-import { type ContactDetails } from "@/features/restaurants/types";
+import { FirstContent, type ContactDetails } from "@/features/restaurants/types";
 import { prisma } from "@/shared/lib/prisma";
 
+function mapContent(content: unknown): FirstContent | null {
+  if (!content || typeof content !== "object") {    
+    return null;
+  } 
+  const value = content as Partial<Record<keyof FirstContent, unknown>>;
+  return {
+    title: typeof value.title === "string" ? value.title : "",
+    description: typeof value.description === "string" ? value.description : "",
+    imageUrl: typeof value.imageUrl === "string" ? value.imageUrl : "",
+    menuBookUrl: typeof value.menuBookUrl === "string" ? value.menuBookUrl : "",
+  };
+}
 function mapContactInfo(contactInfo: unknown): ContactDetails | null {
   if (!contactInfo || typeof contactInfo !== "object") {
     return null;
@@ -41,6 +53,7 @@ export async function GET(
         Address: true,
         logo: true,
         contactInfo: true,
+        content: true,
         seoTitle: true,
         seoDescription: true,
         status: true,
@@ -63,6 +76,7 @@ export async function GET(
         address: restaurant.Address,
         logo: restaurant.logo,
         contactInfo: mapContactInfo(restaurant.contactInfo),
+        content: mapContent(restaurant.content),
         seoTitle: restaurant.seoTitle,
         seoDescription: restaurant.seoDescription,
         status: restaurant.status,

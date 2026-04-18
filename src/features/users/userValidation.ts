@@ -1,7 +1,8 @@
 import { USER_TYPE_OPTIONS, type UserType } from "@/features/users/types";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const PHONE_PATTERN = /^\+?[\d\s()-]{10,20}$/;
+// const PHONE_PATTERN = /^\+?[\d\s()-]{6,20}$/;
+const PHONE_PATTERN = /^\+?[0-9]{8,15}$/;
 
 export type UserFormValidationInput = {
   name?: string;
@@ -22,6 +23,8 @@ export type UserFormValidationOptions = {
   requireUserType?: boolean;
   allowedUserTypes?: readonly UserType[];
   minimumPasswordLength?: number;
+  minimumNameLength?: number;
+  minimumPhoneLength?: number;
 };
 
 export type UserFormValidationErrors = Partial<
@@ -30,8 +33,10 @@ export type UserFormValidationErrors = Partial<
 
 const DEFAULT_OPTIONS: Required<UserFormValidationOptions> = {
   requireName: true,
+  minimumNameLength: 3,
   requireEmail: true,
   requirePhone: true,
+  minimumPhoneLength:8,
   requirePassword: false,
   requireConfirmPassword: false,
   validatePasswordConfirmation: false,
@@ -54,8 +59,10 @@ export function validateUserForm(
   const confirmPassword = form.confirmPassword ?? "";
   const userType = form.userType ?? "";
 
-  if (settings.requireName && !name) {
+  if (settings.requireName && !name.trim()) {
     errors.name = "Name is required.";
+  } else if (name && name.trim().length < settings.minimumNameLength) {
+    errors.name = `Name must be at least ${settings.minimumNameLength} characters.`;
   }
 
   if (settings.requireEmail && !email) {
@@ -66,6 +73,8 @@ export function validateUserForm(
 
   if (settings.requirePhone && !phone) {
     errors.phone = "Phone number is required.";
+  }else if(phone && phone.trim().length < settings.minimumPhoneLength){
+    errors.phone = `phone number must be at least ${settings.minimumPhoneLength} characters`;
   } else if (phone && !PHONE_PATTERN.test(phone)) {
     errors.phone = "Invalid phone number.";
   }

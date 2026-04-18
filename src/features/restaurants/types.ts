@@ -5,12 +5,19 @@ export type ContactDetails = {
   closingHours: string;
   website: string;
 };
+export type FirstContent = {
+  title: string;
+  description: string;
+  imageUrl: string;
+  menuBookUrl: string;
+};
 
 export type RestaurantRecord = {
   id: string;
   name: string;
   category: string;
   contactInfo?: ContactDetails | null;
+  content?: FirstContent | null;
   city: string;
   slug: string;
   address?: string | null;
@@ -26,6 +33,7 @@ export type RestaurantFormState = {
   name: string;
   category: string;
   contactInfo: ContactDetails; 
+  content: FirstContent;
   city: string;
   slug: string;
   status?: "OPEN" | "CLOSED";
@@ -52,4 +60,12 @@ export const EMPTY_RESTAURANT_FORM: RestaurantFormState = {
     openingHours: "",
     closingHours: "",
   },
+  content: {
+    title: "",
+    description: "",
+    imageUrl: "",
+    menuBookUrl: "",
+
+  },
+
 };

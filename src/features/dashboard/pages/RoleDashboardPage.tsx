@@ -285,6 +285,12 @@ useEffect(() => { fetchUsers(); }, [fetchUsers]);
     city: restaurant.city ?? "",
     slug: restaurant.slug ?? "",
     address: restaurant.address ?? "",
+    content: {
+      title: restaurant.content?.title ?? "",
+      description: restaurant.content?.description ?? "",
+      imageUrl: restaurant.content?.imageUrl ?? "",
+      menuBookUrl: restaurant.content?.menuBookUrl ?? "",
+    },
     contactInfo: {
       phone: restaurant.contactInfo?.phone ?? "",
       email: restaurant.contactInfo?.email ?? "",
@@ -399,6 +405,7 @@ useEffect(() => { fetchUsers(); }, [fetchUsers]);
               title={tableTitle}
               emptyMessage={emptyMessage}
               userTypeOptions={creatableUserTypes}    //   this was missing for usertype in patch api
+              onCreateUser={creatableUserTypes.length > 0 ? () => setCreateUserModalOpen(true) : undefined}
               onRefresh={fetchUsers}
               />
             {error ? <p className="mt-4 text-sm text-rose-400">{error}</p> : null}

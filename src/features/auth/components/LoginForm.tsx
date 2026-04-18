@@ -1,14 +1,73 @@
 "use client";
 import { useState } from "react";
+import { validateUserForm } from "@/features/users/userValidation";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<{ email?: string; password?: string }>({});
+  const [touchedFields, setTouchedFields] = useState<{ email?: boolean; password?: boolean }>({});
+
+  const validateLoginForm = (nextEmail: string, nextPassword: string) =>
+    validateUserForm(
+      {
+        email: nextEmail,
+        password: nextPassword,
+      },
+      {
+        requireName: false,
+        requirePhone: false,
+        requirePassword: true,
+        requireConfirmPassword: false,
+        validatePasswordConfirmation: false,
+        requireUserType: false,
+      },
+    );
+
+  const syncFieldErrors = (nextEmail: string, nextPassword: string) => {
+    setFieldErrors(validateLoginForm(nextEmail, nextPassword));
+  };
+
+  const handleEmailChange = (value: string) => {
+    setEmail(value);
+    setError("");
+
+    if (touchedFields.email || Object.keys(fieldErrors).length > 0) {
+      syncFieldErrors(value, password);
+    }
+  };
+
+  const handlePasswordChange = (value: string) => {
+    setPassword(value);
+    setError("");
+
+    if (touchedFields.password || Object.keys(fieldErrors).length > 0) {
+      syncFieldErrors(email, value);
+    }
+  };
+
+  const handleBlur = (field: "email" | "password") => {
+    setTouchedFields((prev) => ({ ...prev, [field]: true }));
+    syncFieldErrors(email, password);
+  };
+
+  const getInputClassName = (field: "email" | "password") =>
+    `w-full mt-2 p-2 sm:p-3 bg-white/5 border rounded-lg focus:ring-2 outline-none text-white text-sm ${fieldErrors[field] ? "border-red-300 focus:ring-rose-500" : "border-white/10 focus:ring-indigo-500"}`;
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const nextErrors = validateLoginForm(email, password);
+    setTouchedFields({ email: true, password: true });
+    setFieldErrors(nextErrors);
+
+    if (Object.keys(nextErrors).length > 0) {
+      setError("");
+      return;
+    }
+
     setError("");
     setIsLoading(true);
 
@@ -20,7 +79,7 @@ export default function LoginForm() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email: email.trim(), password }),
       });
 
       if (!response.ok) {
@@ -52,11 +111,14 @@ export default function LoginForm() {
           </label>
           <input
             type="email"
-            className="w-full mt-2 p-2 sm:p-3 bg-white/5 border border-white/10 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-white text-sm"
+            className={getInputClassName("email")}
             placeholder="you@example.com"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => handleEmailChange(e.target.value)}
+            onBlur={() => handleBlur("email")}
+            aria-invalid={Boolean(fieldErrors.email)}
           />
+          {fieldErrors.email ? <p className="mt-2 text-xs sm:text-sm text-rose-400">{fieldErrors.email}</p> : null}
         </div>
         <div>
           <label className="block text-xs sm:text-sm font-medium text-gray-300">
@@ -64,11 +126,14 @@ export default function LoginForm() {
           </label>
           <input
             type="password"
-            className="w-full mt-2 p-2 sm:p-3 bg-white/5 border border-white/10 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-white text-sm"
+            className={getInputClassName("password")}
             placeholder="••••••••"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => handlePasswordChange(e.target.value)}
+            onBlur={() => handleBlur("password")}
+            aria-invalid={Boolean(fieldErrors.password)}
           />
+          {fieldErrors.password ? <p className="mt-2 text-xs sm:text-sm text-rose-400">{fieldErrors.password}</p> : null}
         </div>
         {error && <p className="text-xs sm:text-sm text-rose-400">{error}</p>}
         <button

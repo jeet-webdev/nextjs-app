@@ -99,6 +99,30 @@ export default function OwnerRestaurantsForm({
           value={restaurantForm.seoDescription}
           onChange={(e) => setRestaurantForm((prev) => ({ ...prev, seoDescription: e.target.value }))}
         />
+        <input 
+          className="p-3 bg-black/40 border border-white/10 rounded-lg col-span-1 sm:col-span-2"
+          placeholder="Content Title"
+          value={restaurantForm.content.title}
+          onChange={(e) => setRestaurantForm((prev) => ({ ...prev, content: { ...prev.content, title: e.target.value } }))}
+        />
+        <input 
+          className="p-3 bg-black/40 border border-white/10 rounded-lg col-span-1 sm:col-span-2"
+          placeholder="Content Description"
+          value={restaurantForm.content.description}
+          onChange={(e) => setRestaurantForm((prev) => ({ ...prev, content: { ...prev.content, description: e.target.value } }))}
+        />
+        <input
+          className="p-3 bg-black/40 border border-white/10 rounded-lg col-span-1 sm:col-span-2"
+          placeholder="Content Image URL"
+          value={restaurantForm.content.imageUrl}
+          onChange={(e) => setRestaurantForm((prev) => ({ ...prev, content: { ...prev.content, imageUrl: e.target.value } }))}
+        />
+        <input
+          className="p-3 bg-black/40 border border-white/10 rounded-lg col-span-1 sm:col-span-2"
+          placeholder="Menu Book URL"
+          value={restaurantForm.content.menuBookUrl}
+          onChange={(e) => setRestaurantForm((prev) => ({ ...prev, content: { ...prev.content, menuBookUrl: e.target.value } }))}
+        />
    <input
   className="p-3 bg-black/40 border border-white/10 rounded-lg"
   placeholder="Phone Number"

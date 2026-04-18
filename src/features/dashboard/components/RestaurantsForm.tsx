@@ -74,8 +74,33 @@ export default function RestaurantsForm({ onSubmit, form, setForm, isSubmitting,
           value={form.seoDescription}
           onChange={(e) => setForm((prev) => ({ ...prev, seoDescription: e.target.value }))}
         />
-          {/* Contact Info Fields */}
-          <input
+
+        <input 
+          className="p-3 bg-black/40 border border-white/10 rounded-lg col-span-1 sm:col-span-2"
+          placeholder="Content Title"
+          value={form.content.title}
+          onChange={(e) => setForm((prev) => ({ ...prev, content: { ...prev.content, title: e.target.value } }))}
+        />
+        <input 
+          className="p-3 bg-black/40 border border-white/10 rounded-lg col-span-1 sm:col-span-2"
+          placeholder="Content Description"
+          value={form.content.description}
+          onChange={(e) => setForm((prev) => ({ ...prev, content: { ...prev.content, description: e.target.value } }))}
+        />
+        <input
+          className="p-3 bg-black/40 border border-white/10 rounded-lg col-span-1 sm:col-span-2"
+          placeholder="Content Image URL"
+          value={form.content.imageUrl}
+          onChange={(e) => setForm((prev) => ({ ...prev, content: { ...prev.content, imageUrl: e.target.value } }))}
+        />
+        <input
+          className="p-3 bg-black/40 border border-white/10 rounded-lg col-span-1 sm:col-span-2"
+          placeholder="Menu Book URL"
+          value={form.content.menuBookUrl}
+          onChange={(e) => setForm((prev) => ({ ...prev, content: { ...prev.content, menuBookUrl: e.target.value } }))}
+        />
+        {/* Contact Info Fields */}
+        <input
   className="p-3 bg-black/40 border border-white/10 rounded-lg"
   placeholder="Phone Number"
   value={form.contactInfo.phone}
