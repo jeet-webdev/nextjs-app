@@ -4,9 +4,11 @@ import { type RestaurantRecord } from "@/features/restaurants/types";
 type RestaurantsSectionProps = {
   restaurants: RestaurantRecord[];
   onEdit?: (restaurant: RestaurantRecord) => void;
+  onDelete?: (restaurant: RestaurantRecord) => void;
+  onCreateRestaurant?: () => void;
 };
 
-export default function RestaurantsSection({ restaurants, onEdit }: RestaurantsSectionProps) {
+export default function RestaurantsSection({ restaurants, onEdit, onDelete, onCreateRestaurant }: RestaurantsSectionProps) {
   return (
     <section className="bg-white/5 rounded-xl border border-white/10 p-4 sm:p-6">
       <div className="mb-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
@@ -22,6 +24,8 @@ export default function RestaurantsSection({ restaurants, onEdit }: RestaurantsS
         emptyMessage="No restaurants found."
         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
         onEdit={onEdit}
+        onDelete={onDelete}
+        onCreateRestaurant={onCreateRestaurant}
       />
     </section>
   );

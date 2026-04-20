@@ -13,6 +13,9 @@ function mapContent(content: unknown): FirstContent | null {
     description: typeof value.description === "string" ? value.description : "",
     imageUrl: typeof value.imageUrl === "string" ? value.imageUrl : "",
     menuBookUrl: typeof value.menuBookUrl === "string" ? value.menuBookUrl : "",
+    heroImageUrl: typeof value.heroImageUrl === "string" ? value.heroImageUrl : "",
+    heroTitle: typeof value.heroTitle === "string" ? value.heroTitle : "",
+    heroDescription: typeof value.heroDescription === "string" ? value.heroDescription : "",
   };
 }
 function mapContactInfo(contactInfo: unknown): ContactDetails | null {

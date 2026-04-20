@@ -7,36 +7,54 @@ type RestaurantGridProps = {
   compact?: boolean;
   className?: string;
   onEdit?: (restaurant: RestaurantRecord) => void;
+  onDelete?: (restaurant: RestaurantRecord) => void;
+  onCreateRestaurant?: () => void;
 };
 
 export default function RestaurantGrid({
   restaurants,
   emptyMessage,
   compact = false,
-  className = "grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3",
+  className = "grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-2",
   onEdit,
+  onDelete,
+  onCreateRestaurant,
 }: RestaurantGridProps) {
+  const createButton = onCreateRestaurant ? (
+    <button
+      type="button"
+      onClick={onCreateRestaurant}
+      className="rounded-lg bg-indigo-600 px-3 py-2 text-xs font-semibold whitespace-nowrap hover:bg-indigo-700 sm:px-4 sm:text-sm"
+    >
+      Create Restaurant
+    </button>
+  ) : null;
 
-
-  console.log("RestaurantGrid received restaurants:", restaurants);
-  if (restaurants.length === 0) {
-    return (
-      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 text-gray-300">
-        {emptyMessage}
-      </div>
-    );
-  }
+  // if (restaurants.length === 0) {
+  //   return (
+  //     <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 text-gray-300">
+  //       {createButton ? <div className="mb-4 flex justify-end">{createButton}</div> : null}
+  //       {emptyMessage}
+  //     </div>
+  //   );
+  // }
 
   return (
-    <div className={className}>
-      {restaurants.map((restaurant) => (
-        <RestaurantCard
-          key={restaurant.id}
-          restaurant={restaurant}
-          compact={compact}
-          onEdit={onEdit}
-        />
-      ))}
-    </div>
+    <>
+      <div className="flex items-center justify-between gap-3 border-b border-white/10 p-4 text-sm font-semibold sm:p-6 sm:text-base">
+        {createButton ?? <h2 className="text-base sm:text-lg font-semibold">Restaurants</h2>}
+      </div>
+      <div className={className}>
+        {restaurants.map((restaurant) => (
+          <RestaurantCard
+            key={restaurant.id}
+            restaurant={restaurant}
+            compact={compact}
+            onEdit={onEdit}
+            onDelete={onDelete}
+          />
+        ))}
+      </div>
+    </>
   );
 }

@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
-
+import SunnyIcon from '@mui/icons-material/Sunny';
+import NightlightIcon from '@mui/icons-material/Nightlight';
 type Theme = "dark" | "light";
 
 const STORAGE_KEY = "site-theme";
@@ -40,7 +41,8 @@ export default function ThemeToggle() {
       aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
       className="fixed right-4 bottom-4 z-[100] rounded-full border border-white/25 bg-black/40 p-2.5 text-white shadow-lg backdrop-blur transition hover:scale-105 hover:bg-black/60"
     >
-      {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+      {theme === "dark"? <SunnyIcon style={{ color: "#fbbf24" }} /> : <NightlightIcon /> }
+                  {/* {theme === "dark" ? <Sun size={18} /> : <Moon size={18} /> } */}
     </button>
   );
 }

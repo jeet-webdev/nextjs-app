@@ -99,6 +99,24 @@ export default function OwnerRestaurantsForm({
           value={restaurantForm.seoDescription}
           onChange={(e) => setRestaurantForm((prev) => ({ ...prev, seoDescription: e.target.value }))}
         />
+         <input 
+          className="p-3 bg-black/40 border border-white/10 rounded-lg col-span-1 sm:col-span-2"
+          placeholder="Content Hero Title"
+          value={restaurantForm.content.heroTitle}
+          onChange={(e) => setRestaurantForm((prev) => ({ ...prev, content: { ...prev.content, heroTitle: e.target.value } }))}
+        />
+          <input
+          className="p-3 bg-black/40 border border-white/10 rounded-lg col-span-1 sm:col-span-2"
+          placeholder="Content Hero Description"
+          value={restaurantForm.content.heroDescription}
+          onChange={(e) => setRestaurantForm((prev) => ({ ...prev, content: { ...prev.content, heroDescription: e.target.value } }))}
+        />
+          <input
+          className="p-3 bg-black/40 border border-white/10 rounded-lg col-span-1 sm:col-span-2"
+          placeholder="Content Hero Image URL"
+          value={restaurantForm.content.heroImageUrl}
+          onChange={(e) => setRestaurantForm((prev) => ({ ...prev, content: { ...prev.content, heroImageUrl: e.target.value } }))}
+        />
         <input 
           className="p-3 bg-black/40 border border-white/10 rounded-lg col-span-1 sm:col-span-2"
           placeholder="Content Title"

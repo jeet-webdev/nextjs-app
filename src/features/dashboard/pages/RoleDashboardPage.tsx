@@ -24,6 +24,7 @@ import RestaurantsSection from "@/features/dashboard/components/RestaurantsSecti
 import MenuSection from "@/features/dashboard/components/MenuSection";
 import RestaurantsForm from "@/features/dashboard/components/RestaurantsForm";
 import { type MenuRecord } from "@/features/menu/types/menuTypes";
+import { toast } from "react-toastify";
 
 type RestaurantMutationResponse = {
   error?: string;
@@ -139,7 +140,7 @@ const [isLoadingMenu, setIsLoadingMenu] = useState(false);
   }, [expectedRole, router]);
   
 useEffect(() => {
-  // Only fetch if we are in the menu-items section
+
   if (activeSection !== "menu-items") return;
 
   const fetchMenu = async () => {
@@ -166,11 +167,11 @@ useEffect(() => {
 const fetchUsers = useCallback(async () => {
     setIsLoading(true);
     try {
-      const res = await fetch("/api/users"); // This hits your GET api
+      const res = await fetch("/api/users"); // This hits  GET api
       if (!res.ok) throw new Error("Failed to fetch");
       const data = await res.json();
       
-      // Based on your GET API response structure: { currentUser, users }
+      
       setUsers(data.users);
     } catch (error) {
       console.error("Fetch error:", error);
@@ -290,6 +291,9 @@ useEffect(() => { fetchUsers(); }, [fetchUsers]);
       description: restaurant.content?.description ?? "",
       imageUrl: restaurant.content?.imageUrl ?? "",
       menuBookUrl: restaurant.content?.menuBookUrl ?? "",
+      heroImageUrl: restaurant.content?.heroImageUrl ?? "",
+      heroTitle: restaurant.content?.heroTitle ?? "",
+      heroDescription: restaurant.content?.heroDescription ?? "",
     },
     contactInfo: {
       phone: restaurant.contactInfo?.phone ?? "",
@@ -312,6 +316,44 @@ useEffect(() => { fetchUsers(); }, [fetchUsers]);
     const el = document.querySelector("form");
     el?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, 100);
+  };
+
+
+  
+///  delete resturent modaL can make here 
+
+  const handleDeleteRestaurant = async (restaurant: RestaurantRecord) => {
+    if (!confirm(`Are you sure you want to delete ${restaurant.name}?`)) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/restaurants/${restaurant.id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      const data = (await response.json().catch(() => ({}))) as { error?: string };
+
+      if (!response.ok) {
+        toast.error(data.error ?? "Failed to delete restaurant.");
+        return;
+      }
+
+      setRestaurants((prev) => prev.filter((item) => item.id !== restaurant.id));
+      setTotalRestaurants((prev) => Math.max(prev - 1, 0));
+      setOwnedRestaurants((prev) => (prev === null ? prev : Math.max(prev - 1, 0)));
+
+      if (editingRestaurantId === restaurant.id) {
+        setIsEditingRestaurant(false);
+        setEditingRestaurantId(null);
+        setRestaurantForm(EMPTY_RESTAURANT_FORM);
+      }
+
+      toast.success("Restaurant deleted successfully");
+    } catch {
+      toast.error("Error connecting to server");
+    }
   };
 
   const handleCancelEdit = () => {
@@ -346,9 +388,6 @@ useEffect(() => { fetchUsers(); }, [fetchUsers]);
             setIsEditingRestaurant(false);
             setEditingRestaurantId(null);
             setActiveSection("create-restaurant");
-          } : undefined}
-          onCreateTableReservation={currentUser && (currentUser.userType === "ADMIN" || currentUser.userType === "OWNER") ? () => {
-            setActiveSection("table-reservations");
           } : undefined}
           // allMenuItem={currentUser && (currentUser.userType === "ADMIN" || currentUser.userType === "OWNER") ? () => {
           //   setActiveSection("menu-items");
@@ -413,7 +452,19 @@ useEffect(() => { fetchUsers(); }, [fetchUsers]);
         ) : null}
 
         {activeSection === "restaurants" ? (
-          <RestaurantsSection restaurants={restaurantsForSection} onEdit={handleEditClick} />
+          <RestaurantsSection
+            restaurants={restaurantsForSection}
+            onEdit={handleEditClick}
+            onDelete={handleDeleteRestaurant}
+            onCreateRestaurant={currentUser && (currentUser.userType === "ADMIN" || currentUser.userType === "OWNER") ? () => {
+              setRestaurantForm(EMPTY_RESTAURANT_FORM);
+              setRestaurantError("");
+              setIsEditingRestaurant(false);
+              setEditingRestaurantId(null);
+              setActiveSection("create-restaurant");
+            } : undefined}
+
+          />
         ) : null}
 
        {activeSection === "menu-items" ? (

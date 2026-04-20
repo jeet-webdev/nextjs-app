@@ -1,19 +1,24 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
-import { type ContactDetails } from "@/features/restaurants/types";
+import { FirstContent, type ContactDetails } from "@/features/restaurants/types";
 import { JWT_COOKIE_NAME, verifyAuthToken } from "@/shared/lib/auth";
 import { prisma } from "@/shared/lib/prisma";
-function mapContent(content: unknown): { title: string; description: string; imageUrl: string; menuBookUrl: string } | null {
-  if (!content || typeof content !== "object") {
+function mapContent(content: unknown): { title: string; description: string; imageUrl: string; menuBookUrl: string; heroImageUrl: string; heroTitle: string; heroDescription: string } | null {
+// function mapContent(content: unknown): FirstContent | null {
+if (!content || typeof content !== "object") {
     return null;
   }
-  const value = content as Partial<{ title: unknown; description: unknown; imageUrl: unknown; menuBookUrl: unknown }>;
+  const value = content as Partial<{ title: unknown; description: unknown; imageUrl: unknown; menuBookUrl: unknown; heroImageUrl: unknown; heroTitle: unknown; heroDescription: unknown }>;
+  //  const value = content as Partial<Record<keyof FirstContent, unknown>>;
   return {
     title: typeof value.title === "string" ? value.title : "",
     description: typeof value.description === "string" ? value.description : "",
     imageUrl: typeof value.imageUrl === "string" ? value.imageUrl : "",
     menuBookUrl: typeof value.menuBookUrl === "string" ? value.menuBookUrl : "",
+    heroImageUrl: typeof value.heroImageUrl === "string" ? value.heroImageUrl : "",
+    heroTitle: typeof value.heroTitle === "string" ? value.heroTitle : "",
+    heroDescription: typeof value.heroDescription === "string" ? value.heroDescription : "",
   };
 }
 function mapContactInfo(contactInfo: unknown): ContactDetails | null {
@@ -42,7 +47,6 @@ function mapRestaurant(restaurant: {
   logo: string | null;
   contactInfo: unknown;
   content: unknown;
-
   seoTitle: string | null;
   seoDescription: string | null;
   status: "OPEN" | "CLOSED";

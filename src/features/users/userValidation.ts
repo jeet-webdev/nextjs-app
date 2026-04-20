@@ -1,4 +1,5 @@
-import { USER_TYPE_OPTIONS, type UserType } from "@/features/users/types";
+// import { USER_TYPE_OPTIONS, type UserType } from "@/features/users/types";
+import { USER_TYPE_MAP, type UserType } from "./types";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 // const PHONE_PATTERN = /^\+?[\d\s()-]{6,20}$/;
@@ -41,7 +42,7 @@ const DEFAULT_OPTIONS: Required<UserFormValidationOptions> = {
   requireConfirmPassword: false,
   validatePasswordConfirmation: false,
   requireUserType: false,
-  allowedUserTypes: USER_TYPE_OPTIONS,
+  allowedUserTypes: Object.keys(USER_TYPE_MAP) as UserType[],
   minimumPasswordLength: 6,
 };
 

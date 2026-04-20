@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import type { UserRecord, UserType } from "@/features/users/types";
+import { USER_TYPE_MAP, type UserRecord, type UserType } from "@/features/users/types";
 import {
   type UserFormValidationErrors,
   hasUserFormErrors,
@@ -246,7 +246,7 @@ export default function UserSignupForm({
               value={form.phone}
               onChange={(event) => handleChange("phone", event.target.value)}
               onBlur={() => handleBlur("phone")}
-              placeholder={isUpdateMode ? "Phone number" : "phone"}
+              placeholder={isUpdateMode ? "Phone number" : "Phone"}
               className={getInputClassName("phone")}
               aria-invalid={Boolean(fieldErrors.phone)}
           />
@@ -277,7 +277,7 @@ export default function UserSignupForm({
          >
               {userTypeOptions.map((option) => (
                 <option key={option} value={option}>
-               {option.toLowerCase()}
+               {USER_TYPE_MAP[option]}
                 </option>
               ))}
            </select>

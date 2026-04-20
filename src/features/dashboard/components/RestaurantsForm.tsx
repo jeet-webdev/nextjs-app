@@ -74,6 +74,24 @@ export default function RestaurantsForm({ onSubmit, form, setForm, isSubmitting,
           value={form.seoDescription}
           onChange={(e) => setForm((prev) => ({ ...prev, seoDescription: e.target.value }))}
         />
+         <input 
+          className="p-3 bg-black/40 border border-white/10 rounded-lg col-span-1 sm:col-span-2"
+          placeholder="Content Title"
+          value={form.content.heroTitle}
+          onChange={(e) => setForm((prev) => ({ ...prev, content: { ...prev.content, heroTitle: e.target.value } }))}
+        />
+          <input
+          className="p-3 bg-black/40 border border-white/10 rounded-lg col-span-1 sm:col-span-2"
+          placeholder="Content Description"
+          value={form.content.heroDescription}
+          onChange={(e) => setForm((prev) => ({ ...prev, content: { ...prev.content, heroDescription: e.target.value } }))}
+        />
+          <input
+          className="p-3 bg-black/40 border border-white/10 rounded-lg col-span-1 sm:col-span-2"
+          placeholder="Content Hero Image URL"
+          value={form.content.heroImageUrl}
+          onChange={(e) => setForm((prev) => ({ ...prev, content: { ...prev.content, heroImageUrl: e.target.value } }))}
+        />
 
         <input 
           className="p-3 bg-black/40 border border-white/10 rounded-lg col-span-1 sm:col-span-2"

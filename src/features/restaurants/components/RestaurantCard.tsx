@@ -1,18 +1,20 @@
 import Link from "next/link";
 
 import { type RestaurantRecord } from "@/features/restaurants/types";
-import { Edit, EditIcon } from "lucide-react";
+import { Archive, DeleteIcon, Edit, EditIcon } from "lucide-react";
 
 type RestaurantCardProps = {
   restaurant: RestaurantRecord;
   compact?: boolean;
   onEdit?: (restaurant: RestaurantRecord) => void;
+  onDelete?: (restaurant: RestaurantRecord) => void;
 };
 
 export default function RestaurantCard({
   restaurant,
   compact = false,
   onEdit,
+  onDelete,
 }: RestaurantCardProps) {
   const content = compact ? (
     <div className="rounded-xl border border-white/10 bg-black/30 p-4 transition hover:bg-black/50 hover:border-sky-500/30">
@@ -70,6 +72,22 @@ export default function RestaurantCard({
     <div className="relative">
       <Link href={`/${restaurant.slug}`}>{content}</Link>
 
+      {/* {onDelete ? (
+        <div className="absolute right-3 bottom-3 z-10">
+          <button
+            type="button"
+            onClick={(event) => {
+              event.preventDefault();
+              onDelete(restaurant);
+            }}
+            className="rounded bg-white/10 px-2 py-1 text-xs text-gray-100 transition hover:bg-white/20"
+          >
+            <DeleteIcon className="h-5 w-5">Delete</DeleteIcon>
+             <DeleteIcon className="h-5 w-5" /> 
+          </button>
+        </div>
+      ) : null} */}
+
       {onEdit ? (
         <div className="absolute right-3 top-3 z-10">
           <button
@@ -81,6 +99,21 @@ export default function RestaurantCard({
             className="rounded bg-white/10 px-2 py-1 text-xs text-gray-100 transition hover:bg-white/20"
           >
             <EditIcon className="h-5 w-5" />
+          </button>
+        </div>
+      ) : null}
+      {onDelete ? (
+        <div className="absolute right-3 bottom-10 z-10">
+          <button
+            type="button"
+            onClick={(event) => {
+              event.preventDefault();
+              onDelete(restaurant);
+            }}
+            className="rounded bg-white/10 px-2 py-1 text-xs text-gray-100 transition hover:bg-white/20"
+          >
+            {/* <DeleteIcon className="h-5 w-5" /> */}
+            <Archive className="h-5 w-5" />
           </button>
         </div>
       ) : null}

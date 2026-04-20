@@ -20,16 +20,20 @@ function mapContactInfo(contactInfo: unknown): ContactDetails | null {
     website: typeof value.website === "string" ? value.website : "",
   };
 }
-function mapContent(content: unknown): { title: string; description: string; imageUrl: string; menuBookUrl: string } | null {
+function mapContent(content: unknown): { title: string; description: string; imageUrl: string; menuBookUrl: string; heroImageUrl: string; heroTitle: string; heroDescription: string } | null {
   if (!content || typeof content !== "object") {
     return null;
   }
-  const value = content as Partial<{ title: unknown; description: unknown; imageUrl: unknown; menuBookUrl: unknown }>;
+  const value = content as Partial<{ title: unknown; description: unknown; imageUrl: unknown; menuBookUrl: unknown; heroImageUrl: unknown; heroTitle: unknown; heroDescription: unknown }>;
   return {
     title: typeof value.title === "string" ? value.title : "",
     description: typeof value.description === "string" ? value.description : "",
     imageUrl: typeof value.imageUrl === "string" ? value.imageUrl : "",
     menuBookUrl: typeof value.menuBookUrl === "string" ? value.menuBookUrl : "",
+    heroImageUrl: typeof value.heroImageUrl === "string" ? value.heroImageUrl : "",
+    heroTitle: typeof value.heroTitle === "string" ? value.heroTitle : "",
+    heroDescription: typeof value.heroDescription === "string" ? value.heroDescription : "",
+
   };
 }
 function mapRestaurant(restaurant: {
@@ -80,6 +84,10 @@ async function getSessionUser() {
   return prisma.user.findUnique({ where: { id: session.sub }, select: { id: true, userType: true } });
 }
 
+
+// this is the PATCH API of resturent 
+
+
 export async function PATCH(
   request: Request,
   context: { params: Promise<{ id: string }> },
@@ -125,6 +133,9 @@ export async function PATCH(
       description: typeof body.content.description === "string" ? body.content.description.trim() : "",
       imageUrl: typeof body.content.imageUrl === "string" ? body.content.imageUrl.trim() : "",
       menuBookUrl: typeof body.content.menuBookUrl === "string" ? body.content.menuBookUrl.trim() : "",
+      heroImageUrl: typeof body.content.heroImageUrl === "string" ? body.content.heroImageUrl.trim() : "",
+      heroTitle: typeof body.content.heroTitle === "string" ? body.content.heroTitle.trim() : "",
+      heroDescription: typeof body.content.heroDescription === "string" ? body.content.heroDescription.trim() : "",
     };
     data.content = content;
   }
@@ -162,6 +173,11 @@ export async function PATCH(
     return NextResponse.json({ error: "Unable to update restaurant" }, { status: 500 });
   }
 }
+
+
+
+// this is the DELETE API of resturent
+
 
 export async function DELETE(
   _request: Request,

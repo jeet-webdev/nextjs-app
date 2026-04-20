@@ -10,6 +10,9 @@ export type FirstContent = {
   description: string;
   imageUrl: string;
   menuBookUrl: string;
+  heroTitle: string;
+  heroDescription: string;
+  heroImageUrl: string;
 };
 
 export type RestaurantRecord = {
@@ -65,7 +68,9 @@ export const EMPTY_RESTAURANT_FORM: RestaurantFormState = {
     description: "",
     imageUrl: "",
     menuBookUrl: "",
-
+    heroTitle: "",
+    heroDescription: "",
+    heroImageUrl: "",
   },
 
 };

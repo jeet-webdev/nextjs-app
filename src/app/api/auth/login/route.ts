@@ -27,7 +27,7 @@ export async function POST(request: Request) {
 
     let user = await prisma.user.findUnique({ where: { email } });
 
-    // Bootstrap a default admin user on first login attempt.
+   
     if (!user && email === adminEmail && password === adminPassword) {
       const hashedPassword = await bcrypt.hash(password, 10);
       user = await prisma.user.create({

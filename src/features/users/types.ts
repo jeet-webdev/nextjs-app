@@ -37,7 +37,11 @@ export const USER_TYPE_OPTIONS: UserType[] = [
   "CUSTOMER",
   "ADMIN",
 ];
-
+export const USER_TYPE_MAP: Record<UserType, string> = {
+  OWNER: "Owner",
+  CUSTOMER: "Customer",
+  ADMIN: "Admin",
+};
 export function getCreatableUserTypes(userType: UserType | null | undefined): UserType[] {
   if (userType === "ADMIN") {
     return [...USER_TYPE_OPTIONS];
