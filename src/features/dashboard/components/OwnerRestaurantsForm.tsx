@@ -1,8 +1,14 @@
 import RestaurantGrid from "@/features/restaurants/components/RestaurantGrid";
+import { restaurantSchema } from "@/features/restaurants/restaurantValidation";
 import {
   type RestaurantFormState,
   type RestaurantRecord,
 } from "@/features/restaurants/types";
+import {z} from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+type RestaurantFormData = z.infer<typeof restaurantSchema>;
 
 type OwnerRestaurantsFormProps = {
   restaurants: RestaurantRecord[];
@@ -48,21 +54,18 @@ export default function OwnerRestaurantsForm({
           <input
             className="rounded-lg border border-white/10 bg-black/40 p-3"
             placeholder="Restaurant Name"
-            required
-            value={restaurantForm.name}
+           value={restaurantForm.name}
             onChange={(event) => setRestaurantForm((prev) => ({ ...prev, name: event.target.value }))}
           />
           <input
             className="rounded-lg border border-white/10 bg-black/40 p-3"
             placeholder="Category"
-            required
             value={restaurantForm.category}
             onChange={(event) => setRestaurantForm((prev) => ({ ...prev, category: event.target.value }))}
           />
           <input
             className="rounded-lg border border-white/10 bg-black/40 p-3"
             placeholder="City"
-            required
             value={restaurantForm.city}
             onChange={(event) => setRestaurantForm((prev) => ({ ...prev, city: event.target.value }))}
           />
@@ -75,7 +78,6 @@ export default function OwnerRestaurantsForm({
           <input
           className="p-3 bg-black/40 border border-white/10 rounded-lg"
           placeholder="Restaurant Address"
-          required
           value={restaurantForm.address}
           onChange={(e) => setRestaurantForm  ((prev) => ({ ...prev, address: e.target.value }))}
         />
@@ -190,6 +192,7 @@ export default function OwnerRestaurantsForm({
   }
 />
     <div className="sm:col-span-2 flex gap-3">
+      
             <button
               type="submit"
               disabled={isSubmitting}
@@ -218,3 +221,4 @@ export default function OwnerRestaurantsForm({
     </>
   );
 }
+

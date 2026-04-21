@@ -42,14 +42,7 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
           label="Menu Items"
           active={activeSection === "menu-items"}
           onClick={() => onSectionChange("menu-items")}
-        />
-        {/* <NavItem
-          icon={<HousePlus size={20} />}
-          label="Create Restaurant"
-          active={activeSection === "create-restaurant"}
-          onClick={() => onSectionChange("create-restaurant")}
-        /> */}
-        
+        />      
       </nav>
     </aside>
   );

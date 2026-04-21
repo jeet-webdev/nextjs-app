@@ -18,24 +18,22 @@ export default function RestaurantsForm({ onSubmit, form, setForm, isSubmitting,
       <h2 className="text-base sm:text-lg font-semibold mb-4">{isEditing ? "Edit Restaurant" : "Create Restaurant"}</h2>
 
       <form className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4" onSubmit={onSubmit}>
+        {/* Basic Info Fields */}
         <input
           className="p-3 bg-black/40 border border-white/10 rounded-lg"
           placeholder="Restaurant Name"
-          required
           value={form.name}
           onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
         />
         <input
           className="p-3 bg-black/40 border border-white/10 rounded-lg"
           placeholder="Category"
-          required
           value={form.category}
           onChange={(e) => setForm((prev) => ({ ...prev, category: e.target.value }))}
         />
         <input
           className="p-3 bg-black/40 border border-white/10 rounded-lg"
           placeholder="City"
-          required
           value={form.city}
           onChange={(e) => setForm((prev) => ({ ...prev, city: e.target.value }))}
         />
@@ -49,7 +47,6 @@ export default function RestaurantsForm({ onSubmit, form, setForm, isSubmitting,
         <input
           className="p-3 bg-black/40 border border-white/10 rounded-lg"
           placeholder="Restaurant Address"
-          required
           value={form.address}
           onChange={(e) => setForm((prev) => ({ ...prev, address: e.target.value }))}
         />

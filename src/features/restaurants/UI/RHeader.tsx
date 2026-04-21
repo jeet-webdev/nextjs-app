@@ -58,12 +58,12 @@ const params = useParams();
   if (error || !restaurant) {
     return (
       <section className="bg-gradient-to-b from-black via-slate-900 to-black px-4 py-20">
-        <div className="mx-auto max-w-6xl">
+        {/* <div className="mx-auto max-w-6xl">
           <div className="rounded-2xl border border-red-500/20 bg-red-950/20 p-6 text-center">
             <h1 className="text-2xl font-bold text-red-400">{error}</h1>
             <p className="mt-2 text-gray-300">The restaurant you&apos;re looking for doesn&apos;t exist.</p>
           </div>
-        </div>
+        </div> */}
       </section>
     );
   }

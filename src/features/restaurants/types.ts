@@ -1,3 +1,7 @@
+import { zodResolver } from "@hookform/resolvers/zod/dist/zod.js";
+import { restaurantSchema } from "./restaurantValidation";
+import { useForm } from "react-hook-form";
+
 export type ContactDetails = {
   phone: string;
   email: string;
@@ -74,3 +78,8 @@ export const EMPTY_RESTAURANT_FORM: RestaurantFormState = {
   },
 
 };
+
+//   const { register, handleSubmit, formState: { errors } } = useForm<RestaurantFormState>({
+//   resolver: zodResolver(restaurantSchema),
+//   defaultValues: EMPTY_RESTAURANT_FORM,
+// });

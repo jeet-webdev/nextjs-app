@@ -108,7 +108,7 @@ export async function PATCH(
   }
 
   const body = await request.json();
-  const data: Record<string, unknown> = {};
+  const data: Record<string, any> = {};  //unknown
 
   if (typeof body.name === "string") data.name = body.name.trim();
   if (typeof body.category === "string") data.category = body.category.trim();
@@ -139,17 +139,30 @@ export async function PATCH(
     };
     data.content = content;
   }
-
-
-
-
   if (typeof body.seoTitle === "string") data.seoTitle = body.seoTitle.trim();
   if (typeof body.seoDescription === "string") data.seoDescription = body.seoDescription.trim();
+  if (typeof body.status === "string" && ["OPEN", "CLOSED"].includes(body.status)) {
+    data.status = body.status;
+  }
+
+
+  
+  const normalizedSlug = (data.slug ) //|| data.name
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-");
+  
 
   try {
     const updated = await prisma.restaurant.update({
       where: { id },
-      data,
+      // data,
+       data: {
+          ...data,
+        slug: normalizedSlug,
+      
+      },
       select: {
         id: true,
         name: true,

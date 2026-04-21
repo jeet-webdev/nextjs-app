@@ -247,15 +247,17 @@ useEffect(() => { fetchUsers(); }, [fetchUsers]);
       const data = (() => {
         try {
           return JSON.parse(responseText) as RestaurantMutationResponse;
-        } catch {
+        }
+        catch {
           return {} as RestaurantMutationResponse;
         }
       })();
 
       if (!response.ok || !data.restaurant) {
         setRestaurantError(data.error ?? "Unable to create restaurant.");
+        toast.error(data.error ?? "Failed to create restaurant.");
         return;
-      }
+      } 
       
       setRestaurants((prev) => {
         const next = [...prev];
@@ -273,10 +275,13 @@ useEffect(() => { fetchUsers(); }, [fetchUsers]);
       setRestaurantForm(EMPTY_RESTAURANT_FORM);
       setIsEditingRestaurant(false);
       setEditingRestaurantId(null);
-    } catch {
+       toast.success(isEditingRestaurant ? "Restaurant updated successfully" : "Restaurant created successfully");
+    }catch {
       setRestaurantError("Unable to create restaurant.");
+      toast.error("Error connecting to server");
     } finally {
       setIsSubmittingShop(false);
+      toast.dismiss("Not able to create restaurant.");
     }
   };
   const handleEditClick = (restaurant: RestaurantRecord) => {
@@ -419,26 +424,7 @@ useEffect(() => { fetchUsers(); }, [fetchUsers]);
 
         {activeSection === "users" ? (
           <>
-            {/* {creatableUserTypes.length > 0 ? (
-              <div id="add-user-form">
-                <AddUserForm
-                  form={form}
-                  isSubmitting={isSubmitting}
-                  error={error}
-                  userTypeOptions={creatableUserTypes}
-                  title={formTitle}
-                  submitLabel={submitLabel}
-                  onSubmit={handleCreateUser}
-                  onChange={setForm}
-                />
-              </div>
-            ) : error ? (
-              <div className="bg-white/5 rounded-xl border border-white/10 p-6 mb-8">
-                <p className="text-rose-400 text-sm">{error}</p>
-              </div>
-            ) : null} */}
-
-            <UsersTable
+           <UsersTable
               users={visibleUsers}
               isLoadingUsers={isLoadingUsers}
               title={tableTitle}

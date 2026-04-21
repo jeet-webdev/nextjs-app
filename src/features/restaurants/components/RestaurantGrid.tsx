@@ -30,15 +30,6 @@ export default function RestaurantGrid({
     </button>
   ) : null;
 
-  // if (restaurants.length === 0) {
-  //   return (
-  //     <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 text-gray-300">
-  //       {createButton ? <div className="mb-4 flex justify-end">{createButton}</div> : null}
-  //       {emptyMessage}
-  //     </div>
-  //   );
-  // }
-
   return (
     <>
       <div className="flex items-center justify-between gap-3 border-b border-white/10 p-4 text-sm font-semibold sm:p-6 sm:text-base">

@@ -42,20 +42,7 @@ export default function RestaurantCard({
       <p className="mt-2 text-sm text-sky-300">{restaurant.category}</p>
       <div className="mt-4 flex items-center justify-between text-sm text-gray-300">
         <span>{restaurant.city}</span>
-        {/* <span className="rounded-full bg-emerald-500/15 px-2 py-1 text-emerald-200">
-          {restaurant.status ?? "OPEN"}
-        </span> */}
-        {/* {restaurant.status === "OPEN" && (
-          <span className="rounded-full bg-emerald-500/15 px-2 py-1 text-emerald-200">
-            Open Now
-          </span>
-        ) : (
-          <span className="rounded-full bg-red-500/15 px-2 py-1 text-red-200">
-            Closed
-          </span>
-        )} */}
-
-      {restaurant.status === "OPEN" ? (
+       {restaurant.status === "OPEN" ? (
   <span className="rounded-full bg-emerald-500/15 px-2 py-1 text-emerald-200">
     Open
   </span>
@@ -72,21 +59,7 @@ export default function RestaurantCard({
     <div className="relative">
       <Link href={`/${restaurant.slug}`}>{content}</Link>
 
-      {/* {onDelete ? (
-        <div className="absolute right-3 bottom-3 z-10">
-          <button
-            type="button"
-            onClick={(event) => {
-              event.preventDefault();
-              onDelete(restaurant);
-            }}
-            className="rounded bg-white/10 px-2 py-1 text-xs text-gray-100 transition hover:bg-white/20"
-          >
-            <DeleteIcon className="h-5 w-5">Delete</DeleteIcon>
-             <DeleteIcon className="h-5 w-5" /> 
-          </button>
-        </div>
-      ) : null} */}
+    
 
       {onEdit ? (
         <div className="absolute right-3 top-3 z-10">
@@ -112,7 +85,6 @@ export default function RestaurantCard({
             }}
             className="rounded bg-white/10 px-2 py-1 text-xs text-gray-100 transition hover:bg-white/20"
           >
-            {/* <DeleteIcon className="h-5 w-5" /> */}
             <Archive className="h-5 w-5" />
           </button>
         </div>
