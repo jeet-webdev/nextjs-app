@@ -9,6 +9,7 @@ import Main from "../../features/restaurants/UI/Main";
 import RHeader from "../../features/restaurants/UI/RHeader";
 import Footer from "@/features/restaurants/UI/Footer";
 import HeroSection from "@/features/restaurants/UI/HeroSection";
+import { toast } from "react-toastify";
 
 export default function RestaurantDetailPage() {
   const params = useParams();
@@ -31,7 +32,7 @@ export default function RestaurantDetailPage() {
         setRestaurant(data.restaurant);
         setError(null);
       } catch (err) {
-        console.error("Error fetching restaurant:", err);
+        toast.error("An error occurred while fetching restaurant details. Please try again later.");
         setError("Unable to load restaurant details");
       } finally {
         setLoading(false);

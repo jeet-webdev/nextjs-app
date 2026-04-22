@@ -276,9 +276,9 @@ useEffect(() => { fetchUsers(); }, [fetchUsers]);
       setIsEditingRestaurant(false);
       setEditingRestaurantId(null);
        toast.success(isEditingRestaurant ? "Restaurant updated successfully" : "Restaurant created successfully");
-    }catch {
+    }catch (error) {
       setRestaurantError("Unable to create restaurant.");
-      toast.error("Error connecting to server");
+      toast.error(error instanceof Error ? error.message : "An error occurred while creating the restaurant. Please try again.");
     } finally {
       setIsSubmittingShop(false);
       toast.dismiss("Not able to create restaurant.");
@@ -356,8 +356,8 @@ useEffect(() => { fetchUsers(); }, [fetchUsers]);
       }
 
       toast.success("Restaurant deleted successfully");
-    } catch {
-      toast.error("Error connecting to server");
+    } catch(error) {
+      toast.error(error instanceof Error ? error.message : "An error occurred while deleting the restaurant. Please try again.");
     }
   };
 

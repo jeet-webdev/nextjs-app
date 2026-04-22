@@ -20,20 +20,20 @@ export default function RestaurantGrid({
   onDelete,
   onCreateRestaurant,
 }: RestaurantGridProps) {
-  const createButton = onCreateRestaurant ? (
-    <button
-      type="button"
-      onClick={onCreateRestaurant}
-      className="rounded-lg bg-indigo-600 px-3 py-2 text-xs font-semibold whitespace-nowrap hover:bg-indigo-700 sm:px-4 sm:text-sm"
-    >
-      Create Restaurant
-    </button>
-  ) : null;
+  // const createButton = onCreateRestaurant ? (
+  //   <button
+  //     type="button"
+  //     onClick={onCreateRestaurant}
+  //     className="rounded-lg bg-indigo-600 px-3 py-2 text-xs font-semibold whitespace-nowrap hover:bg-indigo-700 sm:px-4 sm:text-sm"
+  //   >
+  //     Create Restaurant
+  //   </button>
+  // ) : null;
 
   return (
     <>
       <div className="flex items-center justify-between gap-3 border-b border-white/10 p-4 text-sm font-semibold sm:p-6 sm:text-base">
-        {createButton ?? <h2 className="text-base sm:text-lg font-semibold">Restaurants</h2>}
+        {/* {createButton ?? <h2 className="text-base sm:text-lg font-semibold">Restaurants</h2>} */}
       </div>
       <div className={className}>
         {restaurants.map((restaurant) => (

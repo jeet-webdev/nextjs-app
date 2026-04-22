@@ -4,10 +4,8 @@ import { NextResponse } from "next/server";
 import { FirstContent, type ContactDetails } from "@/features/restaurants/types";
 import { JWT_COOKIE_NAME, verifyAuthToken } from "@/shared/lib/auth";
 import { prisma } from "@/shared/lib/prisma";
-import { toast } from "react-toastify";
-import { error } from "console";
 function mapContent(content: unknown): { title: string; description: string; imageUrl: string; menuBookUrl: string; heroImageUrl: string; heroTitle: string; heroDescription: string } | null {
-// function mapContent(content: unknown): FirstContent | null {
+// function mapContent(content: unknown): FirstContent | null {         
 if (!content || typeof content !== "object") {
     return null;
   }
@@ -196,50 +194,9 @@ export async function POST(request: Request) {
   const content = mapContent(body.content);
 
   
-// if(!name) {
-//   error("Restaurant name is required.");
-//   return NextResponse.json({ error: "Restaurant name is required." }, { status: 400 });
-// }
-// if(!category) {
-//   error("Restaurant category is required.");
-//   return NextResponse.json({ error: "Restaurant category is required." }, { status: 400 });
-// }
-// if(!city) {
-//   error("Restaurant city is required.");
-//   return NextResponse.json({ error: "Restaurant city is required." }, { status: 400 });
-// }
-// if(!address) {
-//   error("Restaurant address is required.");
-//   return NextResponse.json({ error: "Restaurant address is required." }, { status: 400 });
-// }
-// if(!slug) {
-//   error("Restaurant slug is required.");
-//   return NextResponse.json({ error: "Restaurant slug is required." }, { status: 400 });
-// }
-//   if(!contactInfo){
-//     error("Restaurant contact information is required.");
-//     return NextResponse.json({ error: "Restaurant contact information is required." }, { status: 400 });
-//   }
-//   if(!content){
-//     error("Restaurant content information is required.");
-//     return NextResponse.json({ error: "Restaurant content information is required." }, { status: 400 });
-//   }
-//   if (logo && !/^https?:\/\/\S+$/.test(logo)) {
-//     error("Logo must be a valid URL.");
-//     return NextResponse.json({ error: "Logo must be a valid URL." }, { status: 400 });
-//   }
-//   if(seoTitle && seoTitle.length > 60) {
-//     error("SEO Title should be 60 characters or less.");
-//     return NextResponse.json({ error: "SEO Title should be 60 characters or less." }, { status: 400 });
-//   }
-//   if(seoDescription && seoDescription.length > 160) {
-//     error("SEO Description should be 160 characters or less.");
-//     return NextResponse.json({ error: "SEO Description should be 160 characters or less." }, { status: 400 });
-//   }
-
 
   if (!name || !category || !city || !address || !slug || !contactInfo || !content || !contactInfo.phone || !contactInfo.email || !contactInfo.openingHours || !contactInfo.closingHours ) {
-    // return NextResponse.json({ error: "name, category, city, address, and slug are required." }, { status: 400 });
+ 
     if(!name)    return NextResponse.json({ error: "Restaurant name is required." }, { status: 400 });
     if(!category) return NextResponse.json({ error: "Restaurant category is required." }, { status: 400 });
     if(!city)     return NextResponse.json({ error: "Restaurant city is required." }, { status: 400 });
@@ -293,8 +250,6 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ restaurant: mapRestaurant(restaurant) }, { status: 201 });
   } catch (error) {
-    console.error("Error creating restaurant:", error);
-    toast.error("An error occurred while creating the restaurant. Please try again.");
     return NextResponse.json({ error: "Unable to create restaurant." }, { status: 500 });
   }
 }

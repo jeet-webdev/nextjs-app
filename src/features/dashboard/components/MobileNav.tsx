@@ -1,6 +1,6 @@
 "use client";
 
-import { X } from "lucide-react";
+import { BeerIcon, LogsIcon, X } from "lucide-react";
 import { useState } from "react";
 import NavItem from "./NavItem";
 import { LayoutDashboard, Store, Users } from "lucide-react";
@@ -76,12 +76,18 @@ export default function MobileNav({ activeSection, onSectionChange, isOpen: exte
             active={activeSection === "restaurants"}
             onClick={() => handleSectionChange("restaurants")}
           />
-           <NavItem
-            icon={<Store size={20} />}
-            label="Create Restaurant"
-            active={activeSection === "create-restaurant"}
-            onClick={() => handleSectionChange("create-restaurant")}
-          />
+        <NavItem
+          icon={<BeerIcon size={20} />}
+          label="Table Reservations"
+          active={activeSection === "table-reservations"}
+          onClick={() => handleSectionChange("table-reservations")}
+        />
+         <NavItem
+          icon={<LogsIcon size={20} />}
+          label="Menu Items"
+          active={activeSection === "menu-items"}
+          onClick={() => handleSectionChange("menu-items")}
+        />  
         </nav>
       </aside>
     </>

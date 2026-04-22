@@ -3,14 +3,15 @@ import { NextResponse } from "next/server";
 
 import { JWT_COOKIE_NAME, verifyAuthToken } from "@/shared/lib/auth";
 import { prisma } from "@/shared/lib/prisma";
-import { type ContactDetails } from "@/features/restaurants/types";
+import type{ FirstContent,  ContactDetails } from "@/features/restaurants/types";
+import { toLowerCase } from "zod";
 
-function mapContactInfo(contactInfo: unknown): ContactDetails | null {
+function mapContactInfo(contactInfo: string): ContactDetails | null {
   if (!contactInfo || typeof contactInfo !== "object") {
     return null;
   }
 
-  const value = contactInfo as Partial<Record<keyof ContactDetails, unknown>>;
+  const value = contactInfo as Partial<Record<keyof ContactDetails, string>>;
 
   return {
     phone: typeof value.phone === "string" ? value.phone : "",
@@ -20,11 +21,11 @@ function mapContactInfo(contactInfo: unknown): ContactDetails | null {
     website: typeof value.website === "string" ? value.website : "",
   };
 }
-function mapContent(content: unknown): { title: string; description: string; imageUrl: string; menuBookUrl: string; heroImageUrl: string; heroTitle: string; heroDescription: string } | null {
+function mapContent(content: string | FirstContent): FirstContent | null {
   if (!content || typeof content !== "object") {
     return null;
   }
-  const value = content as Partial<{ title: unknown; description: unknown; imageUrl: unknown; menuBookUrl: unknown; heroImageUrl: unknown; heroTitle: unknown; heroDescription: unknown }>;
+  const value = content as Partial<FirstContent>;
   return {
     title: typeof value.title === "string" ? value.title : "",
     description: typeof value.description === "string" ? value.description : "",
@@ -44,13 +45,13 @@ function mapRestaurant(restaurant: {
   slug: string;
   Address: string | null;
   logo: string | null;
-  contactInfo?: any;
+  contactInfo?: any;  //ContactDetails | null; //any
   seoTitle: string | null;
   seoDescription: string | null;
   status: "OPEN" | "CLOSED";
   userId: string;
   createdAt: Date;
-  content?: any;
+  content?: any ;  //FirstContent | null;  //any
 })
  {
   return {
@@ -62,8 +63,7 @@ function mapRestaurant(restaurant: {
     address: restaurant.Address,
     logo: restaurant.logo,
     contactInfo: mapContactInfo(restaurant.contactInfo),
-    content: mapContent(restaurant.content),
-
+    content: mapContent(restaurant.content),  //mapContent(restaurant.content),
     seoTitle: restaurant.seoTitle,
     seoDescription: restaurant.seoDescription,
     status: restaurant.status,
@@ -108,7 +108,7 @@ export async function PATCH(
   }
 
   const body = await request.json();
-  const data: Record<string, any> = {};  //unknown
+  const data: Record<string, string | ContactDetails | FirstContent> = {};  //unknown
 
   if (typeof body.name === "string") data.name = body.name.trim();
   if (typeof body.category === "string") data.category = body.category.trim();
@@ -128,7 +128,7 @@ export async function PATCH(
   }
 
   if(body.content && typeof body.content === "object") {
-    const content = {
+    const content: FirstContent = {
       title: typeof body.content.title === "string" ? body.content.title.trim() : "",
       description: typeof body.content.description === "string" ? body.content.description.trim() : "",
       imageUrl: typeof body.content.imageUrl === "string" ? body.content.imageUrl.trim() : "",
@@ -146,8 +146,7 @@ export async function PATCH(
   }
 
 
-  
-  const normalizedSlug = (data.slug ) //|| data.name
+  const normalizedSlug = (data.slug as string)
     .toLowerCase()
     .replace(/[^\w\s-]/g, "")
     .replace(/\s+/g, "-")
