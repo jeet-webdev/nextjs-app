@@ -56,31 +56,42 @@ export default function OwnerRestaurantsForm({
             placeholder="Restaurant Name"
            value={restaurantForm.name}
             onChange={(event) => setRestaurantForm((prev) => ({ ...prev, name: event.target.value }))}
+            aria-errormessage={error}
           />
+          {!restaurantForm.name && !error && <p className="mt-2 text-xs sm:text-sm text-rose-400">Restaurant name is required.</p>}
           <input
             className="rounded-lg border border-white/10 bg-black/40 p-3"
             placeholder="Category"
             value={restaurantForm.category}
             onChange={(event) => setRestaurantForm((prev) => ({ ...prev, category: event.target.value }))}
-          />
+            aria-errormessage={error}
+            />
+          {!restaurantForm.category && !error && <p className="mt-2 text-xs sm:text-sm text-rose-400">Category is required.</p>}
           <input
             className="rounded-lg border border-white/10 bg-black/40 p-3"
             placeholder="City"
             value={restaurantForm.city}
             onChange={(event) => setRestaurantForm((prev) => ({ ...prev, city: event.target.value }))}
+            aria-errormessage={error}
           />
+          {!restaurantForm.city && !error && <p className="mt-2 text-xs sm:text-sm text-rose-400">City is required.</p>}
           <input
             className="rounded-lg border border-white/10 bg-black/40 p-3"
             placeholder="Slug (unique identifier for URL)"
             value={restaurantForm.slug}
             onChange={(event) => setRestaurantForm((prev) => ({ ...prev, slug: event.target.value }))}
+            aria-errormessage={error}
           />
+          {!restaurantForm.slug && !error && <p className="mt-2 text-xs sm:text-sm text-rose-400">Slug is required.</p>}
+
           <input
           className="p-3 bg-black/40 border border-white/10 rounded-lg"
           placeholder="Restaurant Address"
           value={restaurantForm.address}
           onChange={(e) => setRestaurantForm  ((prev) => ({ ...prev, address: e.target.value }))}
+        aria-errormessage={error}
         />
+        {!restaurantForm.address && !error && <p className="mt-2 text-xs sm:text-sm text-rose-400">Address is required.</p>}
 
         <input
           className="p-3 bg-black/40 border border-white/10 rounded-lg"
@@ -124,7 +135,9 @@ export default function OwnerRestaurantsForm({
           placeholder="Content Title"
           value={restaurantForm.content.title}
           onChange={(e) => setRestaurantForm((prev) => ({ ...prev, content: { ...prev.content, title: e.target.value } }))}
+          // aria-errormessage={error}
         />
+        {/* {!restaurantForm.content.title && !error && <p className="mt-2 text-xs sm:text-sm text-rose-400">Content title is required.</p>} */}
         <input 
           className="p-3 bg-black/40 border border-white/10 rounded-lg col-span-1 sm:col-span-2"
           placeholder="Content Description"
@@ -153,7 +166,9 @@ export default function OwnerRestaurantsForm({
       contactInfo: { ...prev.contactInfo, phone: e.target.value },
     }))
   }
+  aria-errormessage={error}
 />
+{!restaurantForm.contactInfo.phone && !error && <p className="mt-2 text-xs sm:text-sm text-rose-400">Phone number is required.</p>}
 
 {/* Email Input */}
 <input
@@ -166,7 +181,10 @@ export default function OwnerRestaurantsForm({
       contactInfo: { ...prev.contactInfo, email: e.target.value },
     }))
   }
+  aria-errormessage={error}
 />
+{!restaurantForm.contactInfo.email && !error && <p className="mt-2 text-xs sm:text-sm text-rose-400">Email is required.</p>}
+
 {/* Opening Hours */}
 <input
   className="p-3 bg-black/40 border border-white/10 rounded-lg"
@@ -178,7 +196,10 @@ export default function OwnerRestaurantsForm({
       contactInfo: { ...prev.contactInfo, openingHours: e.target.value },
     }))
   }
+  aria-errormessage={error}
 />
+{!restaurantForm.contactInfo.openingHours && !error && <p className="mt-2 text-xs sm:text-sm text-rose-400">Opening hours are required.</p>}
+
 {/* Closing Hours */}
 <input
   className="p-3 bg-black/40 border border-white/10 rounded-lg"
@@ -190,7 +211,9 @@ export default function OwnerRestaurantsForm({
       contactInfo: { ...prev.contactInfo, closingHours: e.target.value },
     }))
   }
+  aria-errormessage={error}
 />
+{!restaurantForm.contactInfo.closingHours && !error && <p className="mt-2 text-xs sm:text-sm text-rose-400">Closing hours are required.</p>}
     <div className="sm:col-span-2 flex gap-3">
       
             <button

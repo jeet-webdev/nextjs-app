@@ -4,6 +4,8 @@ import { NextResponse } from "next/server";
 import { FirstContent, type ContactDetails } from "@/features/restaurants/types";
 import { JWT_COOKIE_NAME, verifyAuthToken } from "@/shared/lib/auth";
 import { prisma } from "@/shared/lib/prisma";
+import { no } from "zod/v4/locales";
+import { Prisma } from "@prisma/client";
 function mapContent(content: unknown): { title: string; description: string; imageUrl: string; menuBookUrl: string; heroImageUrl: string; heroTitle: string; heroDescription: string } | null {
 // function mapContent(content: unknown): FirstContent | null {         
 if (!content || typeof content !== "object") {
@@ -197,23 +199,30 @@ export async function POST(request: Request) {
 
   if (!name || !category || !city || !address || !slug || !contactInfo || !content || !contactInfo.phone || !contactInfo.email || !contactInfo.openingHours || !contactInfo.closingHours ) {
  
-    if(!name)    return NextResponse.json({ error: "Restaurant name is required." }, { status: 400 });
-    if(!category) return NextResponse.json({ error: "Restaurant category is required." }, { status: 400 });
-    if(!city)     return NextResponse.json({ error: "Restaurant city is required." }, { status: 400 });
-    if(!address)  return NextResponse.json({ error: "Restaurant address is required." }, { status: 400 });
-    if(!slug)     return NextResponse.json({ error: "Restaurant slug is required." }, { status: 400 });
-    if(!contactInfo) return NextResponse.json({ error: "Restaurant contact information is required." }, { status: 400 });
-    if(!content) return NextResponse.json({ error: "Restaurant content information is required." }, { status: 400 });
-    if(!contactInfo.phone) return NextResponse.json({ error: "Restaurant phone number is required." }, { status: 400 });
-    if(!contactInfo.email) return NextResponse.json({ error: "Restaurant email is required." }, { status: 400 });
-    if(!contactInfo.openingHours) return NextResponse.json({ error: "Restaurant opening hours are required." }, { status: 400 });
-    if(!contactInfo.closingHours) return NextResponse.json({ error: "Restaurant closing hours are required." }, { status: 400 });
+    if(!name)    return NextResponse.json({ error: "API Restaurant name is required." }, { status: 400 });
+    if(!category) return NextResponse.json({ error: "API Restaurant category is required." }, { status: 400 });
+    if(!city)     return NextResponse.json({ error: "API Restaurant city is required." }, { status: 400 });
+    if(!address)  return NextResponse.json({ error: "API Restaurant address is required." }, { status: 400 });
+    if(!slug)     return NextResponse.json({ error: "API Restaurant slug is required." }, { status: 400 });
+    if(!contactInfo) return NextResponse.json({ error: "API Restaurant contact information is required." }, { status: 400 });
+    if(!content) return NextResponse.json({ error: "API Restaurant content information is required." }, { status: 400 });
+    if(!contactInfo.phone) return NextResponse.json({ error: "API Restaurant phone number is required." }, { status: 400 });
+    if(!contactInfo.email) return NextResponse.json({ error: "API Restaurant email is required." }, { status: 400 });
+    if(!contactInfo.openingHours) return NextResponse.json({ error: "API Restaurant opening hours are required." }, { status: 400 });
+    if(!contactInfo.closingHours) return NextResponse.json({ error:  " API Restaurant closing hours are required." }, { status: 400 });
   }
-  const normalizedSlug = (slug ) //|| name
+  const normalizedSlug = (slug ) 
     .toLowerCase()
     .replace(/[^\w\s-]/g, "")
     .replace(/\s+/g, "-")
     .replace(/-+/g, "-");
+
+  
+    
+
+
+
+
 
   try {
     const restaurant = await prisma.restaurant.create({
@@ -249,7 +258,22 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json({ restaurant: mapRestaurant(restaurant) }, { status: 201 });
+  // } catch (error) {
+  //   return NextResponse.json({ error: "Unable to create restaurant." }, { status: 500 });
+  // }
   } catch (error) {
-    return NextResponse.json({ error: "Unable to create restaurant." }, { status: 500 });
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error.code === 'P2002') {
+        return NextResponse.json(
+          { error: "A restaurant with this slug already exists." }, 
+          { status: 400 }
+        );
+      }
+    }
+
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Internal Server Error" }, 
+      { status: 500 }
+    );
   }
 }

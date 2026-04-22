@@ -5,6 +5,7 @@ import { JWT_COOKIE_NAME, verifyAuthToken } from "@/shared/lib/auth";
 import { prisma } from "@/shared/lib/prisma";
 import type{ FirstContent,  ContactDetails } from "@/features/restaurants/types";
 import { toLowerCase } from "zod";
+import { Prisma } from "@prisma/client";
 
 function mapContactInfo(contactInfo: string): ContactDetails | null {
   if (!contactInfo || typeof contactInfo !== "object") {
@@ -180,10 +181,26 @@ export async function PATCH(
       },
     });
     return NextResponse.json({ restaurant: mapRestaurant(updated) });
+  // } catch (error) {
+  //   console.error("Error updating restaurant:", error);
+  //   return NextResponse.json({ error: "Unable to update restaurant" }, { status: 500 });
+  // }
+
   } catch (error) {
-    console.error("Error updating restaurant:", error);
-    return NextResponse.json({ error: "Unable to update restaurant" }, { status: 500 });
-  }
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2002') {
+          return NextResponse.json(
+            { error: "A restaurant with this slug already exists." }, 
+            { status: 400 }
+          );
+        }
+      }
+  
+      return NextResponse.json(
+        { error: error instanceof Error ? error.message : "Internal Server Error" }, 
+        { status: 500 }
+      );
+    }
 }
 
 

@@ -32,7 +32,7 @@ export default function RestaurantDetailPage() {
         setRestaurant(data.restaurant);
         setError(null);
       } catch (err) {
-        toast.error("An error occurred while fetching restaurant details. Please try again later.");
+        // toast.error("An error occurred while fetching restaurant details. Please try again later.");
         setError("Unable to load restaurant details");
       } finally {
         setLoading(false);
@@ -68,10 +68,10 @@ export default function RestaurantDetailPage() {
 
    return (
     <>
-      <RHeader />
-      <HeroSection />
-      <Main />
-      <Footer />
+      <RHeader restaurant={restaurant} />
+      <HeroSection restaurant={restaurant} />
+      <Main restaurant={restaurant} />
+      <Footer restaurant={restaurant} />
     </>
   )
 

@@ -1,6 +1,6 @@
 import { type RestaurantFormState } from "@/features/restaurants/types";
 import { RestaurantStatus } from "@prisma/client";
-
+import { useState } from "react";
 type RestaurantsFormProps = {
   onSubmit: (e: React.FormEvent) => void;
   form: RestaurantFormState;
@@ -19,37 +19,64 @@ export default function RestaurantsForm({ onSubmit, form, setForm, isSubmitting,
 
       <form className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4" onSubmit={onSubmit}>
         {/* Basic Info Fields */}
+        <div>
         <input
           className="p-3 bg-black/40 border border-white/10 rounded-lg"
           placeholder="Restaurant Name"
           value={form.name}
           onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
+           aria-errormessage={error}
+
         />
+        { !form.name?error && <p className="mt-2 text-xs sm:text-sm text-rose-400">Restaurant name is required.</p> : null} 
+        {/* {!form.name && <p className="mt-2 text-xs sm:text-sm text-rose-400">Restaurant name is required.</p>} */}
+  
+     
+        </div>
+        <div>
         <input
           className="p-3 bg-black/40 border border-white/10 rounded-lg"
           placeholder="Category"
           value={form.category}
           onChange={(e) => setForm((prev) => ({ ...prev, category: e.target.value }))}
+        aria-errormessage={error}
         />
+        {!form.category?error && <p className="mt-2 text-xs sm:text-sm text-rose-400">Category is required.</p> : null}
+        </div>
+        <div>
+
         <input
           className="p-3 bg-black/40 border border-white/10 rounded-lg"
           placeholder="City"
           value={form.city}
           onChange={(e) => setForm((prev) => ({ ...prev, city: e.target.value }))}
+        aria-errormessage={error}
         />
+        {!form.city?error && <p className="mt-2 text-xs sm:text-sm text-rose-400">City is required.</p> : null}
+        
+        </div>
+        <div>
         <input
           className="p-3 bg-black/40 border border-white/10 rounded-lg"
           placeholder="Slug (unique identifier for URL)"
           value={form.slug}
           onChange={(e) => setForm((prev) => ({ ...prev, slug: e.target.value }))}
+         aria-errormessage={error}
         />
-
+        
+        {!form.slug?error && <p className="mt-2 text-xs sm:text-sm text-rose-400">Slug is required.</p> : null}
+   
+        </div>
+<div>
         <input
           className="p-3 bg-black/40 border border-white/10 rounded-lg"
           placeholder="Restaurant Address"
           value={form.address}
           onChange={(e) => setForm((prev) => ({ ...prev, address: e.target.value }))}
+          aria-errormessage={error}
         />
+        {!form.address?error && <p className="mt-2 text-xs sm:text-sm text-rose-400">Address is required.</p> : null}
+        </div>
 
         <input
           className="p-3 bg-black/40 border border-white/10 rounded-lg"
@@ -57,6 +84,7 @@ export default function RestaurantsForm({ onSubmit, form, setForm, isSubmitting,
           value={form.logo}
           onChange={(e) => setForm((prev) => ({ ...prev, logo: e.target.value }))}
         />
+       
 
         <input
           className="p-3 bg-black/40 border border-white/10 rounded-lg col-span-1 sm:col-span-2"
@@ -115,6 +143,7 @@ export default function RestaurantsForm({ onSubmit, form, setForm, isSubmitting,
           onChange={(e) => setForm((prev) => ({ ...prev, content: { ...prev.content, menuBookUrl: e.target.value } }))}
         />
         {/* Contact Info Fields */}
+        <div>
         <input
   className="p-3 bg-black/40 border border-white/10 rounded-lg"
   placeholder="Phone Number"
@@ -125,9 +154,14 @@ export default function RestaurantsForm({ onSubmit, form, setForm, isSubmitting,
       contactInfo: { ...prev.contactInfo, phone: e.target.value },
     }))
   }
-/>
+  aria-errormessage={error}
+ 
+        />
+        {!form.contactInfo.phone ? error && <p className="mt-2 text-xs sm:text-sm text-rose-400">Phone number is required.</p> : null}
+        </div>
 
 {/* Email Input */}
+<div>
 <input
   className="p-3 bg-black/40 border border-white/10 rounded-lg"
   placeholder="Email Address"
@@ -138,8 +172,13 @@ export default function RestaurantsForm({ onSubmit, form, setForm, isSubmitting,
       contactInfo: { ...prev.contactInfo, email: e.target.value },
     }))
   }
+aria-errormessage={error}
 />
+{!form.contactInfo.email ? error && <p className="mt-2 text-xs sm:text-sm text-rose-400">Email address is required.</p> : null}
+</div>
+
 {/* Opening Hours */}
+<div>
 <input
   className="p-3 bg-black/40 border border-white/10 rounded-lg"
   placeholder="Opening Hours"
@@ -150,9 +189,14 @@ export default function RestaurantsForm({ onSubmit, form, setForm, isSubmitting,
       contactInfo: { ...prev.contactInfo, openingHours: e.target.value },
     }))
   }
+  aria-errormessage={error}
 />
+
+ {!form.contactInfo.openingHours ? error && <p className="mt-2 text-xs sm:text-sm text-rose-400">Opening hours are required.</p> : null}
+</div>
 {/* Closing Hours */}
-<input
+<div>
+  <input
   className="p-3 bg-black/40 border border-white/10 rounded-lg"
   placeholder="Closing Hours"
   value={form.contactInfo.closingHours}
@@ -162,7 +206,11 @@ export default function RestaurantsForm({ onSubmit, form, setForm, isSubmitting,
       contactInfo: { ...prev.contactInfo, closingHours: e.target.value },
     }))
   }
+aria-errormessage={error}
 />
+{!form.contactInfo.closingHours ? error && <p className="mt-2 text-xs sm:text-sm text-rose-400">Closing hours are required.</p> : null}
+</div>
+{/* Website */}
 <div className="flex gap-3 col-span-1 sm:col-span-2">
   <label className="flex items-center gap-2 cursor-pointer text-sm font-medium text-white">
     <input

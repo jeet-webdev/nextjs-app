@@ -255,7 +255,7 @@ useEffect(() => { fetchUsers(); }, [fetchUsers]);
 
       if (!response.ok || !data.restaurant) {
         setRestaurantError(data.error ?? "Unable to create restaurant.");
-        toast.error(data.error ?? "Failed to create restaurant.");
+        // toast.error(data.error ?? "Failed to create restaurant.");
         return;
       } 
       
@@ -278,7 +278,7 @@ useEffect(() => { fetchUsers(); }, [fetchUsers]);
        toast.success(isEditingRestaurant ? "Restaurant updated successfully" : "Restaurant created successfully");
     }catch (error) {
       setRestaurantError("Unable to create restaurant.");
-      toast.error(error instanceof Error ? error.message : "An error occurred while creating the restaurant. Please try again.");
+      // toast.error(error instanceof Error ? error.message : "An error occurred while creating the restaurant. Please try again.");
     } finally {
       setIsSubmittingShop(false);
       toast.dismiss("Not able to create restaurant.");
