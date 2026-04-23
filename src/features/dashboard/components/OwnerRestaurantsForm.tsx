@@ -214,7 +214,18 @@ export default function OwnerRestaurantsForm({
   aria-errormessage={error}
 />
 {!restaurantForm.contactInfo.closingHours && !error && <p className="mt-2 text-xs sm:text-sm text-rose-400">Closing hours are required.</p>}
-    <div className="sm:col-span-2 flex gap-3">
+<input 
+  className="p-3 bg-black/40 border border-white/10 rounded-lg col-span-1 sm:col-span-2"
+  placeholder="Website URL"
+  value={restaurantForm.contactInfo.website}
+  onChange={(e) =>
+    setRestaurantForm((prev) => ({
+      ...prev,
+      contactInfo: { ...prev.contactInfo, website: e.target.value },
+    }))
+  }
+/>
+<div className="sm:col-span-2 flex gap-3">
       
             <button
               type="submit"

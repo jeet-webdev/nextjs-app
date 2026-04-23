@@ -1,6 +1,12 @@
 import { type RestaurantFormState } from "@/features/restaurants/types";
 import { RestaurantStatus } from "@prisma/client";
-import { useState } from "react";
+import { Delete, Edit, Edit2,  Plus, VenetianMaskIcon } from "lucide-react";
+import { useEffect, useState } from "react";
+import { TimePicker } from '@mui/x-date-pickers/TimePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs from 'dayjs';
+
 type RestaurantsFormProps = {
   onSubmit: (e: React.FormEvent) => void;
   form: RestaurantFormState;
@@ -12,7 +18,19 @@ type RestaurantsFormProps = {
   onCancel?: () => void;
 };
 
+
+const STORAGE_KEY = "site-theme";
+
 export default function RestaurantsForm({ onSubmit, form, setForm, isSubmitting, error, allCount, isEditing = false, onCancel, }: RestaurantsFormProps) {
+  const [theme, setTheme] = useState<string | null>(null);
+  
+  useEffect(() => {
+  const storedTheme = window.localStorage.getItem(STORAGE_KEY);
+  if (storedTheme === "light" || storedTheme === "dark") {
+    setTheme(storedTheme);
+    // applyTheme(storedTheme);
+  }
+},  []);
   return (
     <div className="bg-white/5 rounded-xl border border-white/10 p-4 sm:p-6 mb-8">
       <h2 className="text-base sm:text-lg font-semibold mb-4">{isEditing ? "Edit Restaurant" : "Create Restaurant"}</h2>
@@ -21,7 +39,7 @@ export default function RestaurantsForm({ onSubmit, form, setForm, isSubmitting,
         {/* Basic Info Fields */}
         <div>
         <input
-          className="p-3 bg-black/40 border border-white/10 rounded-lg"
+          className="p-3 bg-black/40 border border-white/10 rounded-lg w-full"
           placeholder="Restaurant Name"
           value={form.name}
           onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
@@ -35,7 +53,7 @@ export default function RestaurantsForm({ onSubmit, form, setForm, isSubmitting,
         </div>
         <div>
         <input
-          className="p-3 bg-black/40 border border-white/10 rounded-lg"
+          className="p-3 bg-black/40 border border-white/10 rounded-lg w-full"
           placeholder="Category"
           value={form.category}
           onChange={(e) => setForm((prev) => ({ ...prev, category: e.target.value }))}
@@ -46,7 +64,7 @@ export default function RestaurantsForm({ onSubmit, form, setForm, isSubmitting,
         <div>
 
         <input
-          className="p-3 bg-black/40 border border-white/10 rounded-lg"
+          className="p-3 bg-black/40 border border-white/10 rounded-lg w-full"
           placeholder="City"
           value={form.city}
           onChange={(e) => setForm((prev) => ({ ...prev, city: e.target.value }))}
@@ -57,7 +75,7 @@ export default function RestaurantsForm({ onSubmit, form, setForm, isSubmitting,
         </div>
         <div>
         <input
-          className="p-3 bg-black/40 border border-white/10 rounded-lg"
+          className="p-3 bg-black/40 border border-white/10 rounded-lg w-full"
           placeholder="Slug (unique identifier for URL)"
           value={form.slug}
           onChange={(e) => setForm((prev) => ({ ...prev, slug: e.target.value }))}
@@ -69,7 +87,7 @@ export default function RestaurantsForm({ onSubmit, form, setForm, isSubmitting,
         </div>
 <div>
         <input
-          className="p-3 bg-black/40 border border-white/10 rounded-lg"
+          className="p-3 bg-black/40 border border-white/10 rounded-lg w-full"
           placeholder="Restaurant Address"
           value={form.address}
           onChange={(e) => setForm((prev) => ({ ...prev, address: e.target.value }))}
@@ -79,7 +97,7 @@ export default function RestaurantsForm({ onSubmit, form, setForm, isSubmitting,
         </div>
 
         <input
-          className="p-3 bg-black/40 border border-white/10 rounded-lg"
+          className="p-3 bg-black/40 border border-white/10 rounded-lg w-full"
           placeholder="Logo URL"
           value={form.logo}
           onChange={(e) => setForm((prev) => ({ ...prev, logo: e.target.value }))}
@@ -118,6 +136,8 @@ export default function RestaurantsForm({ onSubmit, form, setForm, isSubmitting,
           onChange={(e) => setForm((prev) => ({ ...prev, content: { ...prev.content, heroImageUrl: e.target.value } }))}
         />
 
+
+
         <input 
           className="p-3 bg-black/40 border border-white/10 rounded-lg col-span-1 sm:col-span-2"
           placeholder="Content Title"
@@ -143,9 +163,25 @@ export default function RestaurantsForm({ onSubmit, form, setForm, isSubmitting,
           onChange={(e) => setForm((prev) => ({ ...prev, content: { ...prev.content, menuBookUrl: e.target.value } }))}
         />
         {/* Contact Info Fields */}
+        {/* Website */}
+<div>
+  <input
+  className="p-3 bg-black/40 border border-white/10 rounded-lg w-full"
+  placeholder="Website URL"
+  value={form.contactInfo.website}
+  onChange={(e) =>
+    setForm((prev) => ({
+      ...prev,
+      contactInfo: { ...prev.contactInfo, website: e.target.value },
+    }))
+  }
+// aria-errormessage={error}
+/>
+{/* {!form.contactInfo.website ? error && <p className="mt-2 text-xs sm:text-sm text-rose-400">Website URL is required.</p> : null} */}
+</div>
         <div>
         <input
-  className="p-3 bg-black/40 border border-white/10 rounded-lg"
+  className="p-3 bg-black/40 border border-white/10 rounded-lg w-full"
   placeholder="Phone Number"
   value={form.contactInfo.phone}
   onChange={(e) =>
@@ -163,7 +199,7 @@ export default function RestaurantsForm({ onSubmit, form, setForm, isSubmitting,
 {/* Email Input */}
 <div>
 <input
-  className="p-3 bg-black/40 border border-white/10 rounded-lg"
+  className="p-3 bg-black/40 border border-white/10 rounded-lg w-full"
   placeholder="Email Address"
   value={form.contactInfo.email}
   onChange={(e) =>
@@ -178,37 +214,76 @@ aria-errormessage={error}
 </div>
 
 {/* Opening Hours */}
-<div>
-<input
-  className="p-3 bg-black/40 border border-white/10 rounded-lg"
-  placeholder="Opening Hours"
-  value={form.contactInfo.openingHours}
-  onChange={(e) =>
-    setForm((prev) => ({
-      ...prev,
-      contactInfo: { ...prev.contactInfo, openingHours: e.target.value },
-    }))
-  }
-  aria-errormessage={error}
-/>
 
- {!form.contactInfo.openingHours ? error && <p className="mt-2 text-xs sm:text-sm text-rose-400">Opening hours are required.</p> : null}
+{/* Opening Hours Section */}
+<div className="flex flex-col gap-2">
+  <LocalizationProvider dateAdapter={AdapterDayjs}>
+    <TimePicker
+      label="Opening Hours"
+      value={form.contactInfo.openingHours ? dayjs(form.contactInfo.openingHours, "HH:mm") : null}
+      onChange={(newValue) => {
+        const formattedTime = newValue ? newValue.format("HH:mm") : "";
+        setForm((prev) => ({
+          ...prev,
+          contactInfo: { ...prev.contactInfo, openingHours: formattedTime },
+        }));
+      }} 
+      
+      slotProps={{
+        textField: {
+          fullWidth: true,
+          // className: "border border-white/10 rounded-lg",
+          className:`rounded-lg ${window.localStorage.getItem(STORAGE_KEY) === "light" ? "bg-pink-200/20 " : "bg-emerald-400/20 "} border border-white/10` ,
+          sx: {
+            input: { color: 'rgba(216, 2, 2, 0.88)'  },
+            label: { color: 'rgba(255,255,255,0.5)' },
+            '& .MuiOutlinedInput-notchedOutline': { border: 'none' }
+          }
+          
+        }
+      }}
+    />
+  </LocalizationProvider>
+  
+  {!form.contactInfo.openingHours && error && (
+    <p className="text-xs sm:text-sm text-rose-400">Opening hours are required.</p>
+  )}
 </div>
+
 {/* Closing Hours */}
-<div>
-  <input
-  className="p-3 bg-black/40 border border-white/10 rounded-lg"
-  placeholder="Closing Hours"
-  value={form.contactInfo.closingHours}
-  onChange={(e) =>
-    setForm((prev) => ({
-      ...prev,
-      contactInfo: { ...prev.contactInfo, closingHours: e.target.value },
-    }))
-  }
-aria-errormessage={error}
-/>
-{!form.contactInfo.closingHours ? error && <p className="mt-2 text-xs sm:text-sm text-rose-400">Closing hours are required.</p> : null}
+
+<div className="flex flex-col gap-2">
+  <LocalizationProvider dateAdapter={AdapterDayjs}>
+    <TimePicker
+      label="Closing Hours"
+      value={form.contactInfo.closingHours ? dayjs(form.contactInfo.closingHours, "HH:mm") : null}
+      onChange={(newValue) => {
+        const formattedTime = newValue ? newValue.format("HH:mm") : "";
+        setForm((prev) => ({
+          ...prev,
+          contactInfo: { ...prev.contactInfo, closingHours: formattedTime },
+        }));
+      }} 
+      
+      slotProps={{
+        textField: {
+          fullWidth: true,
+          // className: "border border-white/10 rounded-lg",
+          className:`rounded-lg ${window.localStorage.getItem(STORAGE_KEY) === "light" ? "bg-pink-200/20 " : "bg-emerald-400/20 "} border border-white/10` ,
+          sx: {
+            input: { color: 'rgba(216, 2, 2, 0.88)'  },
+            label: { color: 'rgba(255,255,255,0.5)' },
+            '& .MuiOutlinedInput-notchedOutline': { border: 'none' }
+          }
+          
+        }
+      }}
+    />
+  </LocalizationProvider>
+  
+  {!form.contactInfo.closingHours && error && (
+    <p className="text-xs sm:text-sm text-rose-400">Closing hours are required.</p>
+  )}
 </div>
 {/* Website */}
 <div className="flex gap-3 col-span-1 sm:col-span-2">
@@ -227,6 +302,9 @@ aria-errormessage={error}
     <span>Open Now</span>
   </label>
 </div>
+
+
+
         <div className="flex gap-3 col-span-1 sm:col-span-2">
           <button
             type="submit"
@@ -246,9 +324,64 @@ aria-errormessage={error}
 
       {error && <p className="text-rose-400 text-sm mt-3">{error}</p>}
 
-      <div className="mt-4 text-sm text-gray-300">
+
+{/* <div className="border border-sky-500 m-5 rounded-2xl p-3">
+
+
+  <p 
+  className="p-2 mt-10 font-semibold border-b hover:border-b-sky-500  rounded-xl hover:text-sky-500 flex items-center justify-center "
+  >Add Menu Name, Price, Description And Image</p>
+  <div className="flex gap-3 mt-3">
+    <Plus className="h-8 w-8 text-green-400 bg-green-100 rounded-2xl p-2  hover:text-green-900" />
+
+  </div>
+  
+<div className=" mt-3 menu-field grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 border border-white/10 rounded-lg p-4">
+
+  <input
+    className="p-3 mt-4 bg-black/40 border border-white/10 rounded-lg w-full"
+    placeholder="Add Menu Name"
+    // value={}
+    onChange={(e) => setForm((prev) => ({ ...prev, menuUrl: e.target.value }))}
+  />
+  <input
+    className="p-3 mt-4 bg-black/40 border border-white/10 rounded-lg w-full"
+    placeholder="Add Menu Description"
+    // value={}
+    onChange={(e) => setForm((prev) => ({ ...prev, menuUrl: e.target.value }))}
+  />
+  <input
+    className="p-3 mt-4 bg-black/40 border border-white/10 rounded-lg w-full"
+    placeholder="Add Menu Price"
+    // value={}
+    onChange={(e) => setForm((prev) => ({ ...prev, menuUrl: e.target.value }))}
+  />
+  <input
+    className="p-3 mt-4 bg-black/40 border border-white/10 rounded-lg w-full"
+    placeholder="Add Menu Image URL"
+    // value={}
+    onChange={(e) => setForm((prev) => ({ ...prev, menuUrl: e.target.value }))}
+  />   
+  
+ 
+  <div className="flex grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mt-3 ">
+  
+  <Edit2 className="h-10 w-10 text-yellow-400 bg-yellow-500/10 rounded-2xl p-2 hover:text-yellow-900 flex justify-end" />
+  <VenetianMaskIcon className="h-10 w-10 text-blue-400 bg-blue-500/10 rounded-2xl p-2 hover:text-blue-900 flex justify-end" />
+  <Delete className="h-10 w-10 text-red-400 bg-red-500/10 rounded-2xl p-2 hover:text-red-900 flex justify-end" />
+</div>
+ </div>
+<button type="button"  className="p-3 mt-3 bg-sky-600 hover:bg-sky-700 rounded-lg font-semibold disabled:opacity-60">
+            Save Menu
+</button>
+    </div> */}
+
+
+
+      {/* <div className="mt-4 text-sm text-gray-300">
         Live restaurants: <span className="font-semibold text-white">{allCount}</span>
-      </div>
+     
+      </div> */}
     </div>
   );
 }

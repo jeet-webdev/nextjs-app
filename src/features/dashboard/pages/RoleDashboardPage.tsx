@@ -25,6 +25,7 @@ import MenuSection from "@/features/dashboard/components/MenuSection";
 import RestaurantsForm from "@/features/dashboard/components/RestaurantsForm";
 import { type MenuRecord } from "@/features/menu/types/menuTypes";
 import { toast } from "react-toastify";
+import TableSection from "../components/TableSection";
 
 type RestaurantMutationResponse = {
   error?: string;
@@ -33,11 +34,12 @@ type RestaurantMutationResponse = {
 
 type RoleDashboardPageProps = {
   expectedRole: "ADMIN" | "OWNER";
+  ownedRestaurants?: number | null;
 };
 
 type DashboardSection = "overview" | "users" | "restaurants" | "create-restaurant" | "menu-items" | "table-reservations";
 
-export default function RoleDashboardPage({ expectedRole }: RoleDashboardPageProps) {
+export default function RoleDashboardPage({ expectedRole  }: RoleDashboardPageProps) {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isLoadingUsers, setIsLoadingUsers] = useState(true);
   const [isSubmittingShop, setIsSubmittingShop] = useState(false);
@@ -65,6 +67,7 @@ const [isLoadingMenu, setIsLoadingMenu] = useState(false);
     () => getCreatableUserTypes(currentUser?.userType),
     [currentUser],
   );
+  // console.log("total number of owned restaurent ", ownedRestaurants)                             totasl owned restaurant 
 
   const stats = useMemo(() => {
     const total = users.length;
@@ -377,8 +380,12 @@ useEffect(() => { fetchUsers(); }, [fetchUsers]);
         isOpen={mobileMenuOpen}
         onToggle={() => setMobileMenuOpen(!mobileMenuOpen)}
       />
+      <Sidebar activeSection={activeSection} 
+      onSectionChange={setActiveSection} 
+      ownedRestaurants={ownedRestaurants} 
+      expectedRole={expectedRole} 
 
-      <Sidebar activeSection={activeSection} onSectionChange={setActiveSection} />
+      />
 
       <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
         <DashboardHeader
@@ -457,6 +464,9 @@ useEffect(() => { fetchUsers(); }, [fetchUsers]);
   <MenuSection 
     menuItems={menuItems} 
   />
+) : null}
+ {activeSection === "table-reservations" ? (
+  <TableSection   />
 ) : null}
 
         {activeSection === "create-restaurant" ? (

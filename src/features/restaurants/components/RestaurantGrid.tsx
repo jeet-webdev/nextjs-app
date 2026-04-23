@@ -15,20 +15,12 @@ export default function RestaurantGrid({
   restaurants,
   emptyMessage,
   compact = false,
-  className = "grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-2",
+  className = "grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3",
   onEdit,
   onDelete,
   onCreateRestaurant,
 }: RestaurantGridProps) {
-  // const createButton = onCreateRestaurant ? (
-  //   <button
-  //     type="button"
-  //     onClick={onCreateRestaurant}
-  //     className="rounded-lg bg-indigo-600 px-3 py-2 text-xs font-semibold whitespace-nowrap hover:bg-indigo-700 sm:px-4 sm:text-sm"
-  //   >
-  //     Create Restaurant
-  //   </button>
-  // ) : null;
+ 
 
   return (
     <>
