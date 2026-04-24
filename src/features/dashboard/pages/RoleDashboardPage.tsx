@@ -25,6 +25,7 @@ import MenuSection from "@/features/dashboard/components/MenuSection";
 import RestaurantsForm from "@/features/dashboard/components/RestaurantsForm";
 import { type MenuRecord } from "@/features/menu/types/menuTypes";
 import { toast } from "react-toastify";
+import TableSection from "../components/TableSection";
 
 type RestaurantMutationResponse = {
   error?: string;
@@ -33,11 +34,12 @@ type RestaurantMutationResponse = {
 
 type RoleDashboardPageProps = {
   expectedRole: "ADMIN" | "OWNER";
+  ownedRestaurants?: number | null;
 };
 
 type DashboardSection = "overview" | "users" | "restaurants" | "create-restaurant" | "menu-items" | "table-reservations";
 
-export default function RoleDashboardPage({ expectedRole }: RoleDashboardPageProps) {
+export default function RoleDashboardPage({ expectedRole  }: RoleDashboardPageProps) {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isLoadingUsers, setIsLoadingUsers] = useState(true);
   const [isSubmittingShop, setIsSubmittingShop] = useState(false);
@@ -65,6 +67,7 @@ const [isLoadingMenu, setIsLoadingMenu] = useState(false);
     () => getCreatableUserTypes(currentUser?.userType),
     [currentUser],
   );
+  // console.log("total number of owned restaurent ", ownedRestaurants)                             totasl owned restaurant 
 
   const stats = useMemo(() => {
     const total = users.length;
@@ -247,15 +250,17 @@ useEffect(() => { fetchUsers(); }, [fetchUsers]);
       const data = (() => {
         try {
           return JSON.parse(responseText) as RestaurantMutationResponse;
-        } catch {
+        }
+        catch {
           return {} as RestaurantMutationResponse;
         }
       })();
 
       if (!response.ok || !data.restaurant) {
         setRestaurantError(data.error ?? "Unable to create restaurant.");
+        // toast.error(data.error ?? "Failed to create restaurant.");
         return;
-      }
+      } 
       
       setRestaurants((prev) => {
         const next = [...prev];
@@ -273,10 +278,13 @@ useEffect(() => { fetchUsers(); }, [fetchUsers]);
       setRestaurantForm(EMPTY_RESTAURANT_FORM);
       setIsEditingRestaurant(false);
       setEditingRestaurantId(null);
-    } catch {
+       toast.success(isEditingRestaurant ? "Restaurant updated successfully" : "Restaurant created successfully");
+    }catch (error) {
       setRestaurantError("Unable to create restaurant.");
+      // toast.error(error instanceof Error ? error.message : "An error occurred while creating the restaurant. Please try again.");
     } finally {
       setIsSubmittingShop(false);
+      toast.dismiss("Not able to create restaurant.");
     }
   };
   const handleEditClick = (restaurant: RestaurantRecord) => {
@@ -351,8 +359,8 @@ useEffect(() => { fetchUsers(); }, [fetchUsers]);
       }
 
       toast.success("Restaurant deleted successfully");
-    } catch {
-      toast.error("Error connecting to server");
+    } catch(error) {
+      toast.error(error instanceof Error ? error.message : "An error occurred while deleting the restaurant. Please try again.");
     }
   };
 
@@ -372,8 +380,12 @@ useEffect(() => { fetchUsers(); }, [fetchUsers]);
         isOpen={mobileMenuOpen}
         onToggle={() => setMobileMenuOpen(!mobileMenuOpen)}
       />
+      <Sidebar activeSection={activeSection} 
+      onSectionChange={setActiveSection} 
+      ownedRestaurants={ownedRestaurants} 
+      expectedRole={expectedRole} 
 
-      <Sidebar activeSection={activeSection} onSectionChange={setActiveSection} />
+      />
 
       <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
         <DashboardHeader
@@ -419,26 +431,7 @@ useEffect(() => { fetchUsers(); }, [fetchUsers]);
 
         {activeSection === "users" ? (
           <>
-            {/* {creatableUserTypes.length > 0 ? (
-              <div id="add-user-form">
-                <AddUserForm
-                  form={form}
-                  isSubmitting={isSubmitting}
-                  error={error}
-                  userTypeOptions={creatableUserTypes}
-                  title={formTitle}
-                  submitLabel={submitLabel}
-                  onSubmit={handleCreateUser}
-                  onChange={setForm}
-                />
-              </div>
-            ) : error ? (
-              <div className="bg-white/5 rounded-xl border border-white/10 p-6 mb-8">
-                <p className="text-rose-400 text-sm">{error}</p>
-              </div>
-            ) : null} */}
-
-            <UsersTable
+           <UsersTable
               users={visibleUsers}
               isLoadingUsers={isLoadingUsers}
               title={tableTitle}
@@ -471,6 +464,9 @@ useEffect(() => { fetchUsers(); }, [fetchUsers]);
   <MenuSection 
     menuItems={menuItems} 
   />
+) : null}
+ {activeSection === "table-reservations" ? (
+  <TableSection   />
 ) : null}
 
         {activeSection === "create-restaurant" ? (

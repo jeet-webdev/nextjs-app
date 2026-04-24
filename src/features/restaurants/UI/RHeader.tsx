@@ -20,75 +20,34 @@ import type { RestaurantRecord } from "@/features/restaurants/types";
 import { PhoneCallIcon } from "lucide-react";
 import Image from 'next/image';
 
+interface ResponsiveAppBarProps {
+  restaurant: RestaurantRecord;
+}
 const pages = ['All Menu', 'Top Dishes', 'Drinks'];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
-function ResponsiveAppBar() {
+function ResponsiveAppBar({ restaurant }: ResponsiveAppBarProps) {
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
 const params = useParams();
   const slug = params.slug as string;
 
-  const [restaurant, setRestaurant] = useState<RestaurantRecord | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function fetchRestaurant() {
-      try {
-        setLoading(true);
-        const response = await fetch(`/api/restaurants/slug/${slug}`);
-        if (!response.ok) {
-          setError(response.status === 404 ? "Restaurant not found" : "Failed to load restaurant details");
-          return;
-        }
-        const data = await response.json();
-        setRestaurant(data.restaurant);
-        setError(null);
-      } catch (err) {
-        console.error("Error fetching restaurant:", err);
-        setError("Unable to load restaurant details");
-      } finally {
-        setLoading(false);
-      }
-    }
-    if (slug) fetchRestaurant();
-  }, [slug]);
+ 
+  
 
-  if (error || !restaurant) {
-    return (
-      <section className="bg-gradient-to-b from-black via-slate-900 to-black px-4 py-20">
-        <div className="mx-auto max-w-6xl">
-          <div className="rounded-2xl border border-red-500/20 bg-red-950/20 p-6 text-center">
-            <h1 className="text-2xl font-bold text-red-400">{error}</h1>
-            <p className="mt-2 text-gray-300">The restaurant you&apos;re looking for doesn&apos;t exist.</p>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  const website = restaurant.contactInfo?.website?.trim();
-  // const websiteHref = website
-  //   ? website.startsWith("http://") || website.startsWith("https://")
-  //     ? website
-  //     : `https://${website}`
-  //   : null;
+ 
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
   };
-  const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorElUser(event.currentTarget);
-  };
+ 
 
   const handleCloseNavMenu = () => {
     setAnchorElNav(null);
   };
 
-  const handleCloseUserMenu = () => {
-    setAnchorElUser(null);
-  };
+  
 
   return (
   

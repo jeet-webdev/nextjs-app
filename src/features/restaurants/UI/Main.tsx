@@ -5,79 +5,28 @@ import { useParams } from "next/navigation";
 import type { RestaurantRecord } from "@/features/restaurants/types";
 import Image from "next/image";
 
-export default function RestaurantDetailPage() {
+interface MainProps {
+  restaurant: RestaurantRecord;
+}
+
+export default function RestaurantMainPage({ restaurant }: MainProps) {
   const params = useParams();
   const slug = params.slug as string;
 
-  const [restaurant, setRestaurant] = useState<RestaurantRecord | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function fetchRestaurant() {
-      try {
-        setLoading(true);
-        const response = await fetch(`/api/restaurants/slug/${slug}`);
-        if (!response.ok) {
-          setError(response.status === 404 ? "Restaurant not found" : "Failed to load restaurant details");
-          return;
-        }
-        const data = await response.json();
-        setRestaurant(data.restaurant);
-        setError(null);
-      } catch (err) {
-        console.error("Error fetching restaurant:", err);
-        setError("Unable to load restaurant details");
-      } finally {
-        setLoading(false);
-      }
-    }
-    if (slug) fetchRestaurant();
-  }, [slug]);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-black via-slate-900 to-black px-4 py-30">
-        <div className="mx-auto max-w-4xl animate-pulse space-y-6">
-          <div className="h-12 rounded-lg bg-white/10" />
-          <div className="h-8 rounded-lg bg-white/10" />
-          <div className="h-64 rounded-lg bg-white/10" />
-        </div>
-      </div>
-    );
-  }
 
-  if (error || !restaurant) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-black via-slate-900 to-black px-4 py-20">
-        <div className="mx-auto max-w-4xl">
-          <div className="rounded-2xl border border-red-500/20 bg-red-950/20 p-6 text-center">
-            <h1 className="text-2xl font-bold text-red-400">{error}</h1>
-            <p className="mt-2 text-gray-300">The restaurant you&apos;re looking for doesn&apos;t exist.</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
-  const contact = restaurant.contactInfo;
+ 
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-black via-slate-900 to-black px-4 py-12">
       <div className="mx-auto max-w-4xl space-y-6">
 
         {/* Header Badges */}
-        {/* <div className="mt-10"> */}
+    
         <div>
         <h1 className="mb-4 text-4xl font-bold text-white flex items-center gap-4">
- 
-  {/* <Image 
-    src={restaurant.logo}
-    height={48}
-    width={48} 
-    alt={`${restaurant.name} logo`} 
-    className="h-12 w-12 object-contain" 
-  /> */}
   {restaurant.name}
 </h1>
           <div className="flex flex-wrap gap-3">
