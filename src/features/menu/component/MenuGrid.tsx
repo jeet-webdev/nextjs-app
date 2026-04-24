@@ -2,7 +2,7 @@ import MenuCard from "./MenuCard";
 import { type MenuRecord } from "@/features/menu/types/menuTypes";
 
 type MenuGridProps = {
-  menuItems: MenuRecord[];
+  menuItems?: MenuRecord[];
   emptyMessage: string;
   compact?: boolean;
   className?: string;
@@ -10,8 +10,9 @@ type MenuGridProps = {
 };
 
 export default function MenuGrid({
-  menuItems = [], 
   emptyMessage,
+  menuItems = [],
+
   compact = false,
   className = "grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3",
   onEdit,

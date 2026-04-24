@@ -306,7 +306,7 @@ export async function PATCH(
 
     return NextResponse.json({ menuItem: mapMenuItem(updated) });
   } catch (error) {
-    console.error("Error updating menu item:", error);
+   
     return NextResponse.json({ error: "Unable to update menu item" }, { status: 500 });
   }
 }

@@ -1,5 +1,6 @@
 import { RestaurantFormState } from "@/features/restaurants/types";
 import { Delete, Edit2, Plus, VenetianMaskIcon } from "lucide-react";
+import { useEffect } from "react";
 
 type MenuFormProps = {
   setForm: React.Dispatch<React.SetStateAction<RestaurantFormState>>;
@@ -7,6 +8,8 @@ type MenuFormProps = {
 };
 
 export default function MenuForm({ setForm }: MenuFormProps) {
+
+  
   return (
     <div className="rounded-2xl  hover:border-white/10 bg-white/[0.03] p-6">
       <h2 className="text-lg font-semibold mb-4">Create Menu Item</h2>
@@ -23,32 +26,69 @@ export default function MenuForm({ setForm }: MenuFormProps) {
   </div>
   
 <div className=" mt-3 menu-field grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 border border-white/10 rounded-lg p-4">
-
+{/* menu name */}
   <input
     className="p-3 mt-4 bg-black/40 border border-white/10 rounded-lg w-full"
     placeholder="Add Menu Name"
     // value={}
-    onChange={(e) => setForm((prev) => ({ ...prev, menuUrl: e.target.value }))}
+    onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
   />
+
+  {/* menu description */}
   <input
     className="p-3 mt-4 bg-black/40 border border-white/10 rounded-lg w-full"
     placeholder="Add Menu Description"
     // value={}
-    onChange={(e) => setForm((prev) => ({ ...prev, menuUrl: e.target.value }))}
+    onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))}
   />
+
+  {/* menu price */}
   <input
     className="p-3 mt-4 bg-black/40 border border-white/10 rounded-lg w-full"
     placeholder="Add Menu Price"
     // value={}
-    onChange={(e) => setForm((prev) => ({ ...prev, menuUrl: e.target.value }))}
+    onChange={(e) => setForm((prev) => ({ ...prev, price: e.target.value }))}
   />
+
+    {/* menu image url */}
   <input
     className="p-3 mt-4 bg-black/40 border border-white/10 rounded-lg w-full"
     placeholder="Add Menu Image URL"
     // value={}
-    onChange={(e) => setForm((prev) => ({ ...prev, menuUrl: e.target.value }))}
+    onChange={(e) => setForm((prev) => ({ ...prev, image: e.target.value }))}
+  />   
+
+  {/* menu category */}
+    <input
+    className="p-3 mt-4 bg-black/40 border border-white/10 rounded-lg w-full"
+    placeholder="Add Menu Category"
+    // value={}
+    onChange={(e) => setForm((prev) => ({ ...prev, category: e.target.value }))}
+  />   
+
+  {/* menu subcategory */}
+   <input
+    className="p-3 mt-4 bg-black/40 border border-white/10 rounded-lg w-full"
+    placeholder="Add Menu Subcategory"
+    // value={}
+    onChange={(e) => setForm((prev) => ({ ...prev, subcategory: e.target.value }))}
   />   
   
+  {/* menu discount price */}
+   <input
+    className="p-3 mt-4 bg-black/40 border border-white/10 rounded-lg w-full"
+    placeholder="Add Menu Discount Price"
+    // value={}
+    onChange={(e) => setForm((prev) => ({ ...prev, discountPrice: e.target.value }))}
+  />    
+  
+  {/* menu availability */}
+  <input
+    className="p-3 mt-4 bg-black/40 border border-white/10 rounded-lg w-full"
+    placeholder="Add Menu Availability"
+    // value={}
+    onChange={(e) => setForm((prev) => ({ ...prev, availability: e.target.value }))}
+  />   
  
   <div className="flex grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mt-3 ">
   

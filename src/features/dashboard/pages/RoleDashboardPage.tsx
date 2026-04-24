@@ -35,11 +35,12 @@ type RestaurantMutationResponse = {
 type RoleDashboardPageProps = {
   expectedRole: "ADMIN" | "OWNER";
   ownedRestaurants?: number | null;
+   localMenuItems?: MenuRecord[];
 };
 
 type DashboardSection = "overview" | "users" | "restaurants" | "create-restaurant" | "menu-items" | "table-reservations";
 
-export default function RoleDashboardPage({ expectedRole  }: RoleDashboardPageProps) {
+export default function RoleDashboardPage({ expectedRole , localMenuItems }: RoleDashboardPageProps) {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isLoadingUsers, setIsLoadingUsers] = useState(true);
   const [isSubmittingShop, setIsSubmittingShop] = useState(false);
@@ -67,7 +68,7 @@ const [isLoadingMenu, setIsLoadingMenu] = useState(false);
     () => getCreatableUserTypes(currentUser?.userType),
     [currentUser],
   );
-  // console.log("total number of owned restaurent ", ownedRestaurants)                             totasl owned restaurant 
+  
 
   const stats = useMemo(() => {
     const total = users.length;
@@ -159,7 +160,7 @@ useEffect(() => {
         setMenuItems(data.menuItems || []);
       }
     } catch (err) {
-      console.error("Failed to fetch menu:", err);
+    
     } finally {
       setIsLoadingMenu(false);
     }
@@ -177,7 +178,7 @@ const fetchUsers = useCallback(async () => {
       
       setUsers(data.users);
     } catch (error) {
-      console.error("Fetch error:", error);
+    
     } finally {
       setIsLoading(false);
     }
@@ -462,7 +463,8 @@ useEffect(() => { fetchUsers(); }, [fetchUsers]);
 
        {activeSection === "menu-items" ? (
   <MenuSection 
-    menuItems={menuItems} 
+      localMenuItems={menuItems}
+      menuItems={menuItems} 
   />
 ) : null}
  {activeSection === "table-reservations" ? (

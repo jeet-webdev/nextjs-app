@@ -314,18 +314,18 @@ const ALLOWED_CREATORS = ["ADMIN", "OWNER"] as const;
 type AllowedCreator = (typeof ALLOWED_CREATORS)[number];
 
 export async function POST(request: Request) {
-//   const currentUser = await getSessionUser();
+  const currentUser = await getSessionUser();
 
-//   if (!currentUser) {
-//     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-//   }
+  if (!currentUser) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
-//   if (!ALLOWED_CREATORS.includes(currentUser.userType as AllowedCreator)) {
-//     return NextResponse.json(
-//       { error: "Only admins or owners can create menu items." },
-//       { status: 403 },
-//     );
-//   }
+  if (!ALLOWED_CREATORS.includes(currentUser.userType as AllowedCreator)) {
+    return NextResponse.json(
+      { error: "Only admins or owners can create menu items." },
+      { status: 403 },
+    );
+  }
 
   const body = await request.json();
   const restaurantId = parseRequiredString(body.restaurantId);
@@ -402,7 +402,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ menuItem: mapMenuItem(menuItem) }, { status: 201 });
   } catch (error) {
-    console.error("Error creating menu item:", error);
+  
     return NextResponse.json({ error: "Unable to create menu item." }, { status: 500 });
   }
 }

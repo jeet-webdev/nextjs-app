@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod/dist/zod.js";
 import { restaurantSchema } from "./restaurantValidation";
 import { useForm } from "react-hook-form";
+import { MenuRecord } from "../menu/types/menuTypes";
 
 export type ContactDetails = {
   phone: string;
@@ -23,6 +24,7 @@ export type RestaurantRecord = {
   id: string;
   name: string;
   category: string;
+  menuItems?: MenuRecord[];
   contactInfo?: ContactDetails | null;
   content?: FirstContent | null;
   city: string;
@@ -39,6 +41,7 @@ export type RestaurantRecord = {
 export type RestaurantFormState = {
   name: string;
   category: string;
+  // mwnu?: MenuRecord[];
   contactInfo: ContactDetails; 
   content: FirstContent;
   city: string;

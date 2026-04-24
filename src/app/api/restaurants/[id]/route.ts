@@ -181,10 +181,7 @@ export async function PATCH(
       },
     });
     return NextResponse.json({ restaurant: mapRestaurant(updated) });
-  // } catch (error) {
-  //   console.error("Error updating restaurant:", error);
-  //   return NextResponse.json({ error: "Unable to update restaurant" }, { status: 500 });
-  // }
+ 
 
   } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
