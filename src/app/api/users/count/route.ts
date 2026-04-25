@@ -9,13 +9,13 @@ export async function GET() {
   const token = cookieStore.get(JWT_COOKIE_NAME)?.value;
 
   if (!token) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: "Token faild" }, { status: 401 });
   }
 
   const session = await verifyAuthToken(token);
 
   if (!session) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: "Session Failed" }, { status: 401 });
   }
 
   const totalUsers = await prisma.user.count();

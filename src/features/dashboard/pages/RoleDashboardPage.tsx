@@ -26,6 +26,7 @@ import RestaurantsForm from "@/features/dashboard/components/RestaurantsForm";
 import { type MenuRecord } from "@/features/menu/types/menuTypes";
 import { toast } from "react-toastify";
 import TableSection from "../components/TableSection";
+import { clearStoredUserRole } from "@/shared/lib/auth-storage";
 
 type RestaurantMutationResponse = {
   error?: string;
@@ -123,6 +124,7 @@ const [isLoadingMenu, setIsLoadingMenu] = useState(false);
           currentUser: CurrentUser;
           users: UserRecord[];
         };
+        console.log("Fetched users:", data.currentUser);
 
         if (data.currentUser.userType !== expectedRole) {
           const nextPath = getDashboardPathForUserType(data.currentUser.userType as UserType);
@@ -223,6 +225,7 @@ useEffect(() => { fetchUsers(); }, [fetchUsers]);
         method: "POST",
       });
     } finally {
+      clearStoredUserRole();
       router.push("/");
       router.refresh();
       setIsLoggingOut(false);

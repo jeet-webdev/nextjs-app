@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 import RestaurantGrid from "@/features/restaurants/components/RestaurantGrid";
 import { type RestaurantRecord } from "@/features/restaurants/types";
+import { clearStoredUserRole } from "@/shared/lib/auth-storage";
 
 export default function CustomerDashboardPage() {
   const [totalUsers, setTotalUsers] = useState<number | null>(null);
@@ -79,6 +80,7 @@ export default function CustomerDashboardPage() {
     try {
       await fetch("/api/auth/logout", { method: "POST" });
     } finally {
+      clearStoredUserRole();
       router.push("/");
       router.refresh();
       setIsLoggingOut(false);

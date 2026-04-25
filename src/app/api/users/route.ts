@@ -42,14 +42,23 @@ export async function GET() {
   const currentUser = await getSessionUser();
 
   if (!currentUser) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: "Only ADMIN and OWNER can acceess this data " }, { status: 401 });
   }
 
   if (!DASHBOARD_USER_TYPES.includes(currentUser.userType as DashboardUserType)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
+const whereClause: Prisma.UserWhereInput = {};
+  
 
+  if (currentUser.userType === "OWNER") {
+    whereClause.userType = "CUSTOMER";
+  // whereClause.userType = {
+  //   in: ["CUSTOMER", "OWNER"]
+  // };
+}
   const users = await prisma.user.findMany({
+    where: whereClause,
     select: {
       id: true,
       name: true,

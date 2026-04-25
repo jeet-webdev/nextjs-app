@@ -9,7 +9,7 @@ import {
 } from "@/shared/lib/auth";
 import { prisma } from "@/shared/lib/prisma";
 
-const ONE_WEEK_IN_SECONDS = 60 * 60 * 24 * 7;
+const ONE_WEEK_IN_SECONDS = 60 * 60 * 24 * 1;
 const BCRYPT_HASH_REGEX = /^\$2[aby]\$/;
 
 export async function POST(request: Request) {
@@ -89,7 +89,9 @@ export async function POST(request: Request) {
     const response = NextResponse.json({
       success: true,
       redirectPath: getDashboardPathForUserType(user.userType),
+      userType: user.userType,
     });
+    
     response.cookies.set({
       name: JWT_COOKIE_NAME,
       value: token,
@@ -104,4 +106,8 @@ export async function POST(request: Request) {
   } catch {
     return NextResponse.json({ error: "Unable to login right now." }, { status: 500 });
   }
+
+
+  
 }
+

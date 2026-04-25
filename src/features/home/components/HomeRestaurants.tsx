@@ -4,8 +4,10 @@ import { useEffect, useMemo, useState } from "react";
 
 import RestaurantGrid from "@/features/restaurants/components/RestaurantGrid";
 import { type RestaurantRecord } from "@/features/restaurants/types";
-
-export default function HomeRestaurants() {
+type HomeRestaurantsProps = {
+  onView?: (restaurant: RestaurantRecord) => void;
+};
+export default function HomeRestaurants( { onView }: HomeRestaurantsProps) {
   const [restaurants, setRestaurants] = useState<RestaurantRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -75,6 +77,7 @@ export default function HomeRestaurants() {
 
       <RestaurantGrid
         restaurants={restaurants}
+        onView={onView}
         emptyMessage={isLoading ? "Loading restaurants..." : "No restaurants published yet."}
       />
     </section>

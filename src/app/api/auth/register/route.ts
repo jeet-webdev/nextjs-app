@@ -11,7 +11,7 @@ import {
 import { prisma } from "@/shared/lib/prisma";
 import { normalizePhoneInput, parsePhoneForStorage } from "@/shared/lib/user-phone";
 
-const ONE_WEEK_IN_SECONDS = 60 * 60 * 24 * 7;
+const ONE_WEEK_IN_SECONDS = 60 * 60 * 24 * 1;
 
 export async function POST(request: Request) {
   try {
@@ -64,6 +64,7 @@ export async function POST(request: Request) {
       {
         success: true,
         redirectPath: getDashboardPathForUserType(user.userType),
+        userType: user.userType,
       },
       { status: 201 },
     );

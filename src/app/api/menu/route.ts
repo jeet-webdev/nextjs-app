@@ -317,7 +317,7 @@ export async function POST(request: Request) {
   const currentUser = await getSessionUser();
 
   if (!currentUser) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: "Only admins or owners can create menu items." }, { status: 401 });
   }
 
   if (!ALLOWED_CREATORS.includes(currentUser.userType as AllowedCreator)) {
