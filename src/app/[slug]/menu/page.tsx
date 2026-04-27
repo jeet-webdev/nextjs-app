@@ -87,8 +87,6 @@ useEffect(() => {
       <div className="mx-auto max-w-5xl space-y-8">
         
         <Link
-          // href={`/${restaurant.slug}`}
-          // href={`/dashboard/admin` || `/dashboard/owner`}
           href={dashboardPath}
           className="inline-flex items-center gap-2 text-sm text-gray-400 transition hover:text-white"
         >
