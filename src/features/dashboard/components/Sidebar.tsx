@@ -20,7 +20,7 @@ export default function Sidebar({ activeSection, onSectionChange , ownedRestaura
 const showRestaurantManagement = ["restaurants", "table-reservations", "menu-items"].includes(activeSection);
 const hasRestaurant =  ownedRestaurants && ownedRestaurants > 0 && expectedRole === "OWNER" || expectedRole === "ADMIN";
   return (
-    <aside className="hidden lg:block w-64 border-r border-white/5 p-6 space-y-8">
+    <aside className="hidden sticky top-0 h-screen lg:block w-64 border-r border-white/5 p-6 space-y-8">
       <div className="text-xl font-bold text-indigo-500 px-2">RestroAdminOS</div>
       <nav className="space-y-2">
         <NavItem

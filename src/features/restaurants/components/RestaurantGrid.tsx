@@ -10,6 +10,7 @@ type RestaurantGridProps = {
   onDelete?: (restaurant: RestaurantRecord) => void;
   onCreateRestaurant?: () => void;
   onView?: (restaurant: RestaurantRecord) => void;
+  onViewMenu?: (restaurant: RestaurantRecord) => void;
 };
 
 export default function RestaurantGrid({
@@ -21,6 +22,7 @@ export default function RestaurantGrid({
   onDelete,
   onCreateRestaurant,
   onView,
+  onViewMenu,
 }: RestaurantGridProps) {
  
 
@@ -38,6 +40,7 @@ export default function RestaurantGrid({
             onEdit={onEdit}
             onDelete={onDelete}
             onView={onView}
+            onViewMenu={onViewMenu}
           />
         ))}
       </div>

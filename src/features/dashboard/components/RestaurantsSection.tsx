@@ -6,10 +6,11 @@ type RestaurantsSectionProps = {
   onEdit?: (restaurant: RestaurantRecord) => void;
   onDelete?: (restaurant: RestaurantRecord) => void;
   onCreateRestaurant?: () => void;
+  onViewMenu?: (restaurant: RestaurantRecord) => void;
 };
 
 
-export default function RestaurantsSection({ restaurants, onEdit, onDelete, onCreateRestaurant }: RestaurantsSectionProps) {
+export default function RestaurantsSection({ restaurants, onEdit, onDelete, onCreateRestaurant, onViewMenu }: RestaurantsSectionProps) {
   return (
     <section className="bg-white/5 rounded-xl border border-white/10 p-4 sm:p-6">
       <div className="mb-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
@@ -37,6 +38,7 @@ export default function RestaurantsSection({ restaurants, onEdit, onDelete, onCr
         onEdit={onEdit}
         onDelete={onDelete}
         onCreateRestaurant={onCreateRestaurant}
+        onViewMenu={onViewMenu}
       />
     </section>
   );

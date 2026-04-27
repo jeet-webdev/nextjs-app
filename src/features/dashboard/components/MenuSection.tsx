@@ -14,7 +14,8 @@ export default function MenuSection({ menuItems, localMenuItems }: MenuSectionPr
   return (
     <section className="bg-white/5 rounded-xl border border-white/10 p-4 sm:p-6">
      
-      <MenuForm setForm={() => {}} />
+      {/* <MenuForm 
+      /> */}
 
      
        <div className="mb-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">

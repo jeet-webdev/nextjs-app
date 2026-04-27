@@ -3,12 +3,14 @@ import { type RestaurantRecord } from "@/features/restaurants/types";
 import { Archive, EditIcon, MapPin, Menu, Utensils, View } from "lucide-react";
 import Image from "next/image";
 
+
 type RestaurantCardProps = {
   restaurant: RestaurantRecord;
   compact?: boolean;
   onEdit?: (restaurant: RestaurantRecord) => void;
   onDelete?: (restaurant: RestaurantRecord) => void;
   onView?: (restaurant: RestaurantRecord) => void;
+  onViewMenu?: (restaurant: RestaurantRecord) => void;
 };
 
 export default function RestaurantCard({
@@ -16,7 +18,8 @@ export default function RestaurantCard({
   compact = false,
   onEdit,
   onDelete,
-  onView
+  onView,
+  onViewMenu,
 }: RestaurantCardProps) {
   return (
     <div className="group relative h-full overflow-hidden rounded-2xl border border-white/20 hover:border-sky-500/50">
@@ -73,57 +76,38 @@ export default function RestaurantCard({
             <MapPin className="mr-1 h-3.5 w-3.5 text-gray-500" />
             <span className="truncate">{restaurant.city}</span>
           </div>
-          {/* <div className="mt-auto flex items-center text-sm text-gray-400 hover:text-sky-400">
-         <Link href={`/myMenu`} className="flex h-full w-full items-center justify-center">
-          <Menu /> All Menu
-          </Link>
-          </div> */}
         </div>
       </div>
-
-      {/* <div className="mt-auto p-3 m-5 flex items-center text-sm text-gray-400">
-        <button 
-          onClick={() => setShowMenu(!showMenu)} 
-          className="flex items-center gap-2 hover:text-sky-400 transition-colors"
-        >
-          <Menu className="h-4 w-4" /> {showMenu ? "Hide Menu" : "View Menu"}
-           {showMenu && (
-        <div className="mt-4 border-t border-white/10 pt-4">
-          <MyMenu menuItems={restaurant.menuItems} restaurantId={restaurant.id} /> 
-        </div>
-        )}
-        </button>
-        </div> */}
 
       <div className="absolute right-2 top-2 flex flex-col gap-2 ">
         {(onEdit || onDelete) && (
           <>
-          {onEdit && (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.preventDefault();
-                onEdit(restaurant);
-              }}
-              className="flex h-8 w-8 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-sm transition hover:bg-sky-500 hover:scale-110"
-              title="Edit"
-            >
-              <EditIcon className="h-4 w-4" />
-            </button>
-          )}
-          {onDelete && (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.preventDefault();
-                onDelete(restaurant);
-              }}
-              className="flex h-8 w-8 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-sm transition hover:bg-rose-500 hover:scale-110"
-              title="Archive"
-            >
-              <Archive className="h-4 w-4" />
-            </button>
-          )}
+            {onEdit && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  onEdit(restaurant);
+                }}
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-sm transition hover:bg-sky-500 hover:scale-110"
+                title="Edit"
+              >
+                <EditIcon className="h-4 w-4" />
+              </button>
+            )}
+            {onDelete && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  onDelete(restaurant);
+                }}
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-sm transition hover:bg-rose-500 hover:scale-110"
+                title="Archive"
+              >
+                <Archive className="h-4 w-4" />
+              </button>
+            )}
           </>
         )}
         <Link
@@ -136,16 +120,26 @@ export default function RestaurantCard({
         </Link>
       </div>
       <div className="mt-auto border-t border-white/10 p-4">
-        <Link
-          href={`/${restaurant.slug}/menu`}
-          onClick={() => onView?.(restaurant)}
-          className="flex items-center gap-2 text-sm text-gray-400 transition-colors hover:text-sky-400"
-        >
-          <Menu className="h-4 w-4" />
-          View Menu
-        </Link>
+        {onViewMenu ? (
+          <button
+            type="button"
+            onClick={() => onViewMenu(restaurant)}
+            className="flex items-center gap-2 text-sm text-gray-400 transition-colors hover:text-sky-400"
+          >
+            <Menu className="h-4 w-4" />
+            View Menu
+          </button>
+        ) : (
+          <Link
+            href={`/${restaurant.slug}/menu`}
+            onClick={() => onView?.(restaurant)}
+            className="flex items-center gap-2 text-sm text-gray-400 transition-colors hover:text-sky-400"
+          >
+            <Menu className="h-4 w-4" />
+            View Menu
+          </Link>
+        )}
       </div>
-      {/* <Link href={`/${menupage}`} className="absolute inset-0" /> */}
     </div>
   );
 }

@@ -7,19 +7,20 @@ type MenuGridProps = {
   compact?: boolean;
   className?: string;
   onEdit?: (menuItem: MenuRecord) => void;
+  onDelete?: (id: string) => Promise<void> | void;
 };
 
 export default function MenuGrid({
   emptyMessage,
   menuItems = [],
-
+  onDelete,
   compact = false,
   className = "grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3",
   onEdit,
 }: MenuGridProps) {
 
 
-  if (menuItems.length === 0) {
+  if (!menuItems || menuItems.length === 0) {
     return (
       <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 text-gray-300">
         {emptyMessage}
@@ -35,6 +36,7 @@ export default function MenuGrid({
           menuItem={item}
           compact={compact}
           onEdit={onEdit}
+          onDelete={onDelete}
         />
       ))}
     </div>

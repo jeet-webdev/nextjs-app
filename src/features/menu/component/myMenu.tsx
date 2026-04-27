@@ -7,6 +7,7 @@ import MenuGrid from "./MenuGrid";
 type MyMenuProps = {
   menuItems?: MenuRecord[];
   onEdit?: (menuItem: MenuRecord) => void;
+  onDelete?: (id: string) => void;
   restaurantId: string;
   localMenuItems?: MenuRecord[];
 };
@@ -14,14 +15,10 @@ type MyMenuProps = {
 export default function MyMenu({
   menuItems,
   onEdit,
+  onDelete,
   restaurantId,
 }: MyMenuProps) {
-  console.log("MyMenu received menuItems:", menuItems);
-  console.log("MyMenu received restaurantId:", restaurantId);
-  console.log(
-    `MyMenu show the menu of restaurant with id: ${restaurantId} and the menu items are:`,
-    menuItems,
-  );
+  
 
 //   const [menuItem, setMenuItem] = useState<MenuRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
