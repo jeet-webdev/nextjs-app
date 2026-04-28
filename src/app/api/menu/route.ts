@@ -356,11 +356,11 @@ export async function POST(request: Request) {
     );
   }
 
-//   const access = await assertRestaurantAccess(restaurantId, currentUser);
+  const access = await assertRestaurantAccess(restaurantId, currentUser);
 
-//   if (access.error) {
-//     return access.error;
-//   }
+  if (access.error) {
+    return access.error;
+  }
 
   try {
     const createdMenuItem = await prisma.menuItem.create({

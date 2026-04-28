@@ -1,12 +1,15 @@
-import { type MenuRecord } from "../types/menuTypes";
-import { DeleteIcon, Edit, Trash2 } from "lucide-react"; 
+import { type MouseEvent } from "react";
 import { useState } from "react";
+import { Edit, Trash2 } from "lucide-react";
+
+import { type MenuRecord } from "../types/menuTypes";
 
 type MenuCardProps = {
   menuItem: MenuRecord;
   compact?: boolean;
   onEdit?: (menuItem: MenuRecord) => void;
-  onDelete?: (id: string) => Promise<void> | void; 
+  onDelete?: (id: string) => Promise<void> | void;
+  canManage?: boolean;
 };
 
 export default function MenuCard({
@@ -14,12 +17,15 @@ export default function MenuCard({
   compact = false,
   onEdit,
   onDelete,
+  canManage = false,
 }: MenuCardProps) {
   const [isDeleting, setIsDeleting] = useState(false);
+  const showActions = canManage && (Boolean(onEdit) || Boolean(onDelete));
 
-  const handleDeleteClick = async (e: React.MouseEvent) => {
+  const handleDeleteClick = async (e: MouseEvent) => {
     e.preventDefault();
-      e.stopPropagation(); 
+    e.stopPropagation();
+
     if (!onDelete) return;
 
     if (confirm(`Are you sure you want to delete "${menuItem.name}"?`)) {
@@ -31,11 +37,17 @@ export default function MenuCard({
       }
     }
   };
- const statusBadge = (
-    <span className={`rounded-full px-2 py-1 text-xs ${menuItem.isAvailable ? 'bg-emerald-500/15 text-emerald-200' : 'bg-red-500/15 text-red-200'}`}>
+
+  const statusBadge = (
+    <span
+      className={`rounded-full px-2 py-1 text-xs ${
+        menuItem.isAvailable ? "bg-emerald-500/15 text-emerald-200" : "bg-red-500/15 text-red-200"
+      }`}
+    >
       {menuItem.isAvailable ? "Available" : "Unavailable"}
     </span>
   );
+
   const content = compact ? (
     <div className="rounded-xl border border-white/10 bg-black/30 p-4 transition hover:bg-black/50 hover:border-sky-500/30">
       <p className="font-semibold text-white">{menuItem.name}</p>
@@ -44,9 +56,6 @@ export default function MenuCard({
         <span>${menuItem.price}</span>
         {statusBadge}
       </div>
-      <DeleteIcon
-      onClick={handleDeleteClick} 
-        />
     </div>
   ) : (
     <article className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 mb-4 backdrop-blur transition hover:-translate-y-1 hover:bg-white/[0.06] hover:border-sky-500/30">
@@ -61,9 +70,6 @@ export default function MenuCard({
         </div>
         {statusBadge}
       </div>
-      <DeleteIcon
-      onClick={handleDeleteClick} 
-        />
     </article>
   );
 
@@ -71,7 +77,12 @@ export default function MenuCard({
     <div className="relative group">
       {content}
 
-      <div className="absolute right-3 top-3 z-10 flex gap-2 opacity-0 transition-opacity group-hover:opacity-100">
+      {/* <div
+        className={`absolute right-3 top-3 z-10 flex gap-2 transition-opacity ${
+          showActions ? "opacity-0 group-hover:opacity-100" : "pointer-events-none opacity-0"
+        }`}
+      > */}
+      <div className="absolute right-3 top-3 z-10 flex gap-2">
         {onEdit && (
           <button
             type="button"
@@ -85,6 +96,7 @@ export default function MenuCard({
 
         {onDelete && (
           <button
+            type="button"
             disabled={isDeleting}
             onClick={handleDeleteClick}
             className={`rounded bg-red-500/10 p-2 transition hover:bg-red-500/20 ${

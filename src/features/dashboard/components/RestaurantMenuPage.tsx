@@ -2,7 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { ArrowLeft, Menu } from "lucide-react";
+import { toast } from "react-toastify";
+
 import MyMenu from "@/features/menu/component/myMenu";
+import type { MenuRecord } from "@/features/menu/types/menuTypes";
 import type { RestaurantRecord } from "@/features/restaurants/types";
 import MenuForm from "@/features/menu/component/MenuForm";
 
@@ -15,10 +18,50 @@ export default function RestaurantMenuPage({ restaurant, onBack }: RestaurantMen
   const [restaurantDetails, setRestaurantDetails] = useState<RestaurantRecord | null>(restaurant);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [editingMenuItem, setEditingMenuItem] = useState<MenuRecord | null>(null);
 
   useEffect(() => {
     setRestaurantDetails(restaurant);
   }, [restaurant]);
+
+  const refreshMenuItems = () => {
+    setRefreshKey((current) => current + 1);
+  };
+
+  const handleEditMenuItem = (menuItem: MenuRecord) => {
+    setEditingMenuItem(menuItem);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingMenuItem(null);
+  };
+
+  const handleMenuSaved = () => {
+    setEditingMenuItem(null);
+    refreshMenuItems();
+  };
+
+  const handleDeleteMenuItem = async (id: string) => {
+    const response = await fetch(`/api/menu/${id}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      const data = (await response.json().catch(() => null)) as { error?: string } | null;
+      toast.error(data?.error ?? "Failed to delete menu item.");
+      return;
+    }
+
+    toast.success("Menu item deleted.");
+
+    if (editingMenuItem?.id === id) {
+      setEditingMenuItem(null);
+    }
+
+    refreshMenuItems();
+  };
 
 
   useEffect(() => {
@@ -52,7 +95,7 @@ export default function RestaurantMenuPage({ restaurant, onBack }: RestaurantMen
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-black via-slate-900 to-black px-4 py-24 text-white">
-        <div className="mx-auto max-w-5xl animate-pulse space-y-4">
+      <div className="mx-auto min-w-5xl animate-pulse space-y-4">   {/*//max-w-5xl */}
           <div className="h-6 w-32 rounded bg-white/10" />
           <div className="h-12 w-64 rounded bg-white/10" />
           <div className="h-40 rounded-3xl bg-white/10" />
@@ -80,9 +123,9 @@ export default function RestaurantMenuPage({ restaurant, onBack }: RestaurantMen
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-black via-slate-900 to-black px-4 py-24 text-white">
+    <div className="min-h-screen bg-gradient-to-b from-black via-slate-900 to-black px-4 py-2 text-white">
      
-      <div className="mx-auto max-w-5xl space-y-8">
+      <div className="mx-auto min-w-5xl space-y-8">
         <button
           type="button"
           onClick={onBack}
@@ -108,10 +151,24 @@ export default function RestaurantMenuPage({ restaurant, onBack }: RestaurantMen
           </div>
         </section>
         <section className="rounded-3xl mb-8 border border-white/10 bg-black/20 p-6 backdrop-blur-sm">
-          <MyMenu restaurantId={restaurantDetails.id} menuItems={restaurantDetails.menuItems ?? []} />
+        <MenuForm
+         restaurantId={restaurantDetails.id}
+         menuItem={editingMenuItem}
+         onSaved={handleMenuSaved}
+         onCancelEdit={handleCancelEdit}
+       />
+          <MyMenu
+            restaurantId={restaurantDetails.id}
+            menuItems={restaurantDetails.menuItems ?? []}
+            canManage
+            refreshKey={refreshKey}
+            onEdit={handleEditMenuItem}
+            onDelete={handleDeleteMenuItem}
+          />
+
         </section>
       </div> 
-       <MenuForm restaurantId={restaurantDetails.id} />
+       
     </div>
   );
 }

@@ -8,6 +8,7 @@ type MenuGridProps = {
   className?: string;
   onEdit?: (menuItem: MenuRecord) => void;
   onDelete?: (id: string) => Promise<void> | void;
+  canManage?: boolean;
 };
 
 export default function MenuGrid({
@@ -17,6 +18,7 @@ export default function MenuGrid({
   compact = false,
   className = "grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3",
   onEdit,
+  canManage = false,
 }: MenuGridProps) {
 
 
@@ -37,6 +39,7 @@ export default function MenuGrid({
           compact={compact}
           onEdit={onEdit}
           onDelete={onDelete}
+          canManage={canManage}
         />
       ))}
     </div>

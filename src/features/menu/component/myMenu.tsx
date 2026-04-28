@@ -7,9 +7,11 @@ import MenuGrid from "./MenuGrid";
 type MyMenuProps = {
   menuItems?: MenuRecord[];
   onEdit?: (menuItem: MenuRecord) => void;
-  onDelete?: (id: string) => void;
+  onDelete?: (id: string) => Promise<void> | void;
   restaurantId: string;
   localMenuItems?: MenuRecord[];
+  canManage?: boolean;
+  refreshKey?: number;
 };
 
 export default function MyMenu({
@@ -17,6 +19,8 @@ export default function MyMenu({
   onEdit,
   onDelete,
   restaurantId,
+  canManage = false,
+  refreshKey = 0,
 }: MyMenuProps) {
   
 
@@ -45,18 +49,16 @@ export default function MyMenu({
   useEffect(() => {
     const loadMenuItem = async () => {
       try {
-     
-        const response = await fetch("/api/menu?public=true");
+        const query = canManage
+          ? `/api/menu?restaurantId=${encodeURIComponent(restaurantId)}`
+          : `/api/menu?public=true&restaurantId=${encodeURIComponent(restaurantId)}`;
+        const response = await fetch(query, canManage ? { credentials: "include" } : undefined);
+
         if (!response.ok) return;
 
         const data = await response.json();
         const allItems: MenuRecord[] = data.menuItems || [];
-
-        const filteredItems = allItems.filter(
-          (item) => item.restaurantId === restaurantId,
-        );
-
-        setLocalMenuItems(filteredItems);
+        setLocalMenuItems(allItems);
       } catch (error) {
         console.error("Failed to load menu:", error);
       } finally {
@@ -67,7 +69,7 @@ export default function MyMenu({
     if (restaurantId) {
       void loadMenuItem();
     }
-  }, [restaurantId]);
+  }, [canManage, refreshKey, restaurantId]);
   return (
     <div className="">
       <h1 className="text-2xl font-bold text-white">All My Menu</h1>
@@ -80,15 +82,18 @@ export default function MyMenu({
       ) : (
         <div>
           <p className="mt-2 text-sm text-gray-500">
-            {localMenuItems.length} total menu item
-            {localMenuItems.length !== 1 ? "s" : ""} found for restaurant ID:{" "}
-            {restaurantId}
+            total menu item: {localMenuItems.length} 
+            {/* {localMenuItems.length !== 1 ? "s" : ""} found for restaurant ID:{" "}
+            {restaurantId} */}
           </p>
         </div>
       )}
       <MenuGrid
         menuItems={localMenuItems}
-        className="mt-2 pt-2"
+        className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3"
+        canManage={canManage}
+        onEdit={onEdit}
+        onDelete={onDelete}
         emptyMessage={
           isLoading ? "Loading menu items..." : "No menu published yet."
         }
