@@ -82,6 +82,10 @@ export default function MenuCard({
           showActions ? "opacity-0 group-hover:opacity-100" : "pointer-events-none opacity-0"
         }`}
       > */}
+   
+
+
+
       <div className="absolute right-3 top-3 z-10 flex gap-2">
         {onEdit && (
           <button

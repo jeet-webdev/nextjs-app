@@ -2,10 +2,12 @@ import React, { useEffect, useState } from "react";
 import { Loader2, Plus } from "lucide-react";
 import { toast } from "react-toastify";
 
+import type { CategoryRecord } from "@/features/category/categoryForm";
 import { type MenuRecord } from "@/features/menu/types/menuTypes";
 
 type MenuFormProps = {
   restaurantId: string;
+  categories: CategoryRecord[];
   menuItem?: MenuRecord | null;
   onSaved?: (menuItem: MenuRecord) => void;
   onCancelEdit?: () => void;
@@ -16,6 +18,7 @@ type MenuFormState = {
   description: string;
   price: string;
   discountedPrice: string;
+  categoryId: string;
   category: string;
   subCategory: string;
   image: string;
@@ -46,6 +49,7 @@ const EMPTY_MENU_FORM: MenuFormState = {
   description: "",
   price: "",
   discountedPrice: "",
+  categoryId: "",
   category: "",
   subCategory: "",
   image: "",
@@ -67,6 +71,7 @@ function toFormState(menuItem?: MenuRecord | null): MenuFormState {
       menuItem.discountedPrice !== null && menuItem.discountedPrice !== undefined
         ? String(menuItem.discountedPrice)
         : "",
+    categoryId: menuItem.categoryId ?? "",
     category: menuItem.category ?? "",
     subCategory: menuItem.subCategory ?? "",
     image: menuItem.image ?? "",
@@ -78,6 +83,7 @@ function toFormState(menuItem?: MenuRecord | null): MenuFormState {
 
 export default function MenuForm({
   restaurantId,
+  categories,
   menuItem = null,
   onSaved,
   onCancelEdit,
@@ -89,6 +95,37 @@ export default function MenuForm({
   useEffect(() => {
     setFormData(toFormState(menuItem));
   }, [menuItem]);
+
+  useEffect(() => {
+    setFormData((current) => {
+      const selectedCategory = categories.find((category) => category.id === current.categoryId);
+
+      if (selectedCategory) {
+        if (current.category === selectedCategory.name) {
+          return current;
+        }
+
+        return {
+          ...current,
+          category: selectedCategory.name,
+        };
+      }
+
+      if (categories.length === 0) {
+        return {
+          ...current,
+          categoryId: "",
+          category: "",
+        };
+      }
+
+      return {
+        ...current,
+        categoryId: categories[0].id,
+        category: categories[0].name,
+      };
+    });
+  }, [categories]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -170,8 +207,34 @@ export default function MenuForm({
               onChange={handleChange}
             />
           </div>
-<input type="hidden" name="restaurantId" value={restaurantId} />
+           <input type="hidden" name="restaurantId" value={restaurantId} />
           <div className="space-y-1">
+            <label className="text-xs text-gray-400 ml-1">Category</label>
+            <select
+              name="categoryId"
+              required
+              className="p-3 bg-black/40 border border-white/10 rounded-lg w-full text-white"
+              value={formData.categoryId}
+              onChange={(event) => {
+                const selectedCategory = categories.find((category) => category.id === event.target.value);
+
+                setFormData((current) => ({
+                  ...current,
+                  categoryId: event.target.value,
+                  category: selectedCategory?.name ?? "",
+                }));
+              }}
+            >
+              <option value="">Select a category</option>
+              {categories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* <div className="space-y-1">
             <label className="text-xs text-gray-400 ml-1">Price (INR)</label>
             <input
               name="price"
@@ -182,9 +245,9 @@ export default function MenuForm({
               value={formData.price}
               onChange={handleChange}
             />
-          </div>
+          </div> */}
 
-          <div className="space-y-1">
+          {/* <div className="space-y-1">
             <label className="text-xs text-gray-400 ml-1">Discounted Price</label>
             <input
               name="discountedPrice"
@@ -194,19 +257,10 @@ export default function MenuForm({
               value={formData.discountedPrice}
               onChange={handleChange}
             />
-          </div>
+          </div> */}
 
          
-            {/* <div className="sm:col-span-2 space-y-1">
-            <label className="text-xs text-gray-400 ml-1">Subcategory</label>
-            <input
-              name="Subcategory"
-              className="p-3 bg-black/40 border border-white/10 rounded-lg w-full text-white"
-              placeholder="subCategory "
-              value={formData.subCategory}
-              onChange={handleChange}
-            />
-          </div> */}
+         
 
   <div className="sm:col-span-2 space-y-1">
             <label className="text-xs text-gray-400 ml-1">Description</label>
@@ -219,36 +273,29 @@ export default function MenuForm({
             />
           </div>
 
-          <input
-            name="category"
-            className="p-3 bg-black/40 border border-white/10 rounded-lg w-full text-white"
-            placeholder="Category (ex. Main Course)"
-            value={formData.category}
-            onChange={handleChange}
-          />
-          <input
+          {/* <input
             name="subCategory"
             className="p-3 bg-black/40 border border-white/10 rounded-lg w-full text-white"
             placeholder="Sub Category (ex. Vegetarian)"
             value={formData.subCategory}
             onChange={handleChange}
-          />
+          /> */}
 
-          <input
+          {/* <input
             name="image"
             className="p-3 bg-black/40 border border-white/10 rounded-lg w-full text-white"
             placeholder="Image URL"
             value={formData.image}
             onChange={handleChange}
-          />
+          /> */}
 
-          <input
+          {/* <input
             name="ingredients"
             className="p-3 bg-black/40 border border-white/10 rounded-lg w-full text-white"
             placeholder="Ingredients"
             value={formData.ingredients}
             onChange={handleChange}
-          />
+          /> */}
 
           <input
             name="preparationTime"
@@ -274,7 +321,7 @@ export default function MenuForm({
         <div className="mt-3 flex flex-row gap-5">
         <button
           type="submit" 
-          disabled={loading}
+          disabled={loading || categories.length === 0}
           className="w-full p-3 bg-sky-600 hover:bg-sky-700 text-white rounded-lg font-semibold transition-colors flex justify-center items-center gap-2"
         >
           {loading && <Loader2 className="h-4 w-4 animate-spin" />}

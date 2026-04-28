@@ -50,7 +50,6 @@ export async function GET(
       select: {
         id: true,
         name: true,
-        category: true,
         city: true,
         slug: true,
         Address: true,
@@ -73,7 +72,6 @@ export async function GET(
       restaurant: {
         id: restaurant.id,
         name: restaurant.name,
-        category: restaurant.category,
         city: restaurant.city,
         slug: restaurant.slug,
         address: restaurant.Address,

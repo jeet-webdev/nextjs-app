@@ -2,7 +2,6 @@ import { z } from 'zod';
 
 export const restaurantSchema = z.object({
     name: z.string().min(1, "Restaurant name is required").max(100, "Restaurant name is too long"),
-    category: z.string().min(1, "Category is required").max(50, "Category is too long"),
     city: z.string().min(1, "City is required").max(50, "City is too long"),
     slug: z.string()
         .min(3, "Slug must be at least 3 characters")

@@ -59,14 +59,14 @@ export default function OwnerRestaurantsForm({
             aria-errormessage={error}
           />
           {!restaurantForm.name && !error && <p className="mt-2 text-xs sm:text-sm text-rose-400">Restaurant name is required.</p>}
-          <input
+          {/* <input
             className="rounded-lg border border-white/10 bg-black/40 p-3"
             placeholder="Category"
             value={restaurantForm.category}
             onChange={(event) => setRestaurantForm((prev) => ({ ...prev, category: event.target.value }))}
             aria-errormessage={error}
-            />
-          {!restaurantForm.category && !error && <p className="mt-2 text-xs sm:text-sm text-rose-400">Category is required.</p>}
+            /> */}
+          {/* {!restaurantForm.category && !error && <p className="mt-2 text-xs sm:text-sm text-rose-400">Category is required.</p>} */}
           <input
             className="rounded-lg border border-white/10 bg-black/40 p-3"
             placeholder="City"

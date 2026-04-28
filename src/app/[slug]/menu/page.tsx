@@ -100,7 +100,8 @@ useEffect(() => {
               <p className="text-sm uppercase tracking-[0.3em] text-sky-300">Restaurant Menu</p>
               <h1 className="mt-2 text-3xl font-semibold">{restaurant.name}</h1>
               <p className="mt-2 text-sm text-gray-400">
-                {restaurant.category} in {restaurant.city}
+                {/* {restaurant.category} in {restaurant.city} */}
+                {restaurant.city}
               </p>
             </div>
 
@@ -114,7 +115,9 @@ useEffect(() => {
         </section>
 
         <section className="rounded-3xl border border-white/10 bg-black/20 p-6 backdrop-blur-sm">
-          <MyMenu restaurantId={restaurant.id} menuItems={restaurant.menuItems} />
+          <MyMenu 
+          restaurantId={restaurant.id} 
+          menuItems={restaurant.menuItems} />
         </section>
       </div>
     </div>

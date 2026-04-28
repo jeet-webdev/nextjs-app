@@ -22,7 +22,6 @@ import UsersTable from "@/features/dashboard/components/UsersTable";
 import RestaurantsSection from "@/features/dashboard/components/RestaurantsSection";
 import MenuSection from "@/features/dashboard/components/MenuSection";
 import RestaurantsForm from "@/features/dashboard/components/RestaurantsForm";
-import { type MenuRecord } from "@/features/menu/types/menuTypes";
 import { toast } from "react-toastify";
 import TableSection from "../components/TableSection";
 import { clearStoredUserRole } from "@/shared/lib/auth-storage";
@@ -109,7 +108,6 @@ export default function RoleDashboardPage({
     EMPTY_RESTAURANT_FORM,
   );
 
-  const [menuItems, setMenuItems] = useState<MenuRecord[]>([]);
   const [selectedRestaurant, setSelectedRestaurant] =
     useState<RestaurantRecord | null>(null);
   const [isEditingRestaurant, setIsEditingRestaurant] = useState(false);
@@ -122,7 +120,7 @@ export default function RoleDashboardPage({
   const handleSectionChange = useCallback((section: DashboardSection) => {
     setActiveSection(section);
 
-    if (section !== "restaurants") {
+    if (section !== "restaurants" && section !== "menu-items") {
       setSelectedRestaurant(null);
     }
   }, []);
@@ -153,25 +151,6 @@ export default function RoleDashboardPage({
     expectedRole === "OWNER" ? "No customers yet." : "No users found.";
   const restaurantsForSection = restaurants;
 
-  useEffect(() => {
-    if (activeSection !== "menu-items") return;
-
-    const fetchMenu = async () => {
-      try {
-        const response = await fetch("/api/menu?public=true", {
-          method: "GET",
-          credentials: "include",
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setMenuItems(data.menuItems || []);
-        }
-      } catch {}
-    };
-
-    void fetchMenu();
-  }, [activeSection]);
   const fetchUsers = useCallback(
     async (
       page = userPagination.page,
@@ -368,7 +347,7 @@ export default function RoleDashboardPage({
     setSelectedRestaurant(null);
     setRestaurantForm({
       name: restaurant.name ?? "",
-      category: restaurant.category ?? "",
+      // category: restaurant.category ?? "",
       city: restaurant.city ?? "",
       slug: restaurant.slug ?? "",
       address: restaurant.address ?? "",
@@ -614,7 +593,31 @@ export default function RoleDashboardPage({
 
        
         {activeSection === "menu-items" ? (
-          <MenuSection localMenuItems={menuItems} menuItems={menuItems} />
+          selectedRestaurant ? (
+            <RestaurantMenuPage
+              restaurant={selectedRestaurant}
+              onBack={() => setSelectedRestaurant(null)}
+            />
+          ) : (
+            <MenuSection
+              restaurants={restaurantsForSection}
+              onViewMenu={handleViewRestaurantMenu}
+              onCreateRestaurant={
+                currentUser &&
+                (currentUser.userType === "ADMIN" ||
+                  currentUser.userType === "OWNER")
+                  ? () => {
+                      setRestaurantForm(EMPTY_RESTAURANT_FORM);
+                      setRestaurantError("");
+                      setIsEditingRestaurant(false);
+                      setEditingRestaurantId(null);
+                      setSelectedRestaurant(null);
+                      setActiveSection("create-restaurant");
+                    }
+                  : undefined
+              }
+            />
+          )
         ) : null}
         {activeSection === "table-reservations" ? <TableSection /> : null}
 

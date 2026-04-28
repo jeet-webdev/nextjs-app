@@ -274,6 +274,7 @@ export async function PATCH(
   }
   if (body.discountedPrice !== undefined) data.discountedPrice = parseOptionalNumber(body.discountedPrice);
   if (typeof body.currency === "string") data.currency = body.currency.trim();
+  if (typeof body.categoryId === "string") data.categoryId = parseRequiredString(body.categoryId);
   if (typeof body.category === "string") data.category = body.category.trim();
   if (typeof body.subCategory === "string") data.subCategory = parseOptionalString(body.subCategory);
   if (typeof body.image === "string") data.image = parseOptionalString(body.image);

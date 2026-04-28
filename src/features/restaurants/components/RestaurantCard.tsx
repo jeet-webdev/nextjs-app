@@ -67,9 +67,9 @@ export default function RestaurantCard({
         </div>
 
         <div className="flex flex-wrap gap-2 mb-4">
-          <span className="text-xs font-medium uppercase px-2 py-0.5 rounded">
+          {/* <span className="text-xs font-medium uppercase px-2 py-0.5 rounded">
             {restaurant.category}
-          </span>
+          </span> */}
         </div>
         <div className="mt-auto flex items-center flex-row gap-10 text-sm text-gray-400">
           <div className="flex  ">

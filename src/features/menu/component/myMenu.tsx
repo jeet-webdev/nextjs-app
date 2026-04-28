@@ -23,28 +23,10 @@ export default function MyMenu({
   refreshKey = 0,
 }: MyMenuProps) {
   
-
-//   const [menuItem, setMenuItem] = useState<MenuRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [localMenuItems, setLocalMenuItems] = useState<MenuRecord[]>([]);
 
-  //   useEffect(() => {
-  //     const loadMenuItem = async () => {
-  //       try {
-  //         const response = await fetch("/api/menu?public=true");
-  //         if (!response.ok) return;
 
-  //         const data = await response.json();
-
-  //         const items = data.menuItems || [];
-  //         setMenuItem(items);
-  //       } catch (error) {
-  //       } finally {
-  //         setIsLoading(false);
-  //       }
-  //     };
-  //     void loadMenuItem();
-  //   }, []);
 
   useEffect(() => {
     const loadMenuItem = async () => {

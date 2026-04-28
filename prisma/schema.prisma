@@ -6,113 +6,104 @@ datasource db {
   provider = "postgresql"
 }
 
-enum UserType {
-  OWNER
-  CUSTOMER
-  ADMIN
-}
-enum BookingStatus {
-  PENDING
-  CONFIRMED
-  CANCELLED
-}
-
-enum RestaurantStatus{
-  OPEN
-  CLOSED
-}
-
 model User {
-  id          String   @id @default(cuid())
-  name        String   @default("")
-  email       String   @unique
+  id          String       @id @default(cuid())
+  name        String       @default("")
+  email       String       @unique
   password    String
-  phone       BigInt   @default(0)
-  userType    UserType @default(CUSTOMER)
-  
- 
-  restaurants   Restaurant[]
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  phone       BigInt       @default(0)
+  userType    UserType     @default(CUSTOMER)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  restaurants Restaurant[]
 }
 
 model Restaurant {
-  id          String @id @default(cuid())
-  name        String
-  category    String
-  status      RestaurantStatus  @default(OPEN)
-  city        String
-  slug        String @unique @default(uuid())
-  Address     String
-  logo        String?
-  content     Json?
-  contactInfo Json?
-  seoTitle    String?
+  id             String           @id @default(cuid())
+  name           String
+  status         RestaurantStatus @default(OPEN)
+  city           String
+  slug           String           @unique @default(uuid())
+  Address        String
+  logo           String?
+  content        Json?
+  contactInfo    Json?
+  seoTitle       String?
   seoDescription String?
+  userId         String
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  menuItems      MenuItem[]
+  categories     Category[]
 
-  userId            String
-  user              User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  menuItems         MenuItem[]
-  tableBookings     TableBooking[] 
-    
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tableBookings  TableBooking[]
 
-  @@index([createdAt])
   @@unique([userId, slug])
+  @@index([createdAt])
   @@index([slug])
   @@index([userId])
   @@map("restaurants")
 }
 
 
+model Category{
+  id             String        @id @default(cuid())
+  name           String
+  isAvailable    Boolean        @default(true)
+  restaurantId   String 
+  restaurant     Restaurant     @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  menuItems      MenuItem[]
+
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@index([restaurantId])
+  @@map("categories")
+}
+
 
 model MenuItem {
-  id                String            @id @default(uuid())
-  restaurantId      String
-  restaurant        Restaurant        @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  id              String     @id @default(uuid())
+  restaurantId    String
+  name            String
+  description     String?
+  price           Decimal    @db.Decimal(10, 2)
+  discountedPrice Decimal?   @db.Decimal(10, 2)
+  currency        String     @default("USD")
+  image           String?
+  dietary         Json?
+  isAvailable     Boolean    @default(true)
+  preparationTime Int?
+  ingredients     String?
+  order           Int        @default(0)
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  categoryId      String
+  categories      Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   
-  name              String
-  description       String?
-  price             Decimal           @db.Decimal(10,2)
-  discountedPrice   Decimal?          @db.Decimal(10,2)
-  currency          String            @default("USD")
-  
-  category          String
-  subCategory       String?
-  image             String?
-  
-  dietary           Json?           
-  isAvailable       Boolean           @default(true)
-  preparationTime   Int?
-  ingredients       String?
-  modifiers         Modifier[] @relation("MenuItemToModifier")
-  
-  order             Int               @default(0)
-  createdAt         DateTime          @default(now())
-  updatedAt         DateTime          @updatedAt
-  
+  category        String   
+  subCategory     String?
+  restaurant      Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  modifiers       Modifier[] @relation("MenuItemToModifier")
+
   @@index([restaurantId, category])
   @@map("menu_items")
 }
 
-
-
-model Modifier{
+model Modifier {
   id          String     @id @default(uuid())
   name        String
-  price       Decimal    @default(0) @db.Decimal(10,2)
+  price       Decimal    @default(0) @db.Decimal(10, 2)
   menuContent Json?
   menuItems   MenuItem[] @relation("MenuItemToModifier")
 
   @@map("modifiers")
 }
 
-model TableBooking{
+model TableBooking {
   id           String        @id @default(uuid())
   restaurantId String
-  restaurant   Restaurant    @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
-
   name         String
   email        String?
   phone        String?
@@ -121,10 +112,27 @@ model TableBooking{
   guests       Int
   message      String?
   status       BookingStatus @default(PENDING)
-
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
+  restaurant   Restaurant    @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
 
   @@index([restaurantId])
   @@map("table_bookings")
+}
+
+enum UserType {
+  OWNER
+  CUSTOMER
+  ADMIN
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
+
+enum RestaurantStatus {
+  OPEN
+  CLOSED
 }
