@@ -4,8 +4,10 @@ import { useEffect, useMemo, useState } from "react";
 
 import RestaurantGrid from "@/features/restaurants/components/RestaurantGrid";
 import { type RestaurantRecord } from "@/features/restaurants/types";
-
-export default function HomeRestaurants() {
+type HomeRestaurantsProps = {
+  onView?: (restaurant: RestaurantRecord) => void;
+};
+export default function HomeRestaurants( { onView }: HomeRestaurantsProps) {
   const [restaurants, setRestaurants] = useState<RestaurantRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -21,7 +23,7 @@ export default function HomeRestaurants() {
         const data = (await response.json()) as { restaurants: RestaurantRecord[] };
         setRestaurants(data.restaurants);
       } catch {
-        // Keep home page usable even if restaurants API is unavailable.
+      
       } finally {
         setIsLoading(false);
       }
@@ -30,10 +32,7 @@ export default function HomeRestaurants() {
     void loadRestaurants();
   }, []);
 
-  const categoriesCount = useMemo(
-    () => new Set(restaurants.map((restaurant) => restaurant.category.toLowerCase())).size,
-    [restaurants],
-  );
+
 
   const citiesCount = useMemo(
     () => new Set(restaurants.map((restaurant) => restaurant.city.toLowerCase())).size,
@@ -59,10 +58,7 @@ export default function HomeRestaurants() {
           <p className="text-xs uppercase tracking-[0.16em] text-gray-400">Active Restaurants</p>
           <p className="mt-1 text-2xl font-black text-white">{restaurants.length}</p>
         </div>
-        <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
-          <p className="text-xs uppercase tracking-[0.16em] text-gray-400">Categories</p>
-          <p className="mt-1 text-2xl font-black text-white">{categoriesCount}</p>
-        </div>
+    
         <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
           <p className="text-xs uppercase tracking-[0.16em] text-gray-400">Cities</p>
           <p className="mt-1 text-2xl font-black text-white">{citiesCount}</p>
@@ -75,6 +71,7 @@ export default function HomeRestaurants() {
 
       <RestaurantGrid
         restaurants={restaurants}
+        onView={onView}
         emptyMessage={isLoading ? "Loading restaurants..." : "No restaurants published yet."}
       />
     </section>

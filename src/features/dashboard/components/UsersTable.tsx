@@ -6,6 +6,14 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import { toast } from 'react-toastify';
 import UpdateUserModal from "@/features/home/components/UpdateUserModal";
 
+type UsersPaginationProps = {
+  count: number;
+  page: number;
+  rowsPerPage: number;
+  onPageChange: (newPage: number) => void;
+  onRowsPerPageChange: (newRowsPerPage: number) => void;
+};
+
 type UsersTableProps = {
   users: UserRecord[];
   isLoadingUsers: boolean;
@@ -13,7 +21,8 @@ type UsersTableProps = {
   emptyMessage: string;
   userTypeOptions?: UserType[];
   onRefresh?: () => void | Promise<void>;
-    onCreateUser?: () => void;
+  onCreateUser?: () => void;
+  pagination: UsersPaginationProps;
 };
 
 export default function UsersTable({
@@ -22,17 +31,14 @@ export default function UsersTable({
   title,
   emptyMessage,
   onCreateUser,
-
+  pagination,
   userTypeOptions,
   onRefresh
 }: UsersTableProps) {
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
 
   const [userToEdit, setUserToEdit] = useState<UserRecord | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const paginatedUsers = users.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage); 
   
   const handleEditClick = (user: UserRecord) => {
     setUserToEdit(user);
@@ -110,10 +116,10 @@ export default function UsersTable({
         <tbody className="divide-y divide-white/5">
           {isLoadingUsers ? (
             <tr><td colSpan={7} className="p-4 text-center text-gray-400">Loading users...</td></tr>
-          ) : paginatedUsers.length === 0 ? (
+          ) : users.length === 0 ? (
             <tr><td colSpan={7} className="p-4 text-center text-gray-400">{emptyMessage}</td></tr>
           ) : (
-            paginatedUsers.map((user) => (
+            users.map((user) => (
               <tr key={user.id} className="hover:bg-white/5 transition border-b border-white/5">
                 <td className="p-2 sm:p-4 font-medium">{user.name}</td>
                 <td className="p-2 sm:p-4 text-gray-300 hidden sm:table-cell">{user.email}</td>
@@ -148,13 +154,14 @@ export default function UsersTable({
           )}
         </tbody>
       </table>
-      {!isLoadingUsers && users.length > 0 && (
+      {!isLoadingUsers && pagination.count > 0 && (
         <CommonTablePagination
-          count={users.length}
-          page={page}
-          rowsPerPage={rowsPerPage}
-          onPageChange={setPage}
-          onRowsPerPageChange={(val) => { setRowsPerPage(val); setPage(0); }}
+          count={pagination.count}
+          page={pagination.page}
+          rowsPerPage={pagination.rowsPerPage}
+          rowsPerPageOptions={[10, 20, 30]}
+          onPageChange={pagination.onPageChange}
+          onRowsPerPageChange={pagination.onRowsPerPageChange}
         />
       )}
     </div>

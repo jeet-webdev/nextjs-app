@@ -15,13 +15,13 @@ export default function HomeMenu() {
         if (!response.ok) return;
 
         const data = await response.json();
-        console.log("API Response received:", data); 
+      
 
    
         const items = data.menuItems || []; 
         setMenuItem(items);
       } catch (error) {
-        console.error("Fetch error:", error);
+      
       } finally {
         setIsLoading(false);
       }

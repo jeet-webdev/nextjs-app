@@ -19,9 +19,7 @@ export default function Footer({ restaurant }: FooterProps) {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
             <div className="col-span-1 space-y-6">
               <h3 className="text-3xl font-black text-gray-500">{restaurant.name}</h3>
-              <p className="text-slate-400 text-sm leading-relaxed max-w-xs">
-                {restaurant.category || "Experience culinary excellence through our carefully curated menu and cozy atmosphere."}
-              </p>
+             
               <div className="flex gap-4 pt-2">
                 <div className="mt-6 flex column gap-4 items-end justify-end">
                       <a 

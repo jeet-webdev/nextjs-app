@@ -3,15 +3,18 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import type { UserType } from "@/features/users/types";
 import {
   type UserFormValidationErrors,
   hasUserFormErrors,
   validateUserForm,
 } from "@/features/users/userValidation";
+import { setStoredUserRole } from "@/shared/lib/auth-storage";
 
 type SignupResponse = {
   error?: string;
   redirectPath?: string;
+  userType?: UserType;
 };
 
 type CustomerSignupFormProps = {
@@ -110,8 +113,13 @@ export default function CustomerSignupForm({ onSuccess }: CustomerSignupFormProp
       }
 
       setForm(INITIAL_FORM);
-  setFieldErrors({});
-  setTouchedFields({});
+      setFieldErrors({});
+      setTouchedFields({});
+
+      if (data.userType) {
+        setStoredUserRole(data.userType);
+      }
+
       onSuccess?.();
       router.push(data.redirectPath ?? "/dashboard/customer");
       router.refresh();

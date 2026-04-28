@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { USER_TYPE_MAP, type UserRecord, type UserType } from "@/features/users/types";
+import { setStoredUserRole } from "@/shared/lib/auth-storage";
 import {
   type UserFormValidationErrors,
   hasUserFormErrors,
@@ -201,6 +202,11 @@ export default function UserSignupForm({
       setFieldErrors({});
       setTouchedFields({});
       onSuccess?.();
+
+      if (data && data.userType) {
+        setStoredUserRole(data.userType as UserType);
+      }
+
       router.push((data && data.redirectPath) || "/dashboard");
       router.refresh();
     } catch {

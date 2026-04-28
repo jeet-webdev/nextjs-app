@@ -9,6 +9,9 @@ import { normalizePhoneInput, parsePhoneForStorage, serializeUserPhone } from "@
 
 const ALLOWED_USER_TYPES = ["OWNER", "CUSTOMER", "ADMIN"] as const;
 const DASHBOARD_USER_TYPES = ["ADMIN", "OWNER"] as const;
+const DEFAULT_PAGE = 1;
+const DEFAULT_LIMIT = 10;
+const MAX_LIMIT = 100;
 
 type AllowedUserType = (typeof ALLOWED_USER_TYPES)[number];
 type DashboardUserType = (typeof DASHBOARD_USER_TYPES)[number];
@@ -38,9 +41,111 @@ async function getSessionUser() {
   });
 }
 
-export async function GET() {
-  const currentUser = await getSessionUser();
+function parsePositiveInteger(value: string | null, fallback: number) {
+  if (!value) {
+    return fallback;
+  }
 
+  const parsedValue = Number.parseInt(value, 10);
+
+  if (!Number.isFinite(parsedValue) || parsedValue < 1) {
+    return fallback;
+  }
+
+  return parsedValue;
+}
+
+// export async function GET(request: Request) {
+//   const currentUser = await getSessionUser();
+
+//   if (!currentUser) {
+//     return NextResponse.json({ error: "Only ADMIN and OWNER can acceess this data " }, { status: 401 });
+//   }
+
+//   if (!DASHBOARD_USER_TYPES.includes(currentUser.userType as DashboardUserType)) {
+//     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+//   }
+
+//   const { searchParams } = new URL(request.url);
+//   const page = parsePositiveInteger(searchParams.get("page"), DEFAULT_PAGE);
+//   const requestedLimit = parsePositiveInteger(searchParams.get("limit"), DEFAULT_LIMIT);
+//   const limit = Math.min(requestedLimit, MAX_LIMIT);
+//   const skip = (page - 1) * limit;
+//   const whereClause: Prisma.UserWhereInput = {};
+
+//   if (currentUser.userType === "OWNER") {
+//     whereClause.userType = "CUSTOMER";
+//   }
+
+//   const [users, totalUsers, groupedCounts] = await Promise.all([
+//     prisma.user.findMany({
+//       where: whereClause,
+//       skip,
+//       take: limit,
+//       select: {
+//         id: true,
+//         name: true,
+//         email: true,
+//         phone: true,
+//         userType: true,
+//         createdAt: true,
+//       },
+//       orderBy: {
+//         createdAt: "desc",
+//       },
+//     }),
+//     prisma.user.count({ where: whereClause }),
+//     prisma.user.groupBy({
+//       by: ["userType"],
+//       where: whereClause,
+//       _count: {
+//         _all: true,
+//       },
+//     }),
+//   ]);
+
+//   const stats = {
+//     total: totalUsers,
+//     admins: 0,
+//     owners: 0,
+//     customers: 0,
+//   };
+
+//   for (const countGroup of groupedCounts) {
+//     if (countGroup.userType === "ADMIN") {
+//       stats.admins = countGroup._count._all;
+//     }
+
+//     if (countGroup.userType === "OWNER") {
+//       stats.owners = countGroup._count._all;
+//     }
+
+//     if (countGroup.userType === "CUSTOMER") {
+//       stats.customers = countGroup._count._all;
+//     }
+//   }
+
+//   return NextResponse.json({
+//     currentUser,
+//     users: users.map(serializeUserPhone),
+//     pagination: {
+//       page,
+//       limit,
+//       totalItems: totalUsers,
+//       totalPages: Math.max(1, Math.ceil(totalUsers / limit)),
+//     },
+//     stats,
+//   });
+// }
+
+
+async function getAbsoluteTotal() {
+  return await prisma.user.count();
+}
+
+export async function GET(request: Request) {
+  const currentUser = await getSessionUser();
+ 
   if (!currentUser) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -49,22 +154,74 @@ export async function GET() {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const users = await prisma.user.findMany({
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      phone: true,
-      userType: true,
-      createdAt: true,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
+ 
+  const { searchParams } = new URL(request.url);
+  const page = parsePositiveInteger(searchParams.get("page"), DEFAULT_PAGE);
+  const requestedLimit = parsePositiveInteger(searchParams.get("limit"), DEFAULT_LIMIT);
+  const limit = Math.min(requestedLimit, MAX_LIMIT);
+  const skip = (page - 1) * limit;
 
-  return NextResponse.json({ currentUser, users: users.map(serializeUserPhone) });
+ 
+  const whereClause: Prisma.UserWhereInput = {};
+  if (currentUser.userType === "OWNER") {
+    whereClause.userType = "CUSTOMER";
+  }
+
+  
+  const [users, filteredCount, absoluteTotal, groupedCounts] = await Promise.all([
+    prisma.user.findMany({
+      where: whereClause,
+      skip,
+      take: limit,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        userType: true,
+        createdAt: true,
+      },
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.user.count({ where: whereClause }),  //this is for pagination
+    prisma.user.count(),                        //for total count of user only show by admin
+    prisma.user.groupBy({
+      by: ["userType"],
+      where: whereClause,
+      _count: { _all: true },
+    }),
+  ]);
+
+  
+  const stats = {
+    total: filteredCount,
+    admins: 0,
+    owners: 0,
+    customers: 0,
+  };
+
+  for (const countGroup of groupedCounts) {
+    if (countGroup.userType === "ADMIN") stats.admins = countGroup._count._all;
+    if (countGroup.userType === "OWNER") stats.owners = countGroup._count._all;
+    if (countGroup.userType === "CUSTOMER") stats.customers = countGroup._count._all;
+  }
+
+
+  return NextResponse.json({
+  
+    totalUsers: currentUser.userType !== "OWNER" ? absoluteTotal : filteredCount,
+    currentUser,
+    users: users.map(serializeUserPhone),
+    pagination: {
+      page,
+      limit,
+      totalItems: filteredCount,
+      totalPages: Math.max(1, Math.ceil(filteredCount / limit)),
+    },
+    stats,
+  });
 }
+
 
 export async function POST(request: Request) {
   const currentUser = await getSessionUser();
@@ -86,7 +243,6 @@ export async function POST(request: Request) {
       { status: 403 },
     );
   }
-
   try {
     const body = await request.json();
 

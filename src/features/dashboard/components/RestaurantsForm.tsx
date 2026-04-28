@@ -51,16 +51,7 @@ export default function RestaurantsForm({ onSubmit, form, setForm, isSubmitting,
   
      
         </div>
-        <div>
-        <input
-          className="p-3 bg-black/40 border border-white/10 rounded-lg w-full"
-          placeholder="Category"
-          value={form.category}
-          onChange={(e) => setForm((prev) => ({ ...prev, category: e.target.value }))}
-        aria-errormessage={error}
-        />
-        {!form.category?error && <p className="mt-2 text-xs sm:text-sm text-rose-400">Category is required.</p> : null}
-        </div>
+     
         <div>
 
         <input

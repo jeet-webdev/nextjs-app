@@ -23,8 +23,8 @@ export default function DashboardHeader({
   onToggleMobileMenu,
 }: DashboardHeaderProps) {
   return (
-    <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10">
-      <div className="flex items-center gap-3 w-full sm:w-auto">
+    <header className="flex sticky top-0 z-50 flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10">
+      <div className="flex sticky top-0 z-50 items-center gap-3 w-full sm:w-auto">
         {onToggleMobileMenu && (
           <button
             onClick={onToggleMobileMenu}

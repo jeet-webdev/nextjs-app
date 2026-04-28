@@ -7,12 +7,12 @@ import { prisma } from "@/shared/lib/prisma";
 import { no } from "zod/v4/locales";
 import { Prisma } from "@prisma/client";
 function mapContent(content: unknown): { title: string; description: string; imageUrl: string; menuBookUrl: string; heroImageUrl: string; heroTitle: string; heroDescription: string } | null {
-// function mapContent(content: unknown): FirstContent | null {         
+       
 if (!content || typeof content !== "object") {
     return null;
   }
   const value = content as Partial<{ title: unknown; description: unknown; imageUrl: unknown; menuBookUrl: unknown; heroImageUrl: unknown; heroTitle: unknown; heroDescription: unknown }>;
-  //  const value = content as Partial<Record<keyof FirstContent, unknown>>;
+
   return {
     title: typeof value.title === "string" ? value.title : "",
     description: typeof value.description === "string" ? value.description : "",
@@ -42,7 +42,6 @@ function mapContactInfo(contactInfo: unknown): ContactDetails | null {
 function mapRestaurant(restaurant: {
   id: string;
   name: string;
-  category: string;
   city: string;
   slug: string;
   Address: string | null;
@@ -58,7 +57,6 @@ function mapRestaurant(restaurant: {
   return {
     id: restaurant.id,
     name: restaurant.name,
-    category: restaurant.category,
     city: restaurant.city,
     slug: restaurant.slug,
     address: restaurant.Address,
@@ -139,7 +137,7 @@ export async function GET(request: Request) {
       select: {
         id: true,
         name: true,
-        category: true,
+      
         city: true,
         slug: true,
         Address: true,
@@ -185,7 +183,7 @@ export async function POST(request: Request) {
 
   const body = await request.json();
   const name = typeof body.name === "string" ? body.name.trim() : "";
-  const category = typeof body.category === "string" ? body.category.trim() : "";
+
   const city = typeof body.city === "string" ? body.city.trim() : "";
   const slug = typeof body.slug === "string" ? body.slug.trim() : "";
   const address = typeof body.address === "string" ? body.address.trim() : null;
@@ -195,13 +193,12 @@ export async function POST(request: Request) {
   const contactInfo = mapContactInfo(body.contactInfo);
   const content = mapContent(body.content);
 
-  
+ 
 
-  if (!name || !category || !city || !address || !slug || !contactInfo || !content || !contactInfo.phone || !contactInfo.email || !contactInfo.openingHours || !contactInfo.closingHours ) {
+  if (!name  || !city || !address || !slug || !contactInfo || !content || !contactInfo.phone || !contactInfo.email || !contactInfo.openingHours || !contactInfo.closingHours ) {
  
     if(!name)    return NextResponse.json({ error: "API Restaurant name is required." }, { status: 400 });
-    if(!category) return NextResponse.json({ error: "API Restaurant category is required." }, { status: 400 });
-    if(!city)     return NextResponse.json({ error: "API Restaurant city is required." }, { status: 400 });
+     if(!city)     return NextResponse.json({ error: "API Restaurant city is required." }, { status: 400 });
     if(!address)  return NextResponse.json({ error: "API Restaurant address is required." }, { status: 400 });
     if(!slug)     return NextResponse.json({ error: "API Restaurant slug is required." }, { status: 400 });
     if(!contactInfo) return NextResponse.json({ error: "API Restaurant contact information is required." }, { status: 400 });
@@ -228,7 +225,7 @@ export async function POST(request: Request) {
     const restaurant = await prisma.restaurant.create({
       data: {
         name,
-        category,
+  
         city,
         slug: normalizedSlug,
         Address: address,
@@ -242,7 +239,7 @@ export async function POST(request: Request) {
       select: {
         id: true,
         name: true,
-        category: true,
+      
         city: true,
         slug: true,
         Address: true,
@@ -258,9 +255,7 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json({ restaurant: mapRestaurant(restaurant) }, { status: 201 });
-  // } catch (error) {
-  //   return NextResponse.json({ error: "Unable to create restaurant." }, { status: 500 });
-  // }
+ 
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === 'P2002') {

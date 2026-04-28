@@ -67,7 +67,7 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
 
         return NextResponse.json({ message: "User updated successfully", user: serializeUserPhone(updatedUser) }, { status: 200 });
     } catch (error) {
-        console.error("Update Error:", error);
+       
         toast.error('Failed to update user');
         return NextResponse.json({ error: "Failed to update user" }, { status: 500 });
     }
@@ -90,7 +90,7 @@ export async function DELETE(request: NextRequest, { params }: RouteContext) {
 
     return NextResponse.json({ message: "User deleted successfully" }, { status: 201 });
   } catch (error) {
-    console.error("Delete Error:", error);
+ 
     return NextResponse.json({ error: "User not found or delete failed" }, { status: 500 });
   }
 }
