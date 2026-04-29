@@ -47,7 +47,7 @@ export default function RestaurantsForm({ onSubmit, form, setForm, isSubmitting,
 
         />
         { !form.name?error && <p className="mt-2 text-xs sm:text-sm text-rose-400">Restaurant name is required.</p> : null} 
-        {/* {!form.name && <p className="mt-2 text-xs sm:text-sm text-rose-400">Restaurant name is required.</p>} */}
+      
   
      
         </div>
@@ -153,7 +153,7 @@ export default function RestaurantsForm({ onSubmit, form, setForm, isSubmitting,
           value={form.content.menuBookUrl}
           onChange={(e) => setForm((prev) => ({ ...prev, content: { ...prev.content, menuBookUrl: e.target.value } }))}
         />
-        {/* Contact Info Fields */}
+       
         {/* Website */}
 <div>
   <input
@@ -168,7 +168,6 @@ export default function RestaurantsForm({ onSubmit, form, setForm, isSubmitting,
   }
 // aria-errormessage={error}
 />
-{/* {!form.contactInfo.website ? error && <p className="mt-2 text-xs sm:text-sm text-rose-400">Website URL is required.</p> : null} */}
 </div>
         <div>
         <input
@@ -316,63 +315,6 @@ aria-errormessage={error}
       {error && <p className="text-rose-400 text-sm mt-3">{error}</p>}
 
 
-{/* <div className="border border-sky-500 m-5 rounded-2xl p-3">
-
-
-  <p 
-  className="p-2 mt-10 font-semibold border-b hover:border-b-sky-500  rounded-xl hover:text-sky-500 flex items-center justify-center "
-  >Add Menu Name, Price, Description And Image</p>
-  <div className="flex gap-3 mt-3">
-    <Plus className="h-8 w-8 text-green-400 bg-green-100 rounded-2xl p-2  hover:text-green-900" />
-
-  </div>
-  
-<div className=" mt-3 menu-field grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 border border-white/10 rounded-lg p-4">
-
-  <input
-    className="p-3 mt-4 bg-black/40 border border-white/10 rounded-lg w-full"
-    placeholder="Add Menu Name"
-    // value={}
-    onChange={(e) => setForm((prev) => ({ ...prev, menuUrl: e.target.value }))}
-  />
-  <input
-    className="p-3 mt-4 bg-black/40 border border-white/10 rounded-lg w-full"
-    placeholder="Add Menu Description"
-    // value={}
-    onChange={(e) => setForm((prev) => ({ ...prev, menuUrl: e.target.value }))}
-  />
-  <input
-    className="p-3 mt-4 bg-black/40 border border-white/10 rounded-lg w-full"
-    placeholder="Add Menu Price"
-    // value={}
-    onChange={(e) => setForm((prev) => ({ ...prev, menuUrl: e.target.value }))}
-  />
-  <input
-    className="p-3 mt-4 bg-black/40 border border-white/10 rounded-lg w-full"
-    placeholder="Add Menu Image URL"
-    // value={}
-    onChange={(e) => setForm((prev) => ({ ...prev, menuUrl: e.target.value }))}
-  />   
-  
- 
-  <div className="flex grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mt-3 ">
-  
-  <Edit2 className="h-10 w-10 text-yellow-400 bg-yellow-500/10 rounded-2xl p-2 hover:text-yellow-900 flex justify-end" />
-  <VenetianMaskIcon className="h-10 w-10 text-blue-400 bg-blue-500/10 rounded-2xl p-2 hover:text-blue-900 flex justify-end" />
-  <Delete className="h-10 w-10 text-red-400 bg-red-500/10 rounded-2xl p-2 hover:text-red-900 flex justify-end" />
-</div>
- </div>
-<button type="button"  className="p-3 mt-3 bg-sky-600 hover:bg-sky-700 rounded-lg font-semibold disabled:opacity-60">
-            Save Menu
-</button>
-    </div> */}
-
-
-
-      {/* <div className="mt-4 text-sm text-gray-300">
-        Live restaurants: <span className="font-semibold text-white">{allCount}</span>
-     
-      </div> */}
     </div>
   );
 }

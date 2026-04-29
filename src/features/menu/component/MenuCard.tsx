@@ -77,11 +77,7 @@ export default function MenuCard({
     <div className="relative group">
       {content}
 
-      {/* <div
-        className={`absolute right-3 top-3 z-10 flex gap-2 transition-opacity ${
-          showActions ? "opacity-0 group-hover:opacity-100" : "pointer-events-none opacity-0"
-        }`}
-      > */}
+    
    
 
 

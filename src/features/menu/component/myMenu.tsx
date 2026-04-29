@@ -65,8 +65,6 @@ export default function MyMenu({
         <div>
           <p className="mt-2 text-sm text-gray-500">
             total menu item: {localMenuItems.length} 
-            {/* {localMenuItems.length !== 1 ? "s" : ""} found for restaurant ID:{" "}
-            {restaurantId} */}
           </p>
         </div>
       )}

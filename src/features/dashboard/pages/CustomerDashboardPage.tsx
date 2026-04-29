@@ -109,12 +109,7 @@ export default function CustomerDashboardPage() {
             Explore curated restaurants and view live community size.
           </p>
 
-          {/* <div className="mt-8 inline-flex min-w-[200px] sm:min-w-[220px] flex-col rounded-2xl border border-sky-300/30 bg-sky-400/10 px-4 sm:px-6 py-3 sm:py-4">
-            <span className="text-xs uppercase tracking-[0.2em] text-sky-200">Total Users</span>
-            <span className="mt-2 text-3xl sm:text-4xl font-black leading-none text-white">
-              {totalUsers ?? "..."}
-            </span>
-          </div> */}
+        
 
           {error && <p className="mt-4 text-xs sm:text-sm text-red-400">{error}</p>}
         </header>

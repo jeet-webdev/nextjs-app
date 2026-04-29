@@ -258,17 +258,7 @@ export default function UserSignupForm({
           />
             {fieldErrors.phone ? <p className="mt-2 text-xs sm:text-sm text-red-400">{fieldErrors.phone}</p> : null}
           </label>
-          {/* <label for="phone">Phone Number:</label>
-<input 
-  type="tel" 
-  id="phone"
-  name="phone"
-  placeholder="+1234567890"
-  oninput="this.value = this.value.replace(/[^0-9+]/g, '');" 
-  pattern="^\+?[0-9]{10,15}$" 
-  title="Please enter a valid phone number (10-15 digits, optional +)"
-  required 
-/> */}
+         
         </div>
 
         <label className="block text-xs sm:text-sm font-medium text-gray-200">

@@ -67,20 +67,8 @@ export default function HomeNavbar() {
           />
 
           <div className="md:hidden flex flex-col items-center justify-center relative z-50 mx-4 mb-4 rounded-2xl border border-white/10 bg-[#0a0a0f]/95 backdrop-blur-xl shadow-2xl shadow-black/50 overflow-hidden">
-            {/* Header strip */}
-            {/* <div className="px-5 py-4 border-b border-white/5 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Image src={logo} alt="logo" width={28} height={28} className="rounded-lg" />
-                <span className="text-sm font-bold text-white">RestaurantPlatform</span>
-              </div> 
-              <button
-                onClick={() => setIsOpen(false)}
-                className="p-1.5 rounded-lg hover:bg-white/5 text-gray-400 hover:text-white transition"
-              >
-                <X size={16} />
-              </button>
-            </div> */}
-
+            
+           
             {/* Nav Links */}
             <div className="px-3 py-3 flex flex-col gap-1">
               <a

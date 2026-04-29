@@ -41,34 +41,7 @@ const hasRestaurant =  ownedRestaurants && ownedRestaurants > 0 && expectedRole 
           active={activeSection === "restaurants"}
           onClick={() => onSectionChange("restaurants")}
         />
-         {/* {(expectedRole === "OWNER" || expectedRole === "ADMIN") && hasRestaurant && showRestaurantManagement ? (
-          <div className="ml-4 border-l border-white/10 pl-2 space-y-1">
-            <NavItem
-              icon={<BeerIcon size={20} />}
-              label="Table Reservations"
-              active={activeSection === "table-reservations"}
-              onClick={() => onSectionChange("table-reservations")}
-            />
-            <NavItem
-              icon={<LogsIcon size={20} />}
-              label="Menu Items"
-              active={activeSection === "menu-items"}
-              onClick={() => onSectionChange("menu-items")}
-            />
-          </div>
-        )
-       :
-       (
-        
-    expectedRole === "OWNER" && !hasRestaurant && (
-         <NavItem
-              icon={<HousePlus size={20} />}
-              label="Create Restaurant"
-              active={activeSection === "create-restaurant"}
-              onClick={() => onSectionChange("create-restaurant")}
-            />
-          )
-        )} */}
+       
     
     </nav>
     </aside>

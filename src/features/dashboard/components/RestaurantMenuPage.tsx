@@ -169,7 +169,7 @@ export default function RestaurantMenuPage({
       <div className="min-h-screen bg-gradient-to-b from-black via-slate-900 to-black px-4 py-24 text-white">
         <div className="mx-auto min-w-5xl animate-pulse space-y-4">
           {" "}
-          {/*//max-w-5xl */}
+         
           <div className="h-6 w-32 rounded bg-white/10" />
           <div className="h-12 w-64 rounded bg-white/10" />
           <div className="h-40 rounded-3xl bg-white/10" />

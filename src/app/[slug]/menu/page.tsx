@@ -100,7 +100,7 @@ useEffect(() => {
               <p className="text-sm uppercase tracking-[0.3em] text-sky-300">Restaurant Menu</p>
               <h1 className="mt-2 text-3xl font-semibold">{restaurant.name}</h1>
               <p className="mt-2 text-sm text-gray-400">
-                {/* {restaurant.category} in {restaurant.city} */}
+              
                 {restaurant.city}
               </p>
             </div>

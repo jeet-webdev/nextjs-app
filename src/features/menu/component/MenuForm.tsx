@@ -234,31 +234,7 @@ export default function MenuForm({
             </select>
           </div>
 
-          {/* <div className="space-y-1">
-            <label className="text-xs text-gray-400 ml-1">Price (INR)</label>
-            <input
-              name="price"
-              type="number"
-              required
-              className="p-3 bg-black/40 border border-white/10 rounded-lg w-full text-white"
-              placeholder="299"
-              value={formData.price}
-              onChange={handleChange}
-            />
-          </div> */}
-
-          {/* <div className="space-y-1">
-            <label className="text-xs text-gray-400 ml-1">Discounted Price</label>
-            <input
-              name="discountedPrice"
-              type="number"
-              className="p-3 bg-black/40 border border-white/10 rounded-lg w-full text-white"
-              placeholder="299"
-              value={formData.discountedPrice}
-              onChange={handleChange}
-            />
-          </div> */}
-
+        
          
          
 
@@ -273,30 +249,7 @@ export default function MenuForm({
             />
           </div>
 
-          {/* <input
-            name="subCategory"
-            className="p-3 bg-black/40 border border-white/10 rounded-lg w-full text-white"
-            placeholder="Sub Category (ex. Vegetarian)"
-            value={formData.subCategory}
-            onChange={handleChange}
-          /> */}
-
-          {/* <input
-            name="image"
-            className="p-3 bg-black/40 border border-white/10 rounded-lg w-full text-white"
-            placeholder="Image URL"
-            value={formData.image}
-            onChange={handleChange}
-          /> */}
-
-          {/* <input
-            name="ingredients"
-            className="p-3 bg-black/40 border border-white/10 rounded-lg w-full text-white"
-            placeholder="Ingredients"
-            value={formData.ingredients}
-            onChange={handleChange}
-          /> */}
-
+         
           <input
             name="preparationTime"
             type="number"
