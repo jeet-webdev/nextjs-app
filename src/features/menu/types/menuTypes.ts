@@ -22,6 +22,7 @@ export interface MenuRecord {
     price: number;
     discountedPrice: number;
     currency: string;
+    categoryId: string;
     category: string;
     subCategory: string;
     image: string;
@@ -42,6 +43,7 @@ export interface MenuItemFormData {
   price: string;
   discountedPrice: string;
   currency: string;
+  categoryId: string;
   category: string;
   subCategory: string;
   image: string;
@@ -89,6 +91,7 @@ export const defaultMenuItemFormData: MenuItemFormData = {
   price: "",
   discountedPrice: "",
   currency: "USD",
+  categoryId: "",
   category: "",
   subCategory: "",
   image: "",

@@ -41,7 +41,6 @@ function mapContent(content: string | FirstContent): FirstContent | null {
 function mapRestaurant(restaurant: {
   id: string;
   name: string;
-  category: string;
   city: string;
   slug: string;
   Address: string | null;
@@ -58,7 +57,7 @@ function mapRestaurant(restaurant: {
   return {
     id: restaurant.id,
     name: restaurant.name,
-    category: restaurant.category,
+    // category: restaurant.category,
     city: restaurant.city,
     slug: restaurant.slug,
     address: restaurant.Address,
@@ -109,10 +108,9 @@ export async function PATCH(
   }
 
   const body = await request.json();
-  const data: Record<string, string | ContactDetails | FirstContent> = {};  //unknown
+  const data: Record<string, string | ContactDetails | FirstContent> = {};  
 
   if (typeof body.name === "string") data.name = body.name.trim();
-  if (typeof body.category === "string") data.category = body.category.trim();
   if (typeof body.city === "string") data.city = body.city.trim();
   if (typeof body.slug === "string") data.slug = body.slug.trim();
   if (typeof body.address === "string") data.Address = body.address.trim();
@@ -157,7 +155,6 @@ export async function PATCH(
   try {
     const updated = await prisma.restaurant.update({
       where: { id },
-      // data,
        data: {
           ...data,
         slug: normalizedSlug,
@@ -166,7 +163,6 @@ export async function PATCH(
       select: {
         id: true,
         name: true,
-        category: true,
         city: true,
         slug: true,
         Address: true,
@@ -181,10 +177,7 @@ export async function PATCH(
       },
     });
     return NextResponse.json({ restaurant: mapRestaurant(updated) });
-  // } catch (error) {
-  //   console.error("Error updating restaurant:", error);
-  //   return NextResponse.json({ error: "Unable to update restaurant" }, { status: 500 });
-  // }
+ 
 
   } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {

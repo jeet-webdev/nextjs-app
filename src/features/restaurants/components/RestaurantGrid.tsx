@@ -9,6 +9,8 @@ type RestaurantGridProps = {
   onEdit?: (restaurant: RestaurantRecord) => void;
   onDelete?: (restaurant: RestaurantRecord) => void;
   onCreateRestaurant?: () => void;
+  onView?: (restaurant: RestaurantRecord) => void;
+  onViewMenu?: (restaurant: RestaurantRecord) => void;
 };
 
 export default function RestaurantGrid({
@@ -19,13 +21,15 @@ export default function RestaurantGrid({
   onEdit,
   onDelete,
   onCreateRestaurant,
+  onView,
+  onViewMenu,
 }: RestaurantGridProps) {
  
 
   return (
     <>
       <div className="flex items-center justify-between gap-3 border-b border-white/10 p-4 text-sm font-semibold sm:p-6 sm:text-base">
-        {/* {createButton ?? <h2 className="text-base sm:text-lg font-semibold">Restaurants</h2>} */}
+      
       </div>
       <div className={className}>
         {restaurants.map((restaurant) => (
@@ -35,6 +39,8 @@ export default function RestaurantGrid({
             compact={compact}
             onEdit={onEdit}
             onDelete={onDelete}
+            onView={onView}
+            onViewMenu={onViewMenu}
           />
         ))}
       </div>

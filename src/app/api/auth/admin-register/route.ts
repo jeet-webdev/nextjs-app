@@ -41,7 +41,7 @@ export async function POST(request: Request) {
     const currentUser = await getSessionUser();
 
     if (!currentUser) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: "Only admin and Owner can access" }, { status: 401 });
     }
 
     const isAdminUser = ADMIN_USER_TYPES.includes(currentUser.userType as AdminUserType);

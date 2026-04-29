@@ -1,6 +1,8 @@
 "use client";
 import { useState } from "react";
 import { validateUserForm } from "@/features/users/userValidation";
+import type { UserType } from "@/features/users/types";
+import { setStoredUserRole } from "@/shared/lib/auth-storage";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
@@ -88,7 +90,15 @@ export default function LoginForm() {
         return;
       }
 
-      const data = (await response.json()) as { redirectPath?: string };
+      const data = (await response.json()) as {
+        redirectPath?: string;
+        userType?: UserType;
+      };
+
+      if (data.userType) {
+        setStoredUserRole(data.userType);
+      }
+
       window.location.assign(data.redirectPath ?? "/dashboard");
     } catch {
       setError("Unable to login right now. Please try again.");

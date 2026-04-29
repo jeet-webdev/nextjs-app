@@ -80,14 +80,7 @@ const handleCreateUser = () => {
             <Divider />
 
          
-  {/* <MenuItem 
-    onClick={handleCreateUser}
-    sx={{ color: 'success.main' }}
-  >
-    <Typography sx={{ textAlign: 'center', width: '100%' }}>
-      Create User
-    </Typography>
-  </MenuItem> */}
+
 
             
             <MenuItem 

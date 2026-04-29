@@ -30,9 +30,7 @@ export default function RestaurantMainPage({ restaurant }: MainProps) {
   {restaurant.name}
 </h1>
           <div className="flex flex-wrap gap-3">
-            <span className="rounded-lg bg-sky-500/20 px-4 py-2 text-sm text-sky-200">
-              Category: <span className="font-semibold">{restaurant.category}</span>
-            </span>
+           
             <span className="rounded-lg bg-purple-500/20 px-4 py-2 text-sm text-purple-200">
               Location: <span className="font-semibold">{restaurant.city}</span>
             </span>
@@ -47,7 +45,6 @@ export default function RestaurantMainPage({ restaurant }: MainProps) {
           <h2 className="mb-4 text-lg font-semibold text-white">Restaurant Info</h2>
           <div className="grid gap-4 md:grid-cols-2">
             <InfoCard label="Restaurant Name" value={restaurant.name} color="text-white" />
-            <InfoCard label="Category" value={restaurant.category} color="text-sky-300" />
             <InfoCard label="City" value={restaurant.city} color="text-emerald-300" />
             <InfoCard label="Address" value={restaurant.address || "Not provided"} color="text-purple-300" />
           </div>

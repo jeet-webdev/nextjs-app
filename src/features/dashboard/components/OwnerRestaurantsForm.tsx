@@ -59,14 +59,7 @@ export default function OwnerRestaurantsForm({
             aria-errormessage={error}
           />
           {!restaurantForm.name && !error && <p className="mt-2 text-xs sm:text-sm text-rose-400">Restaurant name is required.</p>}
-          <input
-            className="rounded-lg border border-white/10 bg-black/40 p-3"
-            placeholder="Category"
-            value={restaurantForm.category}
-            onChange={(event) => setRestaurantForm((prev) => ({ ...prev, category: event.target.value }))}
-            aria-errormessage={error}
-            />
-          {!restaurantForm.category && !error && <p className="mt-2 text-xs sm:text-sm text-rose-400">Category is required.</p>}
+         
           <input
             className="rounded-lg border border-white/10 bg-black/40 p-3"
             placeholder="City"
@@ -135,9 +128,8 @@ export default function OwnerRestaurantsForm({
           placeholder="Content Title"
           value={restaurantForm.content.title}
           onChange={(e) => setRestaurantForm((prev) => ({ ...prev, content: { ...prev.content, title: e.target.value } }))}
-          // aria-errormessage={error}
+        
         />
-        {/* {!restaurantForm.content.title && !error && <p className="mt-2 text-xs sm:text-sm text-rose-400">Content title is required.</p>} */}
         <input 
           className="p-3 bg-black/40 border border-white/10 rounded-lg col-span-1 sm:col-span-2"
           placeholder="Content Description"
