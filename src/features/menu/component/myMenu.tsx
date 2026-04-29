@@ -54,8 +54,8 @@ export default function MyMenu({
   }, [canManage, refreshKey, restaurantId]);
   return (
     <div className="">
-      <h1 className="text-2xl font-bold text-white">All My Menu</h1>
-      <p className="mt-2 text-gray-400">Manage your menu items here.</p>
+      {/* <h1 className="text-2xl font-bold text-white">All My Menu</h1> */}
+      <p className="mt-20 text-gray-400">Manage your menu items here.</p>
 
       {localMenuItems.length === 0 && !isLoading ? (
         <p className="mt-4 text-sm text-gray-500">

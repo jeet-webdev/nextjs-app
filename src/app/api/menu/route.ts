@@ -269,9 +269,9 @@ export async function GET(request: Request) {
       currentUser = await getSessionUser();
 //
 
-      // if (!currentUser) {
-      //   return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-      // }
+      if (!currentUser) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
 //
 
     }
@@ -324,18 +324,18 @@ export async function POST(request: Request) {
 
 //
 
-  // const currentUser = await getSessionUser();
+  const currentUser = await getSessionUser();
 
-  // if (!currentUser) {
-  //   return NextResponse.json({ error: "Only admins or owners can create menu items." }, { status: 401 });
-  // }
+  if (!currentUser) {
+    return NextResponse.json({ error: "Only admins or owners can create menu items." }, { status: 401 });
+  }
 
-  // if (!ALLOWED_CREATORS.includes(currentUser.userType as AllowedCreator)) {
-  //   return NextResponse.json(
-  //     { error: "Only admins or owners can create menu items." },
-  //     { status: 403 },
-  //   );
-  // }
+  if (!ALLOWED_CREATORS.includes(currentUser.userType as AllowedCreator)) {
+    return NextResponse.json(
+      { error: "Only admins or owners can create menu items." },
+      { status: 403 },
+    );
+  }
 
 
   //
@@ -371,11 +371,11 @@ export async function POST(request: Request) {
 
   //
 
-  // const access = await assertRestaurantAccess(restaurantId, currentUser);
+  const access = await assertRestaurantAccess(restaurantId, currentUser);
 
-  // if (access.error) {
-  //   return access.error;
-  // }
+  if (access.error) {
+    return access.error;
+  }
 //
   try {
     const createdMenuItem = await prisma.menuItem.create({
@@ -384,8 +384,8 @@ export async function POST(request: Request) {
         categoryId,
         name,
         description,
-        price,
-        discountedPrice,
+        price: new Prisma.Decimal(String(price)),
+        discountedPrice: discountedPrice === null ? null : new Prisma.Decimal(String(discountedPrice)),
         currency,
         category,
         subCategory,
@@ -402,7 +402,7 @@ export async function POST(request: Request) {
                 .filter((modifier) => !modifier.id)
                 .map((modifier) => ({
                   name: modifier.name,
-                  price: modifier.price,
+                  price: new Prisma.Decimal(String(modifier.price)),
                   menuContent: toJsonInput(modifier.menuContent),
                 })),
             }
@@ -418,7 +418,8 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ menuItem: mapMenuItem(menuItem) }, { status: 201 });
   } catch (error) {
-  
-    return NextResponse.json({ error: "Unable to create menu item." }, { status: 500 });
+    console.error("Error creating menu item:", error);
+    const message = error instanceof Error ? error.message : String(error);
+    return NextResponse.json({ error: "Unable to create menu item.", detail: message }, { status: 500 });
   }
 }

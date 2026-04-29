@@ -11,6 +11,8 @@ import MyMenu from "@/features/menu/component/myMenu";
 import type { MenuRecord } from "@/features/menu/types/menuTypes";
 import type { RestaurantRecord } from "@/features/restaurants/types";
 import MenuForm from "@/features/menu/component/MenuForm";
+import Button from "@mui/material/Button";
+import MealForm, { MealRecord } from "@/features/meal/mealForm";
 
 type RestaurantMenuPageProps = {
   restaurant: RestaurantRecord;
@@ -32,6 +34,15 @@ export default function RestaurantMenuPage({
   const [categories, setCategories] = useState<CategoryRecord[]>([]);
   const [isLoadingCategories, setIsLoadingCategories] = useState(true);
   const [categoryFormHide, setCategoryFormHide] = useState(true);
+
+  const [menuFormHide, setMenuFormHide] = useState(true);
+  const [meals, setMeals] = useState<MealRecord[]>([]);
+  const [mealFormHide, setMealFormHide] = useState(true);
+  
+
+const handelMenuForm = () => {
+  setMenuFormHide(false);
+}
 
   const handelCategoryForm = () => {
     setCategoryFormHide(false);
@@ -67,6 +78,16 @@ export default function RestaurantMenuPage({
       return next.sort((left, right) => left.name.localeCompare(right.name));
     });
   };
+
+  const handleMealSaved = (meal: MealRecord) => {
+    setMeals((current) => {
+      const next = [
+        ...current.filter((item) => item.id !== meal.id),
+        meal,
+      ];
+      return next.sort((left, right) => left.name.localeCompare(right.name));
+    });
+  }
 
   const handleDeleteMenuItem = async (id: string) => {
     const response = await fetch(`/api/menu/${id}`, {
@@ -227,9 +248,42 @@ export default function RestaurantMenuPage({
           <ArrowLeft className="h-4 w-4" />
           Back to restaurants
         </button>
+
+
         <section className="rounded-3xl mb-8 border border-white/10 bg-black/20 p-6 backdrop-blur-sm">
           <div className="space-y-6">
-            {categoryFormHide ? (
+             <div className="flex flex-row items-center gap-4 me-6 justify-end">
+
+{mealFormHide ? (
+              <button
+                type="button"
+                onClick={() => setMealFormHide(false)}
+                className="px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-lg text-sm font-medium transition"
+              >
+                + Add New Meal
+              </button>
+             ) : (
+              <div className="relative p-4 border border-white/10 rounded-2xl bg-white/5">
+                <div className="space-y-6">
+                  <h3 className="text-lg font-medium">Add Meal</h3>
+                  <Button 
+                   onClick={() => setMealFormHide(true)}
+                   variant="contained" color="secondary">
+                    <Ban className="pe-1"></Ban>  Cancel
+                   </Button>
+                </div>
+                <MealForm
+                  restaurantId={restaurantDetails.id}
+                  onSaved={(meal) => {
+                    handleMealSaved(meal);
+                    setMealFormHide(true);
+                  }}
+                />
+              </div>
+            )}
+
+
+            {/* {categoryFormHide ? (
               <button
                 type="button"
                 onClick={() => setCategoryFormHide(false)}
@@ -237,18 +291,16 @@ export default function RestaurantMenuPage({
               >
                 + Add New Category
               </button>
-            ) : (
+             ) : (
               <div className="relative p-4 border border-white/10 rounded-2xl bg-white/5">
-                <div className="flex justify-between items-center mb-4">
+                <div className="space-y-6">
                   <h3 className="text-lg font-medium">Add Category</h3>
-                  <button
-                    onClick={() => setCategoryFormHide(true)}
-                    className="text-gray-400 hover:text-white hover:bg-green text-sm"
-                  >
-                  <Ban></Ban> Cancel
-                  </button>
+                  <Button 
+                   onClick={() => setCategoryFormHide(true)}
+                   variant="contained" color="secondary">
+                    <Ban className="pe-1"></Ban>  Cancel
+                   </Button>
                 </div>
-
                 <CategoryForm
                   restaurantId={restaurantDetails.id}
                   onSaved={(category) => {
@@ -259,7 +311,36 @@ export default function RestaurantMenuPage({
               </div>
             )}
 
-            {isLoadingCategories ? (
+             {menuFormHide ? (
+              <button
+                type="button"
+                onClick={()=> setMenuFormHide(false)}
+                className="px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-lg text-sm font-medium transition"
+              >
+                + Add New Menu Item
+              </button>
+             ) : (
+              <div className="relative p-4 border border-white/10 rounded-2xl bg-white/5">
+                <div className="space-y-6">
+                  <h3 className="text-lg font-medium">Add Menu Item</h3>
+                  <Button 
+                   onClick={() => setMenuFormHide(true)}
+                   variant="contained" color="secondary">
+                    <Ban className="pe-1"></Ban>  Cancel
+                   </Button>
+                </div>
+                <MenuForm
+                restaurantId={restaurantDetails.id}
+                categories={categories}
+                menuItem={editingMenuItem}
+                onSaved={handleMenuSaved}
+                onCancelEdit={handleCancelEdit}
+              />
+              </div>
+            )} */}
+
+ </div>
+            {/* {isLoadingCategories ? (
               <div className="rounded-2xl border border-white/10 bg-black/30 p-4 text-sm text-gray-300">
                 Loading categories...
               </div>
@@ -269,15 +350,11 @@ export default function RestaurantMenuPage({
                 after that.
               </div>
             ) : (
-              <MenuForm
-                restaurantId={restaurantDetails.id}
-                categories={categories}
-                menuItem={editingMenuItem}
-                onSaved={handleMenuSaved}
-                onCancelEdit={handleCancelEdit}
-              />
-            )}
-          </div>
+             null
+             )} */}
+        </div>
+
+
           <MyMenu
             restaurantId={restaurantDetails.id}
             menuItems={restaurantDetails.menuItems ?? []}
