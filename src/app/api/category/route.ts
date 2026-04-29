@@ -1,19 +1,16 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-
 import { JWT_COOKIE_NAME, verifyAuthToken } from "@/shared/lib/auth";
 import { prisma } from "@/shared/lib/prisma";
 
-type SessionUser = {
-  id: string;
-  userType: string;
-};
+type SessionUser = { id: string; userType: string };
 
 const categorySelect = {
   id: true,
   name: true,
   isAvailable: true,
   restaurantId: true,
+  mealId: true,
   createdAt: true,
   updatedAt: true,
 } as const;
@@ -22,37 +19,29 @@ function parseRequiredString(value: unknown): string {
   return typeof value === "string" ? value.trim() : "";
 }
 
-function mapCategory(category: {
+function mapCategory(cat: {
   id: string;
   name: string;
   isAvailable: boolean;
   restaurantId: string;
+  mealId: string;
   createdAt: Date;
   updatedAt: Date;
 }) {
   return {
-    id: category.id,
-    name: category.name,
-    isAvailable: category.isAvailable,
-    restaurantId: category.restaurantId,
-    createdAt: category.createdAt.toISOString(),
-    updatedAt: category.updatedAt.toISOString(),
+    ...cat,
+    createdAt: cat.createdAt.toISOString(),
+    updatedAt: cat.updatedAt.toISOString(),
   };
 }
 
-async function getSessionUser() {
+async function getSessionUser(): Promise<SessionUser | null> {
   const cookieStore = await cookies();
   const token = cookieStore.get(JWT_COOKIE_NAME)?.value;
-
-  if (!token) {
-    return null;
-  }
+  if (!token) return null;
 
   const session = await verifyAuthToken(token);
-
-  if (!session) {
-    return null;
-  }
+  if (!session) return null;
 
   return prisma.user.findUnique({
     where: { id: session.sub },
@@ -60,137 +49,170 @@ async function getSessionUser() {
   });
 }
 
-async function assertRestaurantAccess(restaurantId: string, currentUser: SessionUser) {
+async function assertRestaurantAccess(
+  restaurantId: string,
+  currentUser: SessionUser,
+) {
   const restaurant = await prisma.restaurant.findUnique({
     where: { id: restaurantId },
     select: { id: true, userId: true },
   });
 
   if (!restaurant) {
-    return { error: NextResponse.json({ error: "Restaurant not found." }, { status: 404 }) };
+    return { error: "Restaurant not found.", status: 404 };
   }
 
-  if (currentUser.userType === "OWNER" && restaurant.userId !== currentUser.id) {
-    return { error: NextResponse.json({ error: "Forbidden" }, { status: 403 }) };
+  if (
+    currentUser.userType === "OWNER" &&
+    restaurant.userId !== currentUser.id
+  ) {
+    return {
+      error: "You do not have permission to manage this restaurant.",
+      status: 403,
+    };
   }
 
   return { restaurant };
 }
 
-async function getCategoryCounts(currentUser: SessionUser | null) {
-  const [totalCategory, ownedCategory] = await Promise.all([
-    prisma.category.count(),
-    currentUser?.userType === "OWNER"
-      ? prisma.category.count({ where: { restaurant: { is: { userId: currentUser.id } } } })
-      : null,
-  ]);
-
-  return { totalCategory, ownedCategory };
-}
-
+// GET /api/category?restaurantId=xxx
+// GET /api/category?restaurantId=xxx&mealId=xxx   (filter by meal)
+// GET /api/category?restaurantId=xxx&public=true  (no auth, available only)
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const isPublicRequest = searchParams.get("public") === "true";
-    const restaurantId = searchParams.get("restaurantId")?.trim() || null;
-    let currentUser = null;
+    const restaurantId = searchParams.get("restaurantId")?.trim();
+    const mealId = searchParams.get("mealId")?.trim();
+    const isPublic = searchParams.get("public") === "true";
 
-    if (!isPublicRequest) {
-      currentUser = await getSessionUser();
-
-      if (!currentUser) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-      }
+    if (!restaurantId) {
+      return NextResponse.json(
+        { error: "restaurantId query param is required." },
+        { status: 400 },
+      );
     }
 
-    if (restaurantId && currentUser?.userType === "OWNER") {
-      const access = await assertRestaurantAccess(restaurantId, currentUser);
-
-      if (access.error) {
-        return access.error;
-      }
-    }
-
-    const where = isPublicRequest
-      ? {
-          ...(restaurantId ? { restaurantId } : {}),
+    if (isPublic) {
+      const categories = await prisma.category.findMany({
+        where: {
+          restaurantId,
           isAvailable: true,
-        }
-      : currentUser?.userType === "OWNER"
-        ? {
-            restaurant: { is: { userId: currentUser.id } },
-            ...(restaurantId ? { restaurantId } : {}),
-          }
-        : restaurantId
-          ? { restaurantId }
-          : undefined;
+          ...(mealId ? { mealId } : {}),
+        },
+        select: categorySelect,
+        orderBy: { createdAt: "desc" },
+      });
+      return NextResponse.json({ categories: categories.map(mapCategory) });
+    }
+
+    const user = await getSessionUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+    }
+
+    const access = await assertRestaurantAccess(restaurantId, user);
+    if (access.error) {
+      return NextResponse.json(
+        { error: access.error },
+        { status: access.status },
+      );
+    }
 
     const categories = await prisma.category.findMany({
-      where,
+      where: {
+        restaurantId,
+        ...(mealId ? { mealId } : {}),
+      },
       select: categorySelect,
       orderBy: { createdAt: "desc" },
-      ...(isPublicRequest ? { take: 12 } : {}),
     });
 
-    const counts = isPublicRequest ? null : await getCategoryCounts(currentUser);
-
-    return NextResponse.json({
-      category: categories.map(mapCategory),
-      totalCategory: counts?.totalCategory ?? categories.length,
-      ownedCategory: counts?.ownedCategory ?? null,
-    });
-  } catch {
-    return NextResponse.json({ error: "Unable to load category." }, { status: 500 });
+    return NextResponse.json({ categories: categories.map(mapCategory) });
+  } catch (err) {
+    console.error("[GET /api/category]", err);
+    return NextResponse.json(
+      { error: "Unable to load categories." },
+      { status: 500 },
+    );
   }
 }
 
-const ALLOWED_CREATORS = ["ADMIN", "OWNER"] as const;
-type AllowedCreator = (typeof ALLOWED_CREATORS)[number];
-
+// POST /api/category
+// Body: { name: string, restaurantId: string, mealId: string, isAvailable?: boolean }
 export async function POST(request: Request) {
-  const currentUser = await getSessionUser();
-
-  if (!currentUser) {
-    return NextResponse.json({ error: "Only admins or owners can create category items." }, { status: 401 });
-  }
-
-  if (!ALLOWED_CREATORS.includes(currentUser.userType as AllowedCreator)) {
-    return NextResponse.json(
-      { error: "Only admins or owners can create category items." },
-      { status: 403 },
-    );
-  }
-
-  const body = await request.json();
-  const restaurantId = parseRequiredString(body.restaurantId);
-  const name = parseRequiredString(body.name);
-  const isAvailable = typeof body.isAvailable === "boolean" ? body.isAvailable : true;
-
-  if (!restaurantId || !name) {
-    return NextResponse.json(
-      { error: "restaurantId and name are required." },
-      { status: 400 },
-    );
-  }
-
-  const access = await assertRestaurantAccess(restaurantId, currentUser);
-
-  if (access.error) {
-    return access.error;
-  }
-
   try {
-    const createdCategory = await prisma.category.create({
-      data: {
-        restaurantId,
-        name,
-        isAvailable,
-      },
+    const user = await getSessionUser();
+
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+    }
+
+    if (user.userType !== "ADMIN" && user.userType !== "OWNER") {
+      return NextResponse.json(
+        { error: "Only admins or owners can create categories." },
+        { status: 403 },
+      );
+    }
+
+    const body = (await request.json()) as Record<string, unknown>;
+    const name = parseRequiredString(body.name);
+    const restaurantId = parseRequiredString(body.restaurantId);
+    const mealId = parseRequiredString(body.mealId);
+    const isAvailable =
+      typeof body.isAvailable === "boolean" ? body.isAvailable : true;
+
+    if (!name) {
+      return NextResponse.json(
+        { error: "Category name is required." },
+        { status: 400 },
+      );
+    }
+    if (!restaurantId) {
+      return NextResponse.json(
+        { error: "restaurantId is required." },
+        { status: 400 },
+      );
+    }
+    if (!mealId) {
+      return NextResponse.json(
+        { error: "mealId is required." },
+        { status: 400 },
+      );
+    }
+
+    // Verify restaurant access
+    const access = await assertRestaurantAccess(restaurantId, user);
+    if (access.error) {
+      return NextResponse.json(
+        { error: access.error },
+        { status: access.status },
+      );
+    }
+
+    // Verify meal belongs to the same restaurant
+    const meal = await prisma.meal.findFirst({
+      where: { id: mealId, restaurantId },
+      select: { id: true },
+    });
+
+    if (!meal) {
+      return NextResponse.json(
+        { error: "Meal not found in this restaurant." },
+        { status: 404 },
+      );
+    }
+
+    const category = await prisma.category.create({
+      data: { name, isAvailable, restaurantId, mealId },
       select: categorySelect,
     });
 
-    return NextResponse.json({ category: mapCategory(createdCategory) }, { status: 201 });
-  } catch {
-    return NextResponse.json({ error: "Unable to create category." }, { status: 500 });
+    return NextResponse.json({ category: mapCategory(category) }, { status: 201 });
+  } catch (err) {
+    console.error("[POST /api/category]", err);
+    return NextResponse.json(
+      { error: "Unable to create category." },
+      { status: 500 },
+    );
   }
 }

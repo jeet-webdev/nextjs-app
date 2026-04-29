@@ -1,18 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowLeft, Ban, Menu } from "lucide-react";
+import { ArrowLeft, Menu } from "lucide-react";
 import { toast } from "react-toastify";
 
-import CategoryForm, {
-  type CategoryRecord,
-} from "@/features/category/categoryForm";
-import MyMenu from "@/features/menu/component/myMenu";
-import type { MenuRecord } from "@/features/menu/types/menuTypes";
 import type { RestaurantRecord } from "@/features/restaurants/types";
-import MenuForm from "@/features/menu/component/MenuForm";
-import Button from "@mui/material/Button";
-import MealForm, { MealRecord } from "@/features/meal/mealForm";
+import type { MenuRecord } from "@/features/menu/types/menuTypes";
+import MyMenu from "@/features/menu/component/myMenu";
+import MealForm, { type MealRecord } from "@/features/meal/mealForm";
 
 type RestaurantMenuPageProps = {
   restaurant: RestaurantRecord;
@@ -28,103 +23,24 @@ export default function RestaurantMenuPage({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
-  const [editingMenuItem, setEditingMenuItem] = useState<MenuRecord | null>(
-    null,
-  );
-  const [categories, setCategories] = useState<CategoryRecord[]>([]);
-  const [isLoadingCategories, setIsLoadingCategories] = useState(true);
-  const [categoryFormHide, setCategoryFormHide] = useState(true);
+  const [editingMenuItem, setEditingMenuItem] = useState<MenuRecord | null>(null);
 
-  const [menuFormHide, setMenuFormHide] = useState(true);
-  const [meals, setMeals] = useState<MealRecord[]>([]);
-  const [mealFormHide, setMealFormHide] = useState(true);
-  
-
-const handelMenuForm = () => {
-  setMenuFormHide(false);
-}
-
-  const handelCategoryForm = () => {
-    setCategoryFormHide(false);
-  };
 
   useEffect(() => {
     setRestaurantDetails(restaurant);
   }, [restaurant]);
 
-  const refreshMenuItems = () => {
-    setRefreshKey((current) => current + 1);
-  };
-
-  const handleEditMenuItem = (menuItem: MenuRecord) => {
-    setEditingMenuItem(menuItem);
-  };
-
-  const handleCancelEdit = () => {
-    setEditingMenuItem(null);
-  };
-
-  const handleMenuSaved = () => {
-    setEditingMenuItem(null);
-    refreshMenuItems();
-  };
-
-  const handleCategorySaved = (category: CategoryRecord) => {
-    setCategories((current) => {
-      const next = [
-        ...current.filter((item) => item.id !== category.id),
-        category,
-      ];
-      return next.sort((left, right) => left.name.localeCompare(right.name));
-    });
-  };
-
-  const handleMealSaved = (meal: MealRecord) => {
-    setMeals((current) => {
-      const next = [
-        ...current.filter((item) => item.id !== meal.id),
-        meal,
-      ];
-      return next.sort((left, right) => left.name.localeCompare(right.name));
-    });
-  }
-
-  const handleDeleteMenuItem = async (id: string) => {
-    const response = await fetch(`/api/menu/${id}`, {
-      method: "DELETE",
-      credentials: "include",
-    });
-
-    if (!response.ok) {
-      const data = (await response.json().catch(() => null)) as {
-        error?: string;
-      } | null;
-      toast.error(data?.error ?? "Failed to delete menu item.");
-      return;
-    }
-
-    toast.success("Menu item deleted.");
-
-    if (editingMenuItem?.id === id) {
-      setEditingMenuItem(null);
-    }
-
-    refreshMenuItems();
-  };
-
   useEffect(() => {
     async function loadRestaurant() {
       try {
         setIsLoading(true);
-        const response = await fetch(
-          `/api/restaurants/slug/${restaurant.slug}`,
-        );
+        const response = await fetch(`/api/restaurants/slug/${restaurant.slug}`);
 
         if (!response.ok) {
           setError(
             response.status === 404
               ? "Restaurant not found."
-              : "Failed to load restaurant menu.",
+              : "Failed to load restaurant.",
           );
           return;
         }
@@ -133,7 +49,7 @@ const handelMenuForm = () => {
         setRestaurantDetails(data.restaurant);
         setError(null);
       } catch {
-        setError("Failed to load restaurant menu.");
+        setError("Failed to load restaurant.");
       } finally {
         setIsLoading(false);
       }
@@ -146,51 +62,34 @@ const handelMenuForm = () => {
     }
   }, [restaurant.slug]);
 
-  useEffect(() => {
-    async function loadCategories() {
-      if (!restaurantDetails?.id) {
-        setCategories([]);
-        setIsLoadingCategories(false);
-        return;
-      }
+  const handleEditMenuItem = (menuItem: MenuRecord) => setEditingMenuItem(menuItem);
+  const handleCancelEdit = () => setEditingMenuItem(null);
+  const handleMenuSaved = () => {
+    setEditingMenuItem(null);
+    setRefreshKey((k) => k + 1);
+  };
 
-      try {
-        setIsLoadingCategories(true);
-        const response = await fetch(
-          `/api/category?restaurantId=${encodeURIComponent(restaurantDetails.id)}`,
-          {
-            credentials: "include",
-          },
-        );
+  const handleDeleteMenuItem = async (id: string) => {
+    const response = await fetch(`/api/menu/${id}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
 
-        if (!response.ok) {
-          const data = (await response.json().catch(() => null)) as {
-            error?: string;
-          } | null;
-          toast.error(data?.error ?? "Failed to load categories.");
-          setCategories([]);
-          return;
-        }
-
-        const data = (await response.json()) as { category?: CategoryRecord[] };
-        setCategories(Array.isArray(data.category) ? data.category : []);
-      } catch {
-        toast.error("Failed to load categories.");
-        setCategories([]);
-      } finally {
-        setIsLoadingCategories(false);
-      }
+    if (!response.ok) {
+      const data = (await response.json().catch(() => null)) as { error?: string } | null;
+      toast.error(data?.error ?? "Failed to delete menu item.");
+      return;
     }
 
-    void loadCategories();
-  }, [restaurantDetails?.id]);
+    toast.success("Menu item deleted.");
+    if (editingMenuItem?.id === id) setEditingMenuItem(null);
+    setRefreshKey((k) => k + 1);
+  };
 
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-black via-slate-900 to-black px-4 py-24 text-white">
-        <div className="mx-auto min-w-5xl animate-pulse space-y-4">
-          {" "}
-         
+        <div className="mx-auto max-w-5xl animate-pulse space-y-4">
           <div className="h-6 w-32 rounded bg-white/10" />
           <div className="h-12 w-64 rounded bg-white/10" />
           <div className="h-40 rounded-3xl bg-white/10" />
@@ -218,9 +117,12 @@ const handelMenuForm = () => {
       </div>
     );
   }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-black via-slate-900 to-black px-4 py-2 text-white">
-      <div className="mx-auto min-w-5xl space-y-8">
+      <div className="mx-auto max-w-5xl space-y-8">
+
+        {/* Restaurant header */}
         <section className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-2xl shadow-black/30 backdrop-blur-sm">
           <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
             <div>
@@ -230,9 +132,7 @@ const handelMenuForm = () => {
               <h1 className="mt-2 text-3xl font-semibold">
                 {restaurantDetails.name}
               </h1>
-              <p className="mt-2 text-sm text-gray-400">
-                {restaurantDetails.city}
-              </p>
+              <p className="mt-2 text-sm text-gray-400">{restaurantDetails.city}</p>
             </div>
             <div className="inline-flex items-center gap-2 rounded-full border border-sky-400/20 bg-sky-500/10 px-4 py-2 text-sm text-sky-200">
               <Menu className="h-4 w-4" />
@@ -240,6 +140,7 @@ const handelMenuForm = () => {
             </div>
           </div>
         </section>
+
         <button
           type="button"
           onClick={onBack}
@@ -249,112 +150,19 @@ const handelMenuForm = () => {
           Back to restaurants
         </button>
 
+     
+        <section className="rounded-3xl border border-white/10 bg-black/20 p-6 backdrop-blur-sm">
+          <h2 className="mb-6 text-xl font-semibold text-white">
+            Meals
+            <span className="ml-2 text-sm font-normal text-gray-500">
+              — group your menu into meal periods
+            </span>
+          </h2>
+          <MealForm restaurantId={restaurantDetails.id} />
+        </section>
 
-        <section className="rounded-3xl mb-8 border border-white/10 bg-black/20 p-6 backdrop-blur-sm">
-          <div className="space-y-6">
-             <div className="flex flex-row items-center gap-4 me-6 justify-end">
-
-{mealFormHide ? (
-              <button
-                type="button"
-                onClick={() => setMealFormHide(false)}
-                className="px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-lg text-sm font-medium transition"
-              >
-                + Add New Meal
-              </button>
-             ) : (
-              <div className="relative p-4 border border-white/10 rounded-2xl bg-white/5">
-                <div className="space-y-6">
-                  <h3 className="text-lg font-medium">Add Meal</h3>
-                  <Button 
-                   onClick={() => setMealFormHide(true)}
-                   variant="contained" color="secondary">
-                    <Ban className="pe-1"></Ban>  Cancel
-                   </Button>
-                </div>
-                <MealForm
-                  restaurantId={restaurantDetails.id}
-                  onSaved={(meal) => {
-                    handleMealSaved(meal);
-                    setMealFormHide(true);
-                  }}
-                />
-              </div>
-            )}
-
-
-            {/* {categoryFormHide ? (
-              <button
-                type="button"
-                onClick={() => setCategoryFormHide(false)}
-                className="px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-lg text-sm font-medium transition"
-              >
-                + Add New Category
-              </button>
-             ) : (
-              <div className="relative p-4 border border-white/10 rounded-2xl bg-white/5">
-                <div className="space-y-6">
-                  <h3 className="text-lg font-medium">Add Category</h3>
-                  <Button 
-                   onClick={() => setCategoryFormHide(true)}
-                   variant="contained" color="secondary">
-                    <Ban className="pe-1"></Ban>  Cancel
-                   </Button>
-                </div>
-                <CategoryForm
-                  restaurantId={restaurantDetails.id}
-                  onSaved={(category) => {
-                    handleCategorySaved(category);
-                    setCategoryFormHide(true);
-                  }}
-                />
-              </div>
-            )}
-
-             {menuFormHide ? (
-              <button
-                type="button"
-                onClick={()=> setMenuFormHide(false)}
-                className="px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-lg text-sm font-medium transition"
-              >
-                + Add New Menu Item
-              </button>
-             ) : (
-              <div className="relative p-4 border border-white/10 rounded-2xl bg-white/5">
-                <div className="space-y-6">
-                  <h3 className="text-lg font-medium">Add Menu Item</h3>
-                  <Button 
-                   onClick={() => setMenuFormHide(true)}
-                   variant="contained" color="secondary">
-                    <Ban className="pe-1"></Ban>  Cancel
-                   </Button>
-                </div>
-                <MenuForm
-                restaurantId={restaurantDetails.id}
-                categories={categories}
-                menuItem={editingMenuItem}
-                onSaved={handleMenuSaved}
-                onCancelEdit={handleCancelEdit}
-              />
-              </div>
-            )} */}
-
- </div>
-            {/* {isLoadingCategories ? (
-              <div className="rounded-2xl border border-white/10 bg-black/30 p-4 text-sm text-gray-300">
-                Loading categories...
-              </div>
-            ) : categories.length === 0 ? (
-              <div className="rounded-2xl border border-amber-400/20 bg-amber-500/10 p-4 text-sm text-amber-100">
-                Create at least one category first. The menu form will appear
-                after that.
-              </div>
-            ) : (
-             null
-             )} */}
-        </div>
-
-
+       
+        <section className="rounded-3xl border border-white/10 bg-black/20 p-6 backdrop-blur-sm">
           <MyMenu
             restaurantId={restaurantDetails.id}
             menuItems={restaurantDetails.menuItems ?? []}
@@ -364,6 +172,7 @@ const handelMenuForm = () => {
             onDelete={handleDeleteMenuItem}
           />
         </section>
+
       </div>
     </div>
   );
