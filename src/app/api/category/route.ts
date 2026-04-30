@@ -176,12 +176,7 @@ export async function POST(request: Request) {
         { status: 400 },
       );
     }
-    // if(!description) {
-    //   return NextResponse.json(
-    //     { error: "Category description is required." },
-    //     { status: 400 },
-    //   );
-    // }
+   
 
 
     if (!restaurantId) {

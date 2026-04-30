@@ -58,10 +58,6 @@ async function getSessionUser(): Promise<SessionUser | null> {
   });
 }
 
-/**
- * Find meal by ID and verify the current user has access to it.
- * ADMINs can access any meal; OWNERs only their own restaurant's meals.
- */
 async function getAccessibleMeal(id: string, currentUser: SessionUser) {
   const meal = await prisma.meal.findUnique({
     where: { id },
@@ -144,7 +140,6 @@ export async function GET(
 }
 
 // PATCH /api/meal/[id]
-// Body: { name?: string, isAvailable?: boolean, openingTime?: string, closingTime?: string }
 export async function PATCH(
   request: Request,
   context: { params: Promise<{ id: string }> },
@@ -183,12 +178,7 @@ export async function PATCH(
     if (body.description !== undefined) {
       const description =
         typeof body.description === "string" ? body.description.trim() : "";
-      // if (!description) {
-      //   return NextResponse.json(
-      //     { error: "description cannot be empty." },
-      //     { status: 400 },
-      //   );
-      // }
+     
       updateData.description = description;
     }
     

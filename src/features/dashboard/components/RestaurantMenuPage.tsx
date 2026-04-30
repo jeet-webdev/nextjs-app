@@ -161,17 +161,7 @@ export default function RestaurantMenuPage({
           <MealForm restaurantId={restaurantDetails.id} />
         </section>
 
-       
-        {/* <section className="rounded-3xl border border-white/10 bg-black/20 p-6 backdrop-blur-sm">
-          <MyMenu
-            restaurantId={restaurantDetails.id}
-            menuItems={restaurantDetails.menuItems ?? []}
-            canManage
-            refreshKey={refreshKey}
-            onEdit={handleEditMenuItem}
-            onDelete={handleDeleteMenuItem}
-          />
-        </section> */}
+           
 
       </div>
     </div>

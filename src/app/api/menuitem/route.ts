@@ -116,10 +116,6 @@ async function assertRestaurantAccess(
   return { restaurant };
 }
 
-// GET /api/menuitem?restaurantId=xxx
-// GET /api/menuitem?restaurantId=xxx&categoryId=xxx
-// GET /api/menuitem?restaurantId=xxx&mealId=xxx
-// GET /api/menuitem?restaurantId=xxx&public=true  (no auth, available only)
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -170,7 +166,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ menuItems: items.map(mapMenuItem) });
   } catch (err) {
-    console.error("[GET /api/menuitem]", err);
+    
     return NextResponse.json(
       { error: "Unable to load menu items." },
       { status: 500 },
@@ -179,8 +175,6 @@ export async function GET(request: Request) {
 }
 
 // POST /api/menuitem
-// Body: { name, price, restaurantId, mealId, categoryId, description?, discountedPrice?,
-//         currency?, image?, dietary?, isAvailable?, preparationTime?, ingredients?, order? }
 export async function POST(request: Request) {
   try {
     const user = await getSessionUser();
@@ -292,7 +286,7 @@ export async function POST(request: Request) {
       { status: 201 },
     );
   } catch (err) {
-    console.error("[POST /api/menuitem]", err);
+    
     return NextResponse.json(
       { error: "Unable to create menu item." },
       { status: 500 },

@@ -272,8 +272,7 @@ export default function MenuForm({
           </div>
 
           <div className="space-y-1">
-            {/* <label className="text-xs text-gray-400 ml-1">Price (USD)</label> */}
-            <TextField
+             <TextField
               id="standard-password-input"
               label="Price (USD)"
               name="price"
@@ -316,54 +315,11 @@ export default function MenuForm({
           label="Menu Available"
           labelPlacement="end"
           name="isAvailable"
-          // type="checkbox"
           checked={formData.isAvailable}
-          // onChange={handleChange}
-        />
+          />
       </FormGroup>
     </FormControl>
-          {/* <input
-              name="price"
-              type="number"
-              required
-              className="p-3 bg-black/40 border border-white/10 rounded-lg w-full text-white"
-              placeholder="299"
-              value={formData.price}
-              onChange={handleChange}
-            /> 
-            <div className=" space-y-1">
-            <label className="text-xs text-gray-400 ml-1">Description</label>
-            <input
-              name="description"
-              className="p-3 bg-black/40 border border-white/10 rounded-lg w-full text-white"
-              placeholder="Description ex. Grilled paneer with spices..."
-              value={formData.description}
-              onChange={handleChange}
-            />
-          </div>
-          <div>
-            <input
-              name="preparationTime"
-              type="number"
-              className="p-3 bg-black/40 border border-white/10 rounded-lg w-full text-white"
-              placeholder="Preparation Time (minutes)"
-              value={formData.preparationTime}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="flex items-center gap-3 p-3 bg-black/40 border border-white/10 rounded-lg">
-            <input
-              id="isAvailable"
-              name="isAvailable"
-              type="checkbox"
-              checked={formData.isAvailable}
-              onChange={handleChange}
-              className="h-5 w-5 accent-sky-500"
-            />
-            <label htmlFor="isAvailable" className="text-sm text-white">
-              Menu Available
-            </label>
-          </div> */}
+       
         </div>
         <div className="mt-3 flex flex-row gap-5">
           <button

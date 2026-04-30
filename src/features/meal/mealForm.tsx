@@ -313,15 +313,7 @@ export default function MealForm({ restaurantId, onSaved }: MealFormProps) {
               </span>
             </label>
 
-            {/* <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-white/10 bg-black/30 px-4 py-3 select-none">
-              <input
-                type="checkbox"
-                checked={formData.alwaysAvailable}
-                onChange={(e) => setFormData((c) => ({ ...c, alwaysAvailable: e.target.checked }))}
-                className="h-4 w-4 accent-sky-500"
-              />
-              <span className="text-sm text-gray-300">Always available</span>
-            </label> */}
+         
 
             <div className="space-y-1">
               <label className="ml-0.5 text-[11px] text-gray-500">
@@ -537,33 +529,13 @@ export default function MealForm({ restaurantId, onSaved }: MealFormProps) {
                             Available to customers
                           </span>
                         </label>
-                        {/* <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-white/10 bg-black/30 px-4 py-2.5 select-none">
-                          <input
-                            type="checkbox"
-                            checked={editForm.alwaysAvailable}
-                            onChange={(e) => setEditForm((c) => ({ ...c, alwaysAvailable: e.target.checked }))}
-                            className="h-4 w-4 accent-sky-500"
-                          />
-                          <span className="text-sm text-gray-300">Always available</span>
-                        </label> */}
+                     
 
                         <div className="space-y-1">
                           <label className="ml-0.5 text-[11px] text-gray-500">
                             Description
                           </label>
-                          {/* <TextField
-                            className="border border-green/500 bg-black/30 text-sm text-white outline-none focus:border-sky-500 transition-colors"
-                            id="outlined-password-input"
-                            label="Description"
-                            type="text"
-                            value={editForm.description}
-                            onChange={(e) =>
-                              setEditForm((c) => ({
-                                ...c,
-                                description: e.target.value,
-                              }))
-                            }
-                          /> */}
+                          
                           <input
                            type="text"                    
                             className="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-2.5 text-sm text-white outline-none focus:border-sky-500 transition-colors"
