@@ -153,9 +153,9 @@ export default function RestaurantMenuPage({
      
         <section className="rounded-3xl border border-white/10 bg-black/20 p-6 backdrop-blur-sm">
           <h2 className="mb-6 text-xl font-semibold text-white">
-            Meals
+            Menu
             <span className="ml-2 text-sm font-normal text-gray-500">
-              — group your menu into meal periods
+              — All your menu here
             </span>
           </h2>
           <MealForm restaurantId={restaurantDetails.id} />

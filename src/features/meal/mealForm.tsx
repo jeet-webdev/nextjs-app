@@ -91,9 +91,9 @@ export default function MealForm({ restaurantId, onSaved }: MealFormProps) {
       setShowForm(false);
       setOpenIds((prev) => ({ ...prev, [data.meal.id]: true }));
       onSaved?.(data.meal);
-      toast.success("Meal created successfully.");
+      toast.success("Menu created successfully."); {/*  meal */}
     } catch {
-      toast.error("Unable to create meal.");
+      toast.error("Unable to create menu.");  {/*  meal */}
     } finally {
       setIsSubmitting(false);
     }
@@ -126,9 +126,9 @@ export default function MealForm({ restaurantId, onSaved }: MealFormProps) {
       }
       setMeals((prev) => prev.map((m) => (m.id === meal.id ? data.meal : m)));
       cancelEdit();
-      toast.success("Meal updated.");
+      toast.success("Menu updated."); {/*  meal */}
     } catch {
-      toast.error("Unable to update meal.");
+      toast.error("Unable to update menu.");  {/*  meal */}
     } finally {
       setIsSavingEdit(false);
     }
@@ -144,11 +144,11 @@ export default function MealForm({ restaurantId, onSaved }: MealFormProps) {
         credentials: "include",
       });
       const data = await res.json();
-      if (!res.ok) { toast.error(data?.error ?? "Unable to delete meal."); return; }
+      if (!res.ok) { toast.error(data?.error ?? "Unable to delete menu."); return; }
       setMeals((prev) => prev.filter((m) => m.id !== meal.id));
-      toast.success("Meal deleted.");
+      toast.success("Menu deleted."); {/*  meal */}
     } catch {
-      toast.error("Unable to delete meal.");
+      toast.error("Unable to delete menu.");  {/*  meal */}
     } finally {
       setDeletingId(null);
     }
@@ -164,7 +164,7 @@ export default function MealForm({ restaurantId, onSaved }: MealFormProps) {
         <div className="flex items-center gap-2">
           <ChefHat className="h-4 w-4 text-gray-500" />
           <h2 className="text-sm font-semibold text-gray-300 uppercase tracking-widest">
-            Meals
+            Menu
           </h2>
           {meals.length > 0 && (
             <span className="rounded-full bg-white/5 px-2 py-0.5 text-xs text-gray-500">
@@ -173,7 +173,7 @@ export default function MealForm({ restaurantId, onSaved }: MealFormProps) {
           )}
         </div>
 
-        {/* Toggle create form button */}
+        {/* menu/meal create form button */}
         <button
           type="button"
           onClick={() => { setShowForm((v) => !v); setFormData(EMPTY); }}
@@ -186,18 +186,18 @@ export default function MealForm({ restaurantId, onSaved }: MealFormProps) {
           {showForm ? (
             <><X className="h-3.5 w-3.5" /> Cancel</>
           ) : (
-            <><Plus className="h-3.5 w-3.5" /> New Meal</>
+            <><Plus className="h-3.5 w-3.5" /> New Menu</>
           )}
         </button>
       </div>
 
-      {/* ── Collapsible create form ── */}
+      {/* ── close menu/meal create form ── */}
       {showForm && (
         <div className="rounded-2xl border border-white/[0.07] bg-white/[0.02] p-5">
-          <h3 className="mb-4 text-sm font-semibold text-white">Create Meal</h3>
+         <h3 className="mb-4 text-sm font-semibold text-white">Create Menu</h3>  {/*  meal */}
           <form onSubmit={handleSubmit} className="space-y-3">
             <div className="space-y-1">
-              <label className="ml-0.5 text-[11px] text-gray-500">Meal Name</label>
+              <label className="ml-0.5 text-[11px] text-gray-500">Menu Name</label> {/*  meal */}
               <input
                 required
                 autoFocus
@@ -224,7 +224,7 @@ export default function MealForm({ restaurantId, onSaved }: MealFormProps) {
               className="flex w-full items-center justify-center gap-2 rounded-xl bg-sky-600 py-3 text-sm font-semibold text-white transition-colors hover:bg-sky-700 disabled:opacity-60"
             >
               {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
-              {isSubmitting ? "Saving..." : "Create Meal"}
+              {isSubmitting ? "Saving..." : "Create Menu"}  {/*  meal */}
             </button>
           </form>
         </div>
@@ -238,7 +238,7 @@ export default function MealForm({ restaurantId, onSaved }: MealFormProps) {
       ) : meals.length === 0 ? (
         <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-white/5 py-12 text-gray-600">
           <UtensilsCrossed className="h-7 w-7 opacity-30" />
-          <p className="text-sm">No meals yet — click New Meal to get started.</p>
+          <p className="text-sm">No menu — click New Menu to add one.</p>  {/*  meal */}
         </div>
       ) : (
         <div className="space-y-2">
@@ -278,7 +278,7 @@ export default function MealForm({ restaurantId, onSaved }: MealFormProps) {
                       /* ── Edit meal form ── */
                       <div className="space-y-3">
                         <div className="space-y-1">
-                          <label className="ml-0.5 text-[11px] text-gray-500">Meal Name</label>
+                          <label className="ml-0.5 text-[11px] text-gray-500">Menu Name</label>  {/*  meal */}
                           <input
                             autoFocus
                             className="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-2.5 text-sm text-white outline-none focus:border-sky-500 transition-colors"
@@ -327,7 +327,7 @@ export default function MealForm({ restaurantId, onSaved }: MealFormProps) {
                             onClick={() => startEdit(meal)}
                             className="flex items-center gap-1.5 rounded-xl border border-white/[0.07] px-4 py-2 text-xs font-medium text-gray-400 transition-colors hover:bg-white/5 hover:text-white"
                           >
-                            <Pencil className="h-3 w-3" /> Edit Meal
+                          <Pencil className="h-3 w-3" /> Edit Menu        {/* meal */}
                           </button>
                           <button
                             type="button"
