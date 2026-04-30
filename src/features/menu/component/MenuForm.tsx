@@ -27,23 +27,6 @@ type MenuFormState = {
   ingredients: string;
 };
 
-// const Default_values: MenuFormState={
-//   name:"",
-//   description:"",
-//   price:"",
-//   discount
-// }
-
-
-// export const EMPTY_RESTAURANT_FORM: RestaurantFormState = {
-//   name: "",
-//   category: "",
-//   city: "",
-//   slug: "",
-//   status: "OPEN",
-//   address: "",
-//   logo: "",
-
 const EMPTY_MENU_FORM: MenuFormState = {
   name: "",
   description: "",
@@ -68,7 +51,8 @@ function toFormState(menuItem?: MenuRecord | null): MenuFormState {
     description: menuItem.description ?? "",
     price: String(menuItem.price ?? ""),
     discountedPrice:
-      menuItem.discountedPrice !== null && menuItem.discountedPrice !== undefined
+      menuItem.discountedPrice !== null &&
+      menuItem.discountedPrice !== undefined
         ? String(menuItem.discountedPrice)
         : "",
     categoryId: menuItem.categoryId ?? "",
@@ -98,7 +82,9 @@ export default function MenuForm({
 
   useEffect(() => {
     setFormData((current) => {
-      const selectedCategory = categories.find((category) => category.id === current.categoryId);
+      const selectedCategory = categories.find(
+        (category) => category.id === current.categoryId,
+      );
 
       if (selectedCategory) {
         if (current.category === selectedCategory.name) {
@@ -143,29 +129,42 @@ export default function MenuForm({
       ...formData,
       restaurantId,
       price: parseFloat(formData.price) || 0,
-      discountedPrice: formData.discountedPrice ? parseFloat(formData.discountedPrice) : null,
+      discountedPrice: formData.discountedPrice
+        ? parseFloat(formData.discountedPrice)
+        : null,
       preparationTime: parseInt(formData.preparationTime) || 0,
       dietary: { isVegetarian: true, isSpicy: false },
     };
 
     try {
-      const response = await fetch(isEditing ? `/api/menu/${menuItem?.id}` : "/api/menu", {
-        method: isEditing ? "PATCH" : "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(payload),
-      });
+      const response = await fetch(
+        isEditing ? `/api/menu/${menuItem?.id}` : "/api/menu",
+        {
+          method: isEditing ? "PATCH" : "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify(payload),
+        },
+      );
 
-      const data = (await response.json().catch(() => null)) as
-        | { error?: string; menuItem?: MenuRecord }
-        | null;
+      const data = (await response.json().catch(() => null)) as {
+        error?: string;
+        menuItem?: MenuRecord;
+      } | null;
 
       if (!response.ok) {
-        toast.error(data?.error ?? `Unable to ${isEditing ? "update" : "create"} menu item.`);
+        toast.error(
+          data?.error ??
+            `Unable to ${isEditing ? "update" : "create"} menu item.`,
+        );
         return;
       }
 
-      toast.success(isEditing ? "Menu item updated successfully!" : "Menu item created successfully!");
+      toast.success(
+        isEditing
+          ? "Menu item updated successfully!"
+          : "Menu item created successfully!",
+      );
       setFormData(EMPTY_MENU_FORM);
       onSaved?.(data?.menuItem as MenuRecord);
     } catch (error) {
@@ -180,7 +179,9 @@ export default function MenuForm({
     <div className="rounded-2xl bg-white/[0.03] p-6 border border-white/5">
       <div className="mb-4 flex items-center justify-between gap-4">
         <h2 className="text-lg font-semibold text-white">
-          {isEditing ? `Edit ${menuItem?.name ?? "Menu Item"}` : "Create Menu Item"}
+          {isEditing
+            ? `Edit ${menuItem?.name ?? "Menu Item"}`
+            : "Create Menu Item"}
         </h2>
         {isEditing && onCancelEdit ? (
           <button
@@ -192,12 +193,11 @@ export default function MenuForm({
           </button>
         ) : null}
       </div>
-      
+
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border border-white/10 rounded-lg p-4 bg-black/20">
-          
           <div className="space-y-1">
-            <label className="text-xs text-gray-400 ml-1">Item Name</label>
+            <label className="text-xs text-gray-400 ml-1">Menu Name</label>
             <input
               name="name"
               required
@@ -207,7 +207,7 @@ export default function MenuForm({
               onChange={handleChange}
             />
           </div>
-           <input type="hidden" name="restaurantId" value={restaurantId} />
+          <input type="hidden" name="restaurantId" value={restaurantId} />
           <div className="space-y-1">
             <label className="text-xs text-gray-400 ml-1">Category</label>
             <select
@@ -216,7 +216,9 @@ export default function MenuForm({
               className="p-3 bg-black/40 border border-white/10 rounded-lg w-full text-white"
               value={formData.categoryId}
               onChange={(event) => {
-                const selectedCategory = categories.find((category) => category.id === event.target.value);
+                const selectedCategory = categories.find(
+                  (category) => category.id === event.target.value,
+                );
 
                 setFormData((current) => ({
                   ...current,
@@ -234,11 +236,20 @@ export default function MenuForm({
             </select>
           </div>
 
-        
-         
-         
+          <div className="space-y-1">
+            <label className="text-xs text-gray-400 ml-1">Price (USD)</label>
+            <input
+              name="price"
+              type="number"
+              required
+              className="p-3 bg-black/40 border border-white/10 rounded-lg w-full text-white"
+              placeholder="299"
+              value={formData.price}
+              onChange={handleChange}
+            />
+          </div>
 
-  <div className="sm:col-span-2 space-y-1">
+          <div className=" space-y-1">
             <label className="text-xs text-gray-400 ml-1">Description</label>
             <input
               name="description"
@@ -249,7 +260,6 @@ export default function MenuForm({
             />
           </div>
 
-         
           <input
             name="preparationTime"
             type="number"
@@ -268,21 +278,26 @@ export default function MenuForm({
               onChange={handleChange}
               className="h-5 w-5 accent-sky-500"
             />
-            <label htmlFor="isAvailable" className="text-sm text-white">Item Available</label>
+            <label htmlFor="isAvailable" className="text-sm text-white">
+              Menu Available
+            </label>
           </div>
         </div>
         <div className="mt-3 flex flex-row gap-5">
-        <button
-          type="submit" 
-          disabled={loading || categories.length === 0}
-          className="w-full p-3 bg-sky-600 hover:bg-sky-700 text-white rounded-lg font-semibold transition-colors flex justify-center items-center gap-2"
-        >
-          {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-          {!loading ? <Plus className="h-4 w-4" /> : null}
-          {loading ? "Saving..." : isEditing ? "Update Menu Item" : "Save Menu Item"}
-        </button>
+          <button
+            type="submit"
+            disabled={loading || categories.length === 0}
+            className="w-full p-3 bg-sky-600 hover:bg-sky-700 text-white rounded-lg font-semibold transition-colors flex justify-center items-center gap-2"
+          >
+            {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+            {!loading ? <Plus className="h-4 w-4" /> : null}
+            {loading
+              ? "Saving..."
+              : isEditing
+                ? "Update Menu Item"
+                : "Save Menu Item"}
+          </button>
         </div>
- 
       </form>
     </div>
   );

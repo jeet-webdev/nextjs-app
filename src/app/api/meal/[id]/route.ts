@@ -5,29 +5,30 @@ import { prisma } from "@/shared/lib/prisma";
 
 type SessionUser = { id: string; userType: string };
 
-const categorySelect = {
+const mealSelect = {
   id: true,
   name: true,
   isAvailable: true,
   restaurantId: true,
-  mealId: true,
   createdAt: true,
   updatedAt: true,
 } as const;
 
-function mapCategory(cat: {
+function mapMeal(meal: {
   id: string;
   name: string;
   isAvailable: boolean;
   restaurantId: string;
-  mealId: string;
   createdAt: Date;
   updatedAt: Date;
 }) {
   return {
-    ...cat,
-    createdAt: cat.createdAt.toISOString(),
-    updatedAt: cat.updatedAt.toISOString(),
+    id: meal.id,
+    name: meal.name,
+    isAvailable: meal.isAvailable,
+    restaurantId: meal.restaurantId,
+    createdAt: meal.createdAt.toISOString(),
+    updatedAt: meal.updatedAt.toISOString(),
   };
 }
 
@@ -45,32 +46,42 @@ async function getSessionUser(): Promise<SessionUser | null> {
   });
 }
 
-async function getAccessibleCategory(id: string, currentUser: SessionUser) {
-  const category = await prisma.category.findUnique({
+/**
+ * Find meal by ID and verify the current user has access to it.
+ * ADMINs can access any meal; OWNERs only their own restaurant's meals.
+ */
+async function getAccessibleMeal(id: string, currentUser: SessionUser) {
+  const meal = await prisma.meal.findUnique({
     where: { id },
     select: {
-      ...categorySelect,
+      id: true,
+      name: true,
+      isAvailable: true,
+      restaurantId: true,
       restaurant: { select: { userId: true } },
+      createdAt: true,
+      updatedAt: true,
     },
   });
 
-  if (!category) {
-    return { error: "Category not found.", status: 404 } as const;
+  if (!meal) {
+    return { error: "Meal not found.", status: 404 } as const;
   }
 
   const isAdmin = currentUser.userType === "ADMIN";
   const isOwner =
     currentUser.userType === "OWNER" &&
-    category.restaurant.userId === currentUser.id;
+    meal.restaurant.userId === currentUser.id;
 
   if (!isAdmin && !isOwner) {
     return { error: "Forbidden.", status: 403 } as const;
   }
 
-  return { category };
+  return { meal };
 }
 
-// GET /api/category/[id]
+// GET /api/meal/[id]
+// ?public=true → no auth required, only if isAvailable
 export async function GET(
   request: Request,
   context: { params: Promise<{ id: string }> },
@@ -81,17 +92,16 @@ export async function GET(
 
   try {
     if (isPublic) {
-      const category = await prisma.category.findFirst({
+      const meal = await prisma.meal.findFirst({
         where: { id, isAvailable: true },
-        select: categorySelect,
+        select: mealSelect,
       });
-      if (!category) {
-        return NextResponse.json(
-          { error: "Category not found." },
-          { status: 404 },
-        );
+
+      if (!meal) {
+        return NextResponse.json({ error: "Meal not found." }, { status: 404 });
       }
-      return NextResponse.json({ category: mapCategory(category) });
+
+      return NextResponse.json({ meal: mapMeal(meal) });
     }
 
     const user = await getSessionUser();
@@ -99,7 +109,7 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
     }
 
-    const access = await getAccessibleCategory(id, user);
+    const access = await getAccessibleMeal(id, user);
     if ("error" in access) {
       return NextResponse.json(
         { error: access.error },
@@ -107,18 +117,18 @@ export async function GET(
       );
     }
 
-    return NextResponse.json({ category: mapCategory(access.category) });
+    return NextResponse.json({ meal: mapMeal(access.meal) });
   } catch (err) {
-    console.error("[GET /api/category/[id]]", err);
+    console.error("[GET /api/meal/[id]]", err);
     return NextResponse.json(
-      { error: "Unable to load category." },
+      { error: "Unable to load meal." },
       { status: 500 },
     );
   }
 }
 
-// PATCH /api/category/[id]
-// Body: { name?: string, isAvailable?: boolean, mealId?: string }
+// PATCH /api/meal/[id]
+// Body: { name?: string, isAvailable?: boolean }
 export async function PATCH(
   request: Request,
   context: { params: Promise<{ id: string }> },
@@ -131,7 +141,7 @@ export async function PATCH(
       return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
     }
 
-    const access = await getAccessibleCategory(id, user);
+    const access = await getAccessibleMeal(id, user);
     if ("error" in access) {
       return NextResponse.json(
         { error: access.error },
@@ -140,10 +150,11 @@ export async function PATCH(
     }
 
     const body = (await request.json()) as Record<string, unknown>;
-    const updateData: { name?: string; isAvailable?: boolean; mealId?: string } = {};
+    const updateData: { name?: string; isAvailable?: boolean } = {};
 
     if (body.name !== undefined) {
-      const name = typeof body.name === "string" ? body.name.trim() : "";
+      const name =
+        typeof body.name === "string" ? body.name.trim() : "";
       if (!name) {
         return NextResponse.json(
           { error: "name cannot be empty." },
@@ -163,31 +174,6 @@ export async function PATCH(
       updateData.isAvailable = body.isAvailable;
     }
 
-    if (body.mealId !== undefined) {
-      const mealId = typeof body.mealId === "string" ? body.mealId.trim() : "";
-      if (!mealId) {
-        return NextResponse.json(
-          { error: "mealId cannot be empty." },
-          { status: 400 },
-        );
-      }
-
-      
-      const meal = await prisma.meal.findFirst({
-        where: { id: mealId, restaurantId: access.category.restaurantId },
-        select: { id: true },
-      });
-
-      if (!meal) {
-        return NextResponse.json(
-          { error: "Meal not found in this restaurant." },
-          { status: 404 },
-        );
-      }
-
-      updateData.mealId = mealId;
-    }
-
     if (Object.keys(updateData).length === 0) {
       return NextResponse.json(
         { error: "No valid fields provided to update." },
@@ -195,23 +181,23 @@ export async function PATCH(
       );
     }
 
-    const updated = await prisma.category.update({
+    const updated = await prisma.meal.update({
       where: { id },
       data: updateData,
-      select: categorySelect,
+      select: mealSelect,
     });
 
-    return NextResponse.json({ category: mapCategory(updated) });
+    return NextResponse.json({ meal: mapMeal(updated) });
   } catch (err) {
-    console.error("[PATCH /api/category/[id]]", err);
+    console.error("[PATCH /api/meal/[id]]", err);
     return NextResponse.json(
-      { error: "Unable to update category." },
+      { error: "Unable to update meal." },
       { status: 500 },
     );
   }
 }
 
-// DELETE /api/category/[id]
+// DELETE /api/meal/[id]
 export async function DELETE(
   _request: Request,
   context: { params: Promise<{ id: string }> },
@@ -224,7 +210,7 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
     }
 
-    const access = await getAccessibleCategory(id, user);
+    const access = await getAccessibleMeal(id, user);
     if ("error" in access) {
       return NextResponse.json(
         { error: access.error },
@@ -232,13 +218,13 @@ export async function DELETE(
       );
     }
 
-    await prisma.category.delete({ where: { id } });
+    await prisma.meal.delete({ where: { id } });
 
     return NextResponse.json({ success: true });
   } catch (err) {
-    console.error("[DELETE /api/category/[id]]", err);
+    console.error("[DELETE /api/meal/[id]]", err);
     return NextResponse.json(
-      { error: "Unable to delete category." },
+      { error: "Unable to delete meal." },
       { status: 500 },
     );
   }

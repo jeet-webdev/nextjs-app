@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+    previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
@@ -35,6 +36,7 @@ model Restaurant {
   updatedAt      DateTime         @updatedAt
   menuItems      MenuItem[]
   categories     Category[]
+  meals          Meal[]
 
   user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   tableBookings  TableBooking[]
@@ -46,6 +48,20 @@ model Restaurant {
   @@map("restaurants")
 }
 
+model Meal{
+  id             String  @id @default(cuid())
+  name           String
+  isAvailable    Boolean  @default(true)
+  restaurantId   String 
+  restaurant     Restaurant     @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  categories     Category[]    
+  
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt 
+
+  @@index([restaurantId])
+  @@map("meals")
+}
 
 model Category{
   id             String        @id @default(cuid())
@@ -53,12 +69,15 @@ model Category{
   isAvailable    Boolean        @default(true)
   restaurantId   String 
   restaurant     Restaurant     @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  mealId         String
+  meal           Meal           @relation(fields: [mealId], references: [id], onDelete: Cascade)
   menuItems      MenuItem[]
 
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 
-  @@index([restaurantId])
+  @@index([restaurantId, mealId])
   @@map("categories")
 }
 
@@ -79,15 +98,14 @@ model MenuItem {
   order           Int        @default(0)
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
+  mealId          String
   categoryId      String
   categories      Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   
-  category        String   
-  subCategory     String?
   restaurant      Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
-  modifiers       Modifier[] @relation("MenuItemToModifier")
+  modifiers       Modifier[]
 
-  @@index([restaurantId, category])
+  @@index([restaurantId, mealId, categoryId])
   @@map("menu_items")
 }
 
@@ -96,8 +114,10 @@ model Modifier {
   name        String
   price       Decimal    @default(0) @db.Decimal(10, 2)
   menuContent Json?
-  menuItems   MenuItem[] @relation("MenuItemToModifier")
-
+  inIncluded  Boolean     @default(true)
+  menuItemId  String
+  menuItem    MenuItem   @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+  
   @@map("modifiers")
 }
 

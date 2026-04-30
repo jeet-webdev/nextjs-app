@@ -54,17 +54,17 @@ export default function MyMenu({
   }, [canManage, refreshKey, restaurantId]);
   return (
     <div className="">
-      <h1 className="text-2xl font-bold text-white">All My Menu</h1>
-      <p className="mt-2 text-gray-400">Manage your menu items here.</p>
+      {/* <h1 className="text-2xl font-bold text-white">All My Menu</h1> */}
+      <p className="mt-20 text-gray-400">Manage your  items here.</p>
 
       {localMenuItems.length === 0 && !isLoading ? (
         <p className="mt-4 text-sm text-gray-500">
-          No menu items found for this restaurant.
+          No  items found for this restaurant.
         </p>
       ) : (
         <div>
           <p className="mt-2 text-sm text-gray-500">
-            total menu item: {localMenuItems.length} 
+            total  item: {localMenuItems.length} 
           </p>
         </div>
       )}
@@ -75,7 +75,7 @@ export default function MyMenu({
         onEdit={onEdit}
         onDelete={onDelete}
         emptyMessage={
-          isLoading ? "Loading menu items..." : "No menu published yet."
+          isLoading ? "Loading Item items..." : "No Item published yet."
         }
       />
     </div>

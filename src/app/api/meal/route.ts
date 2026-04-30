@@ -5,12 +5,11 @@ import { prisma } from "@/shared/lib/prisma";
 
 type SessionUser = { id: string; userType: string };
 
-const categorySelect = {
+const mealSelect = {
   id: true,
   name: true,
   isAvailable: true,
   restaurantId: true,
-  mealId: true,
   createdAt: true,
   updatedAt: true,
 } as const;
@@ -19,19 +18,21 @@ function parseRequiredString(value: unknown): string {
   return typeof value === "string" ? value.trim() : "";
 }
 
-function mapCategory(cat: {
+function mapMeal(meal: {
   id: string;
   name: string;
   isAvailable: boolean;
   restaurantId: string;
-  mealId: string;
   createdAt: Date;
   updatedAt: Date;
 }) {
   return {
-    ...cat,
-    createdAt: cat.createdAt.toISOString(),
-    updatedAt: cat.updatedAt.toISOString(),
+    id: meal.id,
+    name: meal.name,
+    isAvailable: meal.isAvailable,
+    restaurantId: meal.restaurantId,
+    createdAt: meal.createdAt.toISOString(),
+    updatedAt: meal.updatedAt.toISOString(),
   };
 }
 
@@ -52,7 +53,10 @@ async function getSessionUser(): Promise<SessionUser | null> {
 async function assertRestaurantAccess(
   restaurantId: string,
   currentUser: SessionUser,
-) {
+): Promise<
+  | { restaurant: { id: string; userId: string }; error?: never; status?: never }
+  | { error: string; status: number; restaurant?: never }
+> {
   const restaurant = await prisma.restaurant.findUnique({
     where: { id: restaurantId },
     select: { id: true, userId: true },
@@ -75,14 +79,12 @@ async function assertRestaurantAccess(
   return { restaurant };
 }
 
-// GET /api/category?restaurantId=xxx
-// GET /api/category?restaurantId=xxx&mealId=xxx   (filter by meal)
-// GET /api/category?restaurantId=xxx&public=true  (no auth, available only)
+// GET /api/meal?restaurantId=xxx
+// GET /api/meal?restaurantId=xxx&public=true  (no auth required, only available meals)
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const restaurantId = searchParams.get("restaurantId")?.trim();
-    const mealId = searchParams.get("mealId")?.trim();
     const isPublic = searchParams.get("public") === "true";
 
     if (!restaurantId) {
@@ -92,19 +94,17 @@ export async function GET(request: Request) {
       );
     }
 
+    // Public route — no auth, only available meals
     if (isPublic) {
-      const categories = await prisma.category.findMany({
-        where: {
-          restaurantId,
-          isAvailable: true,
-          ...(mealId ? { mealId } : {}),
-        },
-        select: categorySelect,
+      const meals = await prisma.meal.findMany({
+        where: { restaurantId, isAvailable: true },
+        select: mealSelect,
         orderBy: { createdAt: "desc" },
       });
-      return NextResponse.json({ categories: categories.map(mapCategory) });
+      return NextResponse.json({ meals: meals.map(mapMeal) });
     }
 
+    // Private route — auth required
     const user = await getSessionUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
@@ -118,27 +118,24 @@ export async function GET(request: Request) {
       );
     }
 
-    const categories = await prisma.category.findMany({
-      where: {
-        restaurantId,
-        ...(mealId ? { mealId } : {}),
-      },
-      select: categorySelect,
+    const meals = await prisma.meal.findMany({
+      where: { restaurantId },
+      select: mealSelect,
       orderBy: { createdAt: "desc" },
     });
 
-    return NextResponse.json({ categories: categories.map(mapCategory) });
+    return NextResponse.json({ meals: meals.map(mapMeal) });
   } catch (err) {
-    console.error("[GET /api/category]", err);
+    console.error("[GET /api/meal]", err);
     return NextResponse.json(
-      { error: "Unable to load categories." },
+      { error: "Unable to load meals." },
       { status: 500 },
     );
   }
 }
 
-// POST /api/category
-// Body: { name: string, restaurantId: string, mealId: string, isAvailable?: boolean }
+// POST /api/meal
+// Body: { name: string, restaurantId: string, isAvailable?: boolean }
 export async function POST(request: Request) {
   try {
     const user = await getSessionUser();
@@ -149,7 +146,7 @@ export async function POST(request: Request) {
 
     if (user.userType !== "ADMIN" && user.userType !== "OWNER") {
       return NextResponse.json(
-        { error: "Only admins or owners can create categories." },
+        { error: "Only admins or owners can create meals." },
         { status: 403 },
       );
     }
@@ -157,30 +154,23 @@ export async function POST(request: Request) {
     const body = (await request.json()) as Record<string, unknown>;
     const name = parseRequiredString(body.name);
     const restaurantId = parseRequiredString(body.restaurantId);
-    const mealId = parseRequiredString(body.mealId);
     const isAvailable =
       typeof body.isAvailable === "boolean" ? body.isAvailable : true;
 
     if (!name) {
       return NextResponse.json(
-        { error: "Category name is required." },
+        { error: "Meal name is required." },
         { status: 400 },
       );
     }
+
     if (!restaurantId) {
       return NextResponse.json(
         { error: "restaurantId is required." },
         { status: 400 },
       );
     }
-    if (!mealId) {
-      return NextResponse.json(
-        { error: "mealId is required." },
-        { status: 400 },
-      );
-    }
 
-    // Verify restaurant access
     const access = await assertRestaurantAccess(restaurantId, user);
     if (access.error) {
       return NextResponse.json(
@@ -189,29 +179,16 @@ export async function POST(request: Request) {
       );
     }
 
-    // Verify meal belongs to the same restaurant
-    const meal = await prisma.meal.findFirst({
-      where: { id: mealId, restaurantId },
-      select: { id: true },
+    const meal = await prisma.meal.create({
+      data: { name, isAvailable, restaurantId },
+      select: mealSelect,
     });
 
-    if (!meal) {
-      return NextResponse.json(
-        { error: "Meal not found in this restaurant." },
-        { status: 404 },
-      );
-    }
-
-    const category = await prisma.category.create({
-      data: { name, isAvailable, restaurantId, mealId },
-      select: categorySelect,
-    });
-
-    return NextResponse.json({ category: mapCategory(category) }, { status: 201 });
+    return NextResponse.json({ meal: mapMeal(meal) }, { status: 201 });
   } catch (err) {
-    console.error("[POST /api/category]", err);
+    console.error("[POST /api/meal]", err);
     return NextResponse.json(
-      { error: "Unable to create category." },
+      { error: "Unable to create meal." },
       { status: 500 },
     );
   }
