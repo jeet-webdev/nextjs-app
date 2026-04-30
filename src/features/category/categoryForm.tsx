@@ -13,11 +13,18 @@ import {
   FolderOpen,
 } from "lucide-react";
 import { toast } from "react-toastify";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { TimePicker } from "@mui/x-date-pickers/TimePicker";
+import dayjs from "dayjs";
 
 export type CategoryRecord = {
   id: string;
   name: string;
   isAvailable: boolean;
+  description: string;
+  openingTime: string;
+  closingTime: string;
   restaurantId: string;
   mealId: string;
   createdAt: string;
@@ -29,10 +36,25 @@ type CategoryFormProps = {
   mealId: string;
 };
 
-type CategoryFormState = { name: string; isAvailable: boolean };
-const EMPTY: CategoryFormState = { name: "", isAvailable: true };
+type CategoryFormState = {
+  name: string;
+  isAvailable: boolean;
+  description: string;
+  openingTime: string;
+  closingTime: string;
+};
+const EMPTY: CategoryFormState = {
+  name: "",
+  isAvailable: true,
+  description: "",
+  openingTime: "",
+  closingTime: "",
+};
 
-export default function CategoryForm({ restaurantId, mealId }: CategoryFormProps) {
+export default function CategoryForm({
+  restaurantId,
+  mealId,
+}: CategoryFormProps) {
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState<CategoryFormState>(EMPTY);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -53,7 +75,7 @@ export default function CategoryForm({ restaurantId, mealId }: CategoryFormProps
     try {
       const res = await fetch(
         `/api/category?restaurantId=${encodeURIComponent(restaurantId)}&mealId=${encodeURIComponent(mealId)}`,
-        { credentials: "include" }
+        { credentials: "include" },
       );
       const data = await res.json();
       if (res.ok) setCategories(data.categories ?? []);
@@ -65,13 +87,18 @@ export default function CategoryForm({ restaurantId, mealId }: CategoryFormProps
     }
   }, [restaurantId, mealId]);
 
-  useEffect(() => { void fetchCategories(); }, [fetchCategories]);
+  useEffect(() => {
+    void fetchCategories();
+  }, [fetchCategories]);
 
   // ── Create ────────────────────────────────────────────────────────────────
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const name = formData.name.trim();
-    if (!name) { toast.error("Category name is required."); return; }
+    if (!name) {
+      toast.error("Category name is required.");
+      return;
+    }
 
     setIsSubmitting(true);
     try {
@@ -79,7 +106,15 @@ export default function CategoryForm({ restaurantId, mealId }: CategoryFormProps
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ restaurantId, mealId, name, isAvailable: formData.isAvailable }),
+        body: JSON.stringify({
+          restaurantId,
+          mealId,
+          name,
+          isAvailable: formData.isAvailable,
+          description: formData.description,
+          openingTime: formData.openingTime,
+          closingTime: formData.closingTime,
+        }),
       });
       const data = await res.json();
       if (!res.ok || !data?.category) {
@@ -101,14 +136,26 @@ export default function CategoryForm({ restaurantId, mealId }: CategoryFormProps
   // ── Edit ──────────────────────────────────────────────────────────────────
   const startEdit = (cat: CategoryRecord) => {
     setEditingId(cat.id);
-    setEditForm({ name: cat.name, isAvailable: cat.isAvailable });
+    setEditForm({
+      name: cat.name,
+      isAvailable: cat.isAvailable,
+      description: cat.description,
+      openingTime: cat.openingTime,
+      closingTime: cat.closingTime,
+    });
     setOpenIds((prev) => ({ ...prev, [cat.id]: true }));
   };
-  const cancelEdit = () => { setEditingId(null); setEditForm(EMPTY); };
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditForm(EMPTY);
+  };
 
   const saveEdit = async (cat: CategoryRecord) => {
     const name = editForm.name.trim();
-    if (!name) { toast.error("Category name is required."); return; }
+    if (!name) {
+      toast.error("Category name is required.");
+      return;
+    }
 
     setIsSavingEdit(true);
     try {
@@ -116,14 +163,22 @@ export default function CategoryForm({ restaurantId, mealId }: CategoryFormProps
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ name, isAvailable: editForm.isAvailable }),
+        body: JSON.stringify({
+          name,
+          isAvailable: editForm.isAvailable,
+          description: editForm.description,
+          openingTime: editForm.openingTime,
+          closingTime: editForm.closingTime,
+        }),
       });
       const data = await res.json();
       if (!res.ok || !data?.category) {
         toast.error(data?.error ?? "Unable to update category.");
         return;
       }
-      setCategories((prev) => prev.map((c) => (c.id === cat.id ? data.category : c)));
+      setCategories((prev) =>
+        prev.map((c) => (c.id === cat.id ? data.category : c)),
+      );
       cancelEdit();
       toast.success("Category updated.");
     } catch {
@@ -135,7 +190,8 @@ export default function CategoryForm({ restaurantId, mealId }: CategoryFormProps
 
   // ── Delete ────────────────────────────────────────────────────────────────
   const handleDelete = async (cat: CategoryRecord) => {
-    if (!confirm(`Delete "${cat.name}"? This will also remove its menu items.`)) return;
+    if (!confirm(`Delete "${cat.name}"? This will also remove its menu items.`))
+      return;
     setDeletingId(cat.id);
     try {
       const res = await fetch(`/api/category/${cat.id}`, {
@@ -143,7 +199,10 @@ export default function CategoryForm({ restaurantId, mealId }: CategoryFormProps
         credentials: "include",
       });
       const data = await res.json();
-      if (!res.ok) { toast.error(data?.error ?? "Unable to delete category."); return; }
+      if (!res.ok) {
+        toast.error(data?.error ?? "Unable to delete category.");
+        return;
+      }
       setCategories((prev) => prev.filter((c) => c.id !== cat.id));
       toast.success("Category deleted.");
     } catch {
@@ -172,7 +231,10 @@ export default function CategoryForm({ restaurantId, mealId }: CategoryFormProps
 
         <button
           type="button"
-          onClick={() => { setShowForm((v) => !v); setFormData(EMPTY); }}
+          onClick={() => {
+            setShowForm((v) => !v);
+            setFormData(EMPTY);
+          }}
           className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-semibold transition-all duration-150 ${
             showForm
               ? "border-white/10 bg-white/5 text-gray-400 hover:text-white"
@@ -180,9 +242,13 @@ export default function CategoryForm({ restaurantId, mealId }: CategoryFormProps
           }`}
         >
           {showForm ? (
-            <><X className="h-3 w-3" /> Cancel</>
+            <>
+              <X className="h-3 w-3" /> Cancel
+            </>
           ) : (
-            <><Plus className="h-3 w-3" /> Add Category</>
+            <>
+              <Plus className="h-3 w-3" /> Add Category
+            </>
           )}
         </button>
       </div>
@@ -199,25 +265,126 @@ export default function CategoryForm({ restaurantId, mealId }: CategoryFormProps
             className="w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm text-white outline-none placeholder:text-gray-600 focus:border-sky-500 transition-colors"
             placeholder="e.g. Starters, Mains, Desserts"
             value={formData.name}
-            onChange={(e) => setFormData((c) => ({ ...c, name: e.target.value }))}
+            onChange={(e) =>
+              setFormData((c) => ({ ...c, name: e.target.value }))
+            }
           />
 
           <label className="flex cursor-pointer items-center gap-2.5 rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-xs select-none">
             <input
               type="checkbox"
               checked={formData.isAvailable}
-              onChange={(e) => setFormData((c) => ({ ...c, isAvailable: e.target.checked }))}
+              onChange={(e) =>
+                setFormData((c) => ({ ...c, isAvailable: e.target.checked }))
+              }
               className="h-3.5 w-3.5 accent-sky-500"
             />
             <span className="text-gray-400">Available to customers</span>
           </label>
+
+          <label className="flex cursor-pointer items-center gap-2.5 rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-xs select-none">
+            <input
+              className="w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm text-white outline-none placeholder:text-gray-600 focus:border-sky-500 transition-colors"
+              placeholder="Description (optional)"
+              value={formData.description}
+              onChange={(e) =>
+                setFormData((c) => ({ ...c, description: e.target.value }))
+              }
+            />{" "}
+          </label>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <label className="ml-0.5 text-[11px] text-gray-500">
+                Opening Hours
+              </label>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <TimePicker
+                  value={
+                    formData.openingTime
+                      ? dayjs(formData.openingTime, "HH:mm")
+                      : null
+                  }
+                  onChange={(newValue) => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      openingTime: newValue ? newValue.format("HH:mm") : "",
+                    }));
+                  }}
+                  slotProps={{
+                    textField: {
+                      fullWidth: true,
+                      size: "small",
+                      sx: {
+                        "& .MuiInputBase-root": {
+                          backgroundColor: "rgba(0,0,0,0.3)",
+                          borderRadius: "12px",
+                          border: "1px solid rgba(255,255,255,0.1)",
+                          color: "white",
+                          fontSize: "0.875rem",
+                        },
+                        "& .MuiOutlinedInput-notchedOutline": {
+                          border: "none",
+                        },
+                        "& .MuiSvgIcon-root": { color: "#64748b" }, // gray-500
+                      },
+                    },
+                  }}
+                />
+              </LocalizationProvider>
+            </div>
+
+            <div className="space-y-1">
+              <label className="ml-0.5 text-[11px] text-gray-500">
+                Closing Hours
+              </label>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <TimePicker
+                  value={
+                    formData.closingTime
+                      ? dayjs(formData.closingTime, "HH:mm")
+                      : null
+                  }
+                  onChange={(newValue) => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      closingTime: newValue ? newValue.format("HH:mm") : "",
+                    }));
+                  }}
+                  slotProps={{
+                    textField: {
+                      fullWidth: true,
+                      size: "small",
+                      sx: {
+                        "& .MuiInputBase-root": {
+                          backgroundColor: "rgba(0,0,0,0.3)",
+                          borderRadius: "12px",
+                          border: "1px solid rgba(255,255,255,0.1)",
+                          color: "white",
+                          fontSize: "0.875rem",
+                        },
+                        "& .MuiOutlinedInput-notchedOutline": {
+                          border: "none",
+                        },
+                        "& .MuiSvgIcon-root": { color: "#64748b" },
+                      },
+                    },
+                  }}
+                />
+              </LocalizationProvider>
+            </div>
+          </div>
 
           <button
             type="submit"
             disabled={isSubmitting}
             className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-sky-600 py-2 text-xs font-semibold text-white transition-colors hover:bg-sky-700 disabled:opacity-60"
           >
-            {isSubmitting ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check className="h-3 w-3" />}
+            {isSubmitting ? (
+              <Loader2 className="h-3 w-3 animate-spin" />
+            ) : (
+              <Check className="h-3 w-3" />
+            )}
             {isSubmitting ? "Saving..." : "Save Category"}
           </button>
         </form>
@@ -252,16 +419,23 @@ export default function CategoryForm({ restaurantId, mealId }: CategoryFormProps
                 >
                   <div className="flex items-center gap-2">
                     <Tag className="h-2.5 w-2.5 text-sky-600" />
-                    <span className="text-xs font-medium text-gray-300">{cat.name}</span>
-                    <span className={`rounded-full px-1.5 py-px text-[9px] font-semibold tracking-wide ${
-                      cat.isAvailable
-                        ? "bg-emerald-500/10 text-emerald-500"
-                        : "bg-gray-500/10 text-gray-600"
-                    }`}>
+                    <span className="text-xs font-medium text-gray-300">
+                      {cat.name}
+                    </span>
+                    <span
+                      className={`rounded-full px-1.5 py-px text-[9px] font-semibold tracking-wide ${
+                        cat.isAvailable
+                          ? "bg-emerald-500/10 text-emerald-500"
+                          : "bg-gray-500/10 text-gray-600"
+                      }`}
+                    >
                       {cat.isAvailable ? "ON" : "OFF"}
                     </span>
+                    <span> {cat.description} </span>
                   </div>
-                  <ChevronDown className={`h-3 w-3 text-gray-600 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
+                  <ChevronDown
+                    className={`h-3 w-3 text-gray-600 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+                  />
                 </button>
 
                 {/* Row body */}
@@ -273,17 +447,95 @@ export default function CategoryForm({ restaurantId, mealId }: CategoryFormProps
                           autoFocus
                           className="w-full rounded-md border border-white/10 bg-black/40 px-2.5 py-1.5 text-xs text-white outline-none focus:border-sky-500 transition-colors"
                           value={editForm.name}
-                          onChange={(e) => setEditForm((c) => ({ ...c, name: e.target.value }))}
+                          onChange={(e) =>
+                            setEditForm((c) => ({ ...c, name: e.target.value }))
+                          }
                         />
+                        <input
+                          className="w-full rounded-md border border-white/10 bg-black/40 px-2.5 py-1.5 text-xs text-white outline-none focus:border-sky-500 transition-colors"
+                          placeholder="Description (optional)"
+                          value={editForm.description}
+                          onChange={(e) =>
+                            setEditForm((c) => ({
+                              ...c,
+                              description: e.target.value,
+                            }))
+                          }
+                        />
+
                         <label className="flex cursor-pointer items-center gap-2 rounded-md border border-white/10 bg-black/30 px-2.5 py-1.5 text-xs select-none">
                           <input
                             type="checkbox"
                             checked={editForm.isAvailable}
-                            onChange={(e) => setEditForm((c) => ({ ...c, isAvailable: e.target.checked }))}
+                            onChange={(e) =>
+                              setEditForm((c) => ({
+                                ...c,
+                                isAvailable: e.target.checked,
+                              }))
+                            }
                             className="h-3 w-3 accent-sky-500"
                           />
-                          <span className="text-gray-400">Available to customers</span>
+                          <span className="text-gray-400">
+                            Available to customers
+                          </span>
                         </label>
+
+                        <div className="grid grid-cols-2 gap-4">
+                          {/* Opening Time Picker */}
+                          <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <TimePicker
+                              label="Open"
+                              value={
+                                editForm.openingTime
+                                  ? dayjs(editForm.openingTime, "HH:mm")
+                                  : null
+                              }
+                              onChange={(val) =>
+                                setEditForm((f) => ({
+                                  ...f,
+                                  openingTime: val ? val.format("HH:mm") : "",
+                                }))
+                              }
+                              slotProps={{
+                                textField: {
+                                  size: "small",
+                                  sx: {
+                                    input: { color: "white" },
+                                    label: { color: "gray" },
+                                  },
+                                },
+                              }}
+                            />
+                          </LocalizationProvider>
+
+                          {/* Closing Time Picker */}
+                          <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <TimePicker
+                              label="Close"
+                              value={
+                                editForm.closingTime
+                                  ? dayjs(editForm.closingTime, "HH:mm")
+                                  : null
+                              }
+                              onChange={(val) =>
+                                setEditForm((f) => ({
+                                  ...f,
+                                  closingTime: val ? val.format("HH:mm") : "",
+                                }))
+                              }
+                              slotProps={{
+                                textField: {
+                                  size: "small",
+                                  sx: {
+                                    input: { color: "white" },
+                                    label: { color: "gray" },
+                                  },
+                                },
+                              }}
+                            />
+                          </LocalizationProvider>
+                        </div>
+
                         <div className="flex gap-1.5">
                           <button
                             type="button"
@@ -291,7 +543,11 @@ export default function CategoryForm({ restaurantId, mealId }: CategoryFormProps
                             disabled={isSavingEdit}
                             className="flex flex-1 items-center justify-center gap-1 rounded-md bg-sky-600 py-1.5 text-[11px] font-semibold text-white disabled:opacity-60"
                           >
-                            {isSavingEdit ? <Loader2 className="h-2.5 w-2.5 animate-spin" /> : <Check className="h-2.5 w-2.5" />}
+                            {isSavingEdit ? (
+                              <Loader2 className="h-2.5 w-2.5 animate-spin" />
+                            ) : (
+                              <Check className="h-2.5 w-2.5" />
+                            )}
                             Save
                           </button>
                           <button
@@ -306,7 +562,12 @@ export default function CategoryForm({ restaurantId, mealId }: CategoryFormProps
                       </div>
                     ) : (
                       <div className="flex items-center justify-between">
-                        <span className="font-mono text-[9px] text-gray-700">{cat.id}</span>
+                        <span className="font-mono text-[9px] ">
+                          {/* {cat.id} */} {cat.openingTime} - {cat.closingTime}
+                        </span>
+                         <span className="font-mono text-[9px] ">
+                         {cat.description}
+                        </span>
                         <div className="flex gap-1">
                           <button
                             type="button"
@@ -321,8 +582,15 @@ export default function CategoryForm({ restaurantId, mealId }: CategoryFormProps
                             disabled={isDeleting}
                             className="flex items-center gap-1 rounded-md border border-rose-500/10 px-2 py-1 text-[11px] text-rose-500/70 transition-colors hover:bg-rose-500/10 hover:text-rose-400 disabled:opacity-60"
                           >
-                            {isDeleting ? <Loader2 className="h-2.5 w-2.5 animate-spin" /> : <Trash2 className="h-2.5 w-2.5" />}
+                            {isDeleting ? (
+                              <Loader2 className="h-2.5 w-2.5 animate-spin" />
+                            ) : (
+                              <Trash2 className="h-2.5 w-2.5" />
+                            )}
                             Delete
+                          </button>
+                          <button className="flex flex-row p-3 gap-1 rounded-md text-[12px] border-2 border-sky-800/30 bg-sky-500/10 text-sky-400 hover:bg-sky-500/20 hover:text-sky-300">
+                            <Plus className="h-3 w-3" /> Add Item
                           </button>
                         </div>
                       </div>

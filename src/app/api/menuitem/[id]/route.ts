@@ -12,14 +12,8 @@ const menuItemSelect = {
   name: true,
   description: true,
   price: true,
-  discountedPrice: true,
-  currency: true,
   image: true,
-  dietary: true,
   isAvailable: true,
-  preparationTime: true,
-  ingredients: true,
-  order: true,
   restaurantId: true,
   mealId: true,
   categoryId: true,
@@ -37,14 +31,11 @@ function mapMenuItem(item: {
   name: string;
   description: string | null;
   price: Decimal;
-  discountedPrice: Decimal | null;
-  currency: string;
+ 
   image: string | null;
-  dietary: unknown;
+ 
   isAvailable: boolean;
-  preparationTime: number | null;
-  ingredients: string | null;
-  order: number;
+ 
   restaurantId: string;
   mealId: string;
   categoryId: string;
@@ -56,14 +47,11 @@ function mapMenuItem(item: {
     name: item.name,
     description: item.description,
     price: toDecimalString(item.price),
-    discountedPrice: toDecimalString(item.discountedPrice),
-    currency: item.currency,
+  
     image: item.image,
-    dietary: item.dietary,
+   
     isAvailable: item.isAvailable,
-    preparationTime: item.preparationTime,
-    ingredients: item.ingredients,
-    order: item.order,
+  
     restaurantId: item.restaurantId,
     mealId: item.mealId,
     categoryId: item.categoryId,
@@ -111,7 +99,7 @@ async function getAccessibleMenuItem(id: string, currentUser: SessionUser) {
   return { item };
 }
 
-// GET /api/menu-item/[id]
+// GET /api/menuitem/[id]
 export async function GET(
   request: Request,
   context: { params: Promise<{ id: string }> },
@@ -152,7 +140,7 @@ export async function GET(
 
     return NextResponse.json({ menuItem: mapMenuItem(access.item) });
   } catch (err) {
-    console.error("[GET /api/menu-item/[id]]", err);
+    console.error("[GET /api/menuitem/[id]]", err);
     return NextResponse.json(
       { error: "Unable to load menu item." },
       { status: 500 },
@@ -160,7 +148,7 @@ export async function GET(
   }
 }
 
-// PATCH /api/menu-item/[id]
+// PATCH /api/menuitem/[id]
 // Body: any subset of { name, description, price, discountedPrice, currency,
 //                       image, dietary, isAvailable, preparationTime, ingredients, order, categoryId, mealId }
 export async function PATCH(
@@ -215,34 +203,14 @@ export async function PATCH(
       updateData.price = price;
     }
 
-    if (body.discountedPrice !== undefined) {
-      if (body.discountedPrice === null) {
-        updateData.discountedPrice = null;
-      } else {
-        const dp = Number(body.discountedPrice);
-        if (isNaN(dp) || dp < 0) {
-          return NextResponse.json(
-            { error: "discountedPrice must be a non-negative number or null." },
-            { status: 400 },
-          );
-        }
-        updateData.discountedPrice = dp;
-      }
-    }
-
-    if (body.currency !== undefined) {
-      updateData.currency =
-        typeof body.currency === "string" ? body.currency.trim() : "USD";
-    }
+  
 
     if (body.image !== undefined) {
       updateData.image =
         typeof body.image === "string" ? body.image.trim() || null : null;
     }
 
-    if (body.dietary !== undefined) {
-      updateData.dietary = body.dietary;
-    }
+  
 
     if (body.isAvailable !== undefined) {
       if (typeof body.isAvailable !== "boolean") {
@@ -254,21 +222,7 @@ export async function PATCH(
       updateData.isAvailable = body.isAvailable;
     }
 
-    if (body.preparationTime !== undefined) {
-      updateData.preparationTime =
-        typeof body.preparationTime === "number" ? body.preparationTime : null;
-    }
-
-    if (body.ingredients !== undefined) {
-      updateData.ingredients =
-        typeof body.ingredients === "string"
-          ? body.ingredients.trim() || null
-          : null;
-    }
-
-    if (body.order !== undefined) {
-      updateData.order = typeof body.order === "number" ? body.order : 0;
-    }
+   
 
     // If moving to a different category, validate it belongs to the same restaurant
     if (body.categoryId !== undefined) {
@@ -348,7 +302,7 @@ export async function PATCH(
 
     return NextResponse.json({ menuItem: mapMenuItem(updated) });
   } catch (err) {
-    console.error("[PATCH /api/menu-item/[id]]", err);
+    console.error("[PATCH /api/menuitem/[id]]", err);
     return NextResponse.json(
       { error: "Unable to update menu item." },
       { status: 500 },
@@ -356,7 +310,7 @@ export async function PATCH(
   }
 }
 
-// DELETE /api/menu-item/[id]
+// DELETE /api/menuitem/[id]
 export async function DELETE(
   _request: Request,
   context: { params: Promise<{ id: string }> },
@@ -381,7 +335,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (err) {
-    console.error("[DELETE /api/menu-item/[id]]", err);
+    console.error("[DELETE /api/menuitem/[id]]", err);
     return NextResponse.json(
       { error: "Unable to delete menu item." },
       { status: 500 },

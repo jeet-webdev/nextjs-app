@@ -8,7 +8,10 @@ type SessionUser = { id: string; userType: string };
 const categorySelect = {
   id: true,
   name: true,
+  description: true,
   isAvailable: true,
+  openingTime: true,
+  closingTime: true,
   restaurantId: true,
   mealId: true,
   createdAt: true,
@@ -22,7 +25,10 @@ function parseRequiredString(value: unknown): string {
 function mapCategory(cat: {
   id: string;
   name: string;
+  description: string | null;
   isAvailable: boolean;
+  openingTime: string  | null;
+  closingTime: string  | null;
   restaurantId: string;
   mealId: string;
   createdAt: Date;
@@ -138,7 +144,7 @@ export async function GET(request: Request) {
 }
 
 // POST /api/category
-// Body: { name: string, restaurantId: string, mealId: string, isAvailable?: boolean }
+// Body: { name: string, description: string, restaurantId: string, mealId: string, isAvailable?: boolean }
 export async function POST(request: Request) {
   try {
     const user = await getSessionUser();
@@ -156,10 +162,13 @@ export async function POST(request: Request) {
 
     const body = (await request.json()) as Record<string, unknown>;
     const name = parseRequiredString(body.name);
+    const description = parseRequiredString(body.description) || "";  // default to empty string if not provided
     const restaurantId = parseRequiredString(body.restaurantId);
     const mealId = parseRequiredString(body.mealId);
     const isAvailable =
       typeof body.isAvailable === "boolean" ? body.isAvailable : true;
+    const openingTime = parseRequiredString(body.openingTime);
+    const closingTime = parseRequiredString(body.closingTime);
 
     if (!name) {
       return NextResponse.json(
@@ -167,6 +176,14 @@ export async function POST(request: Request) {
         { status: 400 },
       );
     }
+    // if(!description) {
+    //   return NextResponse.json(
+    //     { error: "Category description is required." },
+    //     { status: 400 },
+    //   );
+    // }
+
+
     if (!restaurantId) {
       return NextResponse.json(
         { error: "restaurantId is required." },
@@ -179,6 +196,19 @@ export async function POST(request: Request) {
         { status: 400 },
       );
     }
+if (!openingTime) {
+      return NextResponse.json(
+        { error: "Opening time is required." },
+        { status: 400 },
+      );
+    }
+if (!closingTime) {
+      return NextResponse.json(
+        { error: "Closing time is required." },
+        { status: 400 },
+      );
+    }
+
 
     // Verify restaurant access
     const access = await assertRestaurantAccess(restaurantId, user);
@@ -203,7 +233,7 @@ export async function POST(request: Request) {
     }
 
     const category = await prisma.category.create({
-      data: { name, isAvailable, restaurantId, mealId },
+      data: { name, description, isAvailable, restaurantId, mealId , openingTime, closingTime},  // default to always open
       select: categorySelect,
     });
 

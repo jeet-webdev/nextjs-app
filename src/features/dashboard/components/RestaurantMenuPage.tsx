@@ -70,7 +70,7 @@ export default function RestaurantMenuPage({
   };
 
   const handleDeleteMenuItem = async (id: string) => {
-    const response = await fetch(`/api/menu/${id}`, {
+    const response = await fetch(`/api/menuitem/${id}`, {
       method: "DELETE",
       credentials: "include",
     });
@@ -162,7 +162,7 @@ export default function RestaurantMenuPage({
         </section>
 
        
-        <section className="rounded-3xl border border-white/10 bg-black/20 p-6 backdrop-blur-sm">
+        {/* <section className="rounded-3xl border border-white/10 bg-black/20 p-6 backdrop-blur-sm">
           <MyMenu
             restaurantId={restaurantDetails.id}
             menuItems={restaurantDetails.menuItems ?? []}
@@ -171,7 +171,7 @@ export default function RestaurantMenuPage({
             onEdit={handleEditMenuItem}
             onDelete={handleDeleteMenuItem}
           />
-        </section>
+        </section> */}
 
       </div>
     </div>

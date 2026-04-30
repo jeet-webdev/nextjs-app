@@ -116,10 +116,10 @@ async function assertRestaurantAccess(
   return { restaurant };
 }
 
-// GET /api/menu-item?restaurantId=xxx
-// GET /api/menu-item?restaurantId=xxx&categoryId=xxx
-// GET /api/menu-item?restaurantId=xxx&mealId=xxx
-// GET /api/menu-item?restaurantId=xxx&public=true  (no auth, available only)
+// GET /api/menuitem?restaurantId=xxx
+// GET /api/menuitem?restaurantId=xxx&categoryId=xxx
+// GET /api/menuitem?restaurantId=xxx&mealId=xxx
+// GET /api/menuitem?restaurantId=xxx&public=true  (no auth, available only)
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -146,7 +146,6 @@ export async function GET(request: Request) {
       const items = await prisma.menuItem.findMany({
         where,
         select: menuItemSelect,
-        orderBy: [{ order: "asc" }, { createdAt: "desc" }],
       });
       return NextResponse.json({ menuItems: items.map(mapMenuItem) });
     }
@@ -167,12 +166,11 @@ export async function GET(request: Request) {
     const items = await prisma.menuItem.findMany({
       where,
       select: menuItemSelect,
-      orderBy: [{ order: "asc" }, { createdAt: "desc" }],
     });
 
     return NextResponse.json({ menuItems: items.map(mapMenuItem) });
   } catch (err) {
-    console.error("[GET /api/menu-item]", err);
+    console.error("[GET /api/menuitem]", err);
     return NextResponse.json(
       { error: "Unable to load menu items." },
       { status: 500 },
@@ -180,7 +178,7 @@ export async function GET(request: Request) {
   }
 }
 
-// POST /api/menu-item
+// POST /api/menuitem
 // Body: { name, price, restaurantId, mealId, categoryId, description?, discountedPrice?,
 //         currency?, image?, dietary?, isAvailable?, preparationTime?, ingredients?, order? }
 export async function POST(request: Request) {
@@ -275,30 +273,16 @@ export async function POST(request: Request) {
         mealId,
         categoryId,
         price,
-        discountedPrice:
-          discountedPrice !== null && !isNaN(discountedPrice)
-            ? discountedPrice
-            : undefined,
-        currency:
-          typeof body.currency === "string" ? body.currency.trim() : "USD",
         description:
           typeof body.description === "string"
             ? body.description.trim() || null
             : null,
         image:
           typeof body.image === "string" ? body.image.trim() || null : null,
-        // dietary: body.dietary ?? null,
-        isAvailable:
+          isAvailable:
           typeof body.isAvailable === "boolean" ? body.isAvailable : true,
-        preparationTime:
-          typeof body.preparationTime === "number"
-            ? body.preparationTime
-            : null,
-        ingredients:
-          typeof body.ingredients === "string"
-            ? body.ingredients.trim() || null
-            : null,
-        order: typeof body.order === "number" ? body.order : 0,
+       
+        
       },
       select: menuItemSelect,
     });
@@ -308,7 +292,7 @@ export async function POST(request: Request) {
       { status: 201 },
     );
   } catch (err) {
-    console.error("[POST /api/menu-item]", err);
+    console.error("[POST /api/menuitem]", err);
     return NextResponse.json(
       { error: "Unable to create menu item." },
       { status: 500 },

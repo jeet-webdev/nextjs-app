@@ -1,9 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { Loader2, Plus } from "lucide-react";
+import { Loader2, Plus, X } from "lucide-react";
 import { toast } from "react-toastify";
 
 import type { CategoryRecord } from "@/features/category/categoryForm";
 import { type MenuRecord } from "@/features/menu/types/menuTypes";
+import TextField from "@mui/material/TextField";
+import Checkbox from '@mui/material/Checkbox';
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import FormControl from '@mui/material/FormControl';
+import FormLabel from '@mui/material/FormLabel';
+
 
 type MenuFormProps = {
   restaurantId: string;
@@ -138,7 +145,7 @@ export default function MenuForm({
 
     try {
       const response = await fetch(
-        isEditing ? `/api/menu/${menuItem?.id}` : "/api/menu",
+        isEditing ? `/api/menuitem/${menuItem?.id}` : "/api/menuitem",
         {
           method: isEditing ? "PATCH" : "POST",
           headers: { "Content-Type": "application/json" },
@@ -174,9 +181,37 @@ export default function MenuForm({
       setLoading(false);
     }
   };
+  const [showMenuItemForm, setShowMenuItemForm] = useState(false);
+  const [menuItemFormData, setMenuItemFormData] =
+    useState<MenuFormState>(EMPTY_MENU_FORM);
 
   return (
     <div className="rounded-2xl bg-white/[0.03] p-6 border border-white/5">
+      <div>
+        <button
+          type="button"
+          onClick={() => {
+            setShowMenuItemForm((v) => !v);
+            setMenuItemFormData(EMPTY_MENU_FORM);
+          }}
+          className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-semibold transition-all duration-150 ${
+            showMenuItemForm
+              ? "border-white/10 bg-white/5 text-gray-400 hover:text-white"
+              : "border-sky-500/30 bg-sky-500/10 text-sky-400 hover:bg-sky-500/20 hover:text-sky-300"
+          }`}
+        >
+          {showMenuItemForm ? (
+            <>
+              <X className="h-3 w-3" /> Cancel
+            </>
+          ) : (
+            <>
+              <Plus className="h-3 w-3" /> Add Item
+            </>
+          )}
+        </button>
+      </div>
+
       <div className="mb-4 flex items-center justify-between gap-4">
         <h2 className="text-lg font-semibold text-white">
           {isEditing
@@ -237,8 +272,57 @@ export default function MenuForm({
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs text-gray-400 ml-1">Price (USD)</label>
-            <input
+            {/* <label className="text-xs text-gray-400 ml-1">Price (USD)</label> */}
+            <TextField
+              id="standard-password-input"
+              label="Price (USD)"
+              name="price"
+              type="number"
+              required
+              placeholder="299"
+              value={formData.price}
+              onChange={handleChange}
+              variant="standard"
+            />
+            <TextField
+              id="standard-password-input"
+              label="name"
+              name="name"
+              type="text"
+              required
+              placeholder="Paneer Tikka"
+              value={formData.name}
+              onChange={handleChange}
+              variant="standard"
+            />
+            <TextField
+              id="standard-password-input"
+              label="Description"
+              name="description"
+              type="text"
+              required
+              placeholder="Description ex. Grilled paneer with spices..."
+              value={formData.description}
+              onChange={handleChange}
+              variant="standard"
+            />
+          </div>
+           <FormControl component="fieldset">
+     
+      <FormGroup aria-label="position" row>
+        <FormControlLabel
+          value="end"
+          control={<Checkbox />}
+          label="Menu Available"
+          labelPlacement="end"
+          name="isAvailable"
+          // type="checkbox"
+          checked={formData.isAvailable}
+          // onChange={handleChange}
+        />
+      </FormGroup>
+    </FormControl>
+          {/* <input
               name="price"
               type="number"
               required
@@ -246,10 +330,8 @@ export default function MenuForm({
               placeholder="299"
               value={formData.price}
               onChange={handleChange}
-            />
-          </div>
-
-          <div className=" space-y-1">
+            /> 
+            <div className=" space-y-1">
             <label className="text-xs text-gray-400 ml-1">Description</label>
             <input
               name="description"
@@ -259,16 +341,16 @@ export default function MenuForm({
               onChange={handleChange}
             />
           </div>
-
-          <input
-            name="preparationTime"
-            type="number"
-            className="p-3 bg-black/40 border border-white/10 rounded-lg w-full text-white"
-            placeholder="Preparation Time (minutes)"
-            value={formData.preparationTime}
-            onChange={handleChange}
-          />
-
+          <div>
+            <input
+              name="preparationTime"
+              type="number"
+              className="p-3 bg-black/40 border border-white/10 rounded-lg w-full text-white"
+              placeholder="Preparation Time (minutes)"
+              value={formData.preparationTime}
+              onChange={handleChange}
+            />
+          </div>
           <div className="flex items-center gap-3 p-3 bg-black/40 border border-white/10 rounded-lg">
             <input
               id="isAvailable"
@@ -281,7 +363,7 @@ export default function MenuForm({
             <label htmlFor="isAvailable" className="text-sm text-white">
               Menu Available
             </label>
-          </div>
+          </div> */}
         </div>
         <div className="mt-3 flex flex-row gap-5">
           <button

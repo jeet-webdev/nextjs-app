@@ -8,7 +8,10 @@ type SessionUser = { id: string; userType: string };
 const categorySelect = {
   id: true,
   name: true,
+  description: true,
   isAvailable: true,
+  openingTime: true,
+  closingTime: true,
   restaurantId: true,
   mealId: true,
   createdAt: true,
@@ -18,7 +21,10 @@ const categorySelect = {
 function mapCategory(cat: {
   id: string;
   name: string;
+  description: string | null;
   isAvailable: boolean;
+  openingTime: string  | null;
+  closingTime: string  | null;
   restaurantId: string;
   mealId: string;
   createdAt: Date;
@@ -140,7 +146,7 @@ export async function PATCH(
     }
 
     const body = (await request.json()) as Record<string, unknown>;
-    const updateData: { name?: string; isAvailable?: boolean; mealId?: string } = {};
+    const updateData: { name?: string; description?: string; isAvailable?: boolean; mealId?: string, openingTime?: string, closingTime?: string } = {};
 
     if (body.name !== undefined) {
       const name = typeof body.name === "string" ? body.name.trim() : "";
@@ -153,6 +159,17 @@ export async function PATCH(
       updateData.name = name;
     }
 
+    if (body.description !== undefined) {
+      const description = typeof body.description === "string" ? body.description.trim() : "";
+      // if(!description){
+      //   return NextResponse.json(
+      //     { error: "description cannot be empty." },
+      //     { status: 400 },
+      //   );
+      // }
+      updateData.description = description;
+    }
+
     if (body.isAvailable !== undefined) {
       if (typeof body.isAvailable !== "boolean") {
         return NextResponse.json(
@@ -162,6 +179,29 @@ export async function PATCH(
       }
       updateData.isAvailable = body.isAvailable;
     }
+
+
+    
+
+    if (body.openingTime !== undefined) {
+      if(typeof body.openingTime !== "string" || !body.openingTime.trim()) {
+        return NextResponse.json(
+          { error: "openingTime must be a non-empty string." },
+          { status: 400 },
+        );
+      }
+      updateData.openingTime = body.openingTime;
+    }
+    if (body.closingTime !== undefined) {
+      if(typeof body.closingTime !== "string" || !body.closingTime.trim()) {
+        return NextResponse.json(
+          { error: "closingTime must be a non-empty string." },
+          { status: 400 },
+        );
+      }
+      updateData.closingTime = body.closingTime;
+    }
+
 
     if (body.mealId !== undefined) {
       const mealId = typeof body.mealId === "string" ? body.mealId.trim() : "";

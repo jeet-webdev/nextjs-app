@@ -32,8 +32,8 @@ export default function MyMenu({
     const loadMenuItem = async () => {
       try {
         const query = canManage
-          ? `/api/menu?restaurantId=${encodeURIComponent(restaurantId)}`
-          : `/api/menu?public=true&restaurantId=${encodeURIComponent(restaurantId)}`;
+          ? `/api/menuitem?restaurantId=${encodeURIComponent(restaurantId)}`
+          : `/api/menuitem?public=true&restaurantId=${encodeURIComponent(restaurantId)}`;
         const response = await fetch(query, canManage ? { credentials: "include" } : undefined);
 
         if (!response.ok) return;
