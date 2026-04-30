@@ -135,7 +135,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ categories: categories.map(mapCategory) });
   } catch (err) {
-    console.error("[GET /api/category]", err);
+
     return NextResponse.json(
       { error: "Unable to load categories." },
       { status: 500 },
@@ -234,7 +234,7 @@ if (!closingTime) {
 
     return NextResponse.json({ category: mapCategory(category) }, { status: 201 });
   } catch (err) {
-    console.error("[POST /api/category]", err);
+    
     return NextResponse.json(
       { error: "Unable to create category." },
       { status: 500 },

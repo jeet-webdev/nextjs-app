@@ -115,7 +115,7 @@ export async function GET(
 
     return NextResponse.json({ category: mapCategory(access.category) });
   } catch (err) {
-    console.error("[GET /api/category/[id]]", err);
+  
     return NextResponse.json(
       { error: "Unable to load category." },
       { status: 500 },
@@ -161,12 +161,7 @@ export async function PATCH(
 
     if (body.description !== undefined) {
       const description = typeof body.description === "string" ? body.description.trim() : "";
-      // if(!description){
-      //   return NextResponse.json(
-      //     { error: "description cannot be empty." },
-      //     { status: 400 },
-      //   );
-      // }
+    
       updateData.description = description;
     }
 
@@ -243,7 +238,7 @@ export async function PATCH(
 
     return NextResponse.json({ category: mapCategory(updated) });
   } catch (err) {
-    console.error("[PATCH /api/category/[id]]", err);
+
     return NextResponse.json(
       { error: "Unable to update category." },
       { status: 500 },
@@ -276,7 +271,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (err) {
-    console.error("[DELETE /api/category/[id]]", err);
+  
     return NextResponse.json(
       { error: "Unable to delete category." },
       { status: 500 },

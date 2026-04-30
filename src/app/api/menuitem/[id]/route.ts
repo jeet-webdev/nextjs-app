@@ -140,7 +140,7 @@ export async function GET(
 
     return NextResponse.json({ menuItem: mapMenuItem(access.item) });
   } catch (err) {
-    console.error("[GET /api/menuitem/[id]]", err);
+    
     return NextResponse.json(
       { error: "Unable to load menu item." },
       { status: 500 },
@@ -302,7 +302,7 @@ export async function PATCH(
 
     return NextResponse.json({ menuItem: mapMenuItem(updated) });
   } catch (err) {
-    console.error("[PATCH /api/menuitem/[id]]", err);
+    
     return NextResponse.json(
       { error: "Unable to update menu item." },
       { status: 500 },
@@ -335,7 +335,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (err) {
-    console.error("[DELETE /api/menuitem/[id]]", err);
+    
     return NextResponse.json(
       { error: "Unable to delete menu item." },
       { status: 500 },

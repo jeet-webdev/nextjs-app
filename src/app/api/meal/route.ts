@@ -140,7 +140,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ meals: meals.map(mapMeal) });
   } catch (err) {
-    console.error("[GET /api/meal]", err);
+    
     return NextResponse.json(
       { error: "Unable to load meals." },
       { status: 500 },
@@ -207,7 +207,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ meal: mapMeal(meal) }, { status: 201 });
   } catch (err) {
-    console.error("[POST /api/meal]", err);
+    
     return NextResponse.json(
       { error: "Unable to create meal." },
       { status: 500 },

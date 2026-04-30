@@ -42,7 +42,7 @@ export default function MyMenu({
         const allItems: MenuRecord[] = data.menuItems || [];
         setLocalMenuItems(allItems);
       } catch (error) {
-        console.error("Failed to load menu:", error);
+        
       } finally {
         setIsLoading(false);
       }

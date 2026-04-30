@@ -175,7 +175,7 @@ export default function MenuForm({
       setFormData(EMPTY_MENU_FORM);
       onSaved?.(data?.menuItem as MenuRecord);
     } catch (error) {
-      console.error("Error saving menu item:", error);
+      
       toast.error(`Unable to ${isEditing ? "update" : "create"} menu item.`);
     } finally {
       setLoading(false);

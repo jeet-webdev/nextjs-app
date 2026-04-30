@@ -131,7 +131,7 @@ export async function GET(
 
     return NextResponse.json({ meal: mapMeal(access.meal) });
   } catch (err) {
-    console.error("[GET /api/meal/[id]]", err);
+    
     return NextResponse.json(
       { error: "Unable to load meal." },
       { status: 500 },
@@ -238,7 +238,7 @@ export async function PATCH(
 
     return NextResponse.json({ meal: mapMeal(updated) });
   } catch (err) {
-    console.error("[PATCH /api/meal/[id]]", err);
+    
     return NextResponse.json(
       { error: "Unable to update meal." },
       { status: 500 },
@@ -271,7 +271,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (err) {
-    console.error("[DELETE /api/meal/[id]]", err);
+    
     return NextResponse.json(
       { error: "Unable to delete meal." },
       { status: 500 },
