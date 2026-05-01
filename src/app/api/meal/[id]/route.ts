@@ -9,6 +9,10 @@ const mealSelect = {
   id: true,
   name: true,
   isAvailable: true,
+  // alwaysAvailable: true,
+  description: true,
+  openingTime: true,
+  closingTime: true,
   restaurantId: true,
   createdAt: true,
   updatedAt: true,
@@ -18,6 +22,10 @@ function mapMeal(meal: {
   id: string;
   name: string;
   isAvailable: boolean;
+  // alwaysAvailable: boolean;
+  description: string | null;
+  openingTime: string  | null;
+  closingTime: string  | null;
   restaurantId: string;
   createdAt: Date;
   updatedAt: Date;
@@ -26,6 +34,10 @@ function mapMeal(meal: {
     id: meal.id,
     name: meal.name,
     isAvailable: meal.isAvailable,
+    // alwaysAvailable: meal.alwaysAvailable,
+    description: meal.description,
+    openingTime: meal.openingTime,
+    closingTime: meal.closingTime,
     restaurantId: meal.restaurantId,
     createdAt: meal.createdAt.toISOString(),
     updatedAt: meal.updatedAt.toISOString(),
@@ -46,10 +58,6 @@ async function getSessionUser(): Promise<SessionUser | null> {
   });
 }
 
-/**
- * Find meal by ID and verify the current user has access to it.
- * ADMINs can access any meal; OWNERs only their own restaurant's meals.
- */
 async function getAccessibleMeal(id: string, currentUser: SessionUser) {
   const meal = await prisma.meal.findUnique({
     where: { id },
@@ -57,6 +65,10 @@ async function getAccessibleMeal(id: string, currentUser: SessionUser) {
       id: true,
       name: true,
       isAvailable: true,
+      // alwaysAvailable: true,
+      description: true,
+      openingTime: true,
+      closingTime: true,
       restaurantId: true,
       restaurant: { select: { userId: true } },
       createdAt: true,
@@ -119,7 +131,7 @@ export async function GET(
 
     return NextResponse.json({ meal: mapMeal(access.meal) });
   } catch (err) {
-    console.error("[GET /api/meal/[id]]", err);
+    
     return NextResponse.json(
       { error: "Unable to load meal." },
       { status: 500 },
@@ -128,7 +140,6 @@ export async function GET(
 }
 
 // PATCH /api/meal/[id]
-// Body: { name?: string, isAvailable?: boolean }
 export async function PATCH(
   request: Request,
   context: { params: Promise<{ id: string }> },
@@ -150,7 +161,7 @@ export async function PATCH(
     }
 
     const body = (await request.json()) as Record<string, unknown>;
-    const updateData: { name?: string; isAvailable?: boolean } = {};
+    const updateData: { name?: string; description?: string;  isAvailable?: boolean; openingTime?: string; closingTime?: string } = {}; // alwaysAvailable?: boolean; 
 
     if (body.name !== undefined) {
       const name =
@@ -163,6 +174,14 @@ export async function PATCH(
       }
       updateData.name = name;
     }
+    
+    if (body.description !== undefined) {
+      const description =
+        typeof body.description === "string" ? body.description.trim() : "";
+     
+      updateData.description = description;
+    }
+    
 
     if (body.isAvailable !== undefined) {
       if (typeof body.isAvailable !== "boolean") {
@@ -172,6 +191,36 @@ export async function PATCH(
         );
       }
       updateData.isAvailable = body.isAvailable;
+    }
+
+    // if (body.alwaysAvailable !== undefined) {
+    //   if (typeof body.alwaysAvailable !== "boolean") {
+    //     return NextResponse.json(
+    //       { error: "alwaysAvailable must be a boolean." },
+    //       { status: 400 },
+    //     );
+    //   }
+    //   updateData.alwaysAvailable = body.alwaysAvailable;
+    // }
+  
+
+    if (body.openingTime !== undefined) {
+      if(typeof body.openingTime !== "string" || !body.openingTime.trim()) {
+        return NextResponse.json(
+          { error: "openingTime must be a non-empty string." },
+          { status: 400 },
+        );
+      }
+      updateData.openingTime = body.openingTime;
+    }
+    if (body.closingTime !== undefined) {
+      if(typeof body.closingTime !== "string" || !body.closingTime.trim()) {
+        return NextResponse.json(
+          { error: "closingTime must be a non-empty string." },
+          { status: 400 },
+        );
+      }
+      updateData.closingTime = body.closingTime;
     }
 
     if (Object.keys(updateData).length === 0) {
@@ -189,7 +238,7 @@ export async function PATCH(
 
     return NextResponse.json({ meal: mapMeal(updated) });
   } catch (err) {
-    console.error("[PATCH /api/meal/[id]]", err);
+    
     return NextResponse.json(
       { error: "Unable to update meal." },
       { status: 500 },
@@ -222,7 +271,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (err) {
-    console.error("[DELETE /api/meal/[id]]", err);
+    
     return NextResponse.json(
       { error: "Unable to delete meal." },
       { status: 500 },

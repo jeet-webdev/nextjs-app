@@ -52,9 +52,15 @@ model Meal{
   id             String  @id @default(cuid())
   name           String
   isAvailable    Boolean  @default(true)
+  openingTime    String?
+  closingTime    String?
+  description    String?
+  alwaysAvailabe Boolean? @default(true) 
+  
   restaurantId   String 
   restaurant     Restaurant     @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
-  categories     Category[]    
+  categories     Category[]
+  menuItems      MenuItem[]                     
   
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt 
@@ -67,6 +73,10 @@ model Category{
   id             String        @id @default(cuid())
   name           String
   isAvailable    Boolean        @default(true)
+  openingTime    String?
+  closingTime    String?
+  description    String?
+  
   restaurantId   String 
   restaurant     Restaurant     @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
 
@@ -84,24 +94,20 @@ model Category{
 
 model MenuItem {
   id              String     @id @default(uuid())
-  restaurantId    String
   name            String
   description     String?
   price           Decimal    @db.Decimal(10, 2)
-  discountedPrice Decimal?   @db.Decimal(10, 2)
-  currency        String     @default("USD")
   image           String?
-  dietary         Json?
   isAvailable     Boolean    @default(true)
-  preparationTime Int?
-  ingredients     String?
-  order           Int        @default(0)
+  
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
+
+  restaurantId    String
   mealId          String
   categoryId      String
   categories      Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  
+  meal            Meal     @relation(fields: [mealId], references: [id], onDelete: Cascade)
   restaurant      Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
   modifiers       Modifier[]
 
@@ -114,6 +120,7 @@ model Modifier {
   name        String
   price       Decimal    @default(0) @db.Decimal(10, 2)
   menuContent Json?
+  noOfItem    Int?        @default(1)
   inIncluded  Boolean     @default(true)
   menuItemId  String
   menuItem    MenuItem   @relation(fields: [menuItemId], references: [id], onDelete: Cascade)

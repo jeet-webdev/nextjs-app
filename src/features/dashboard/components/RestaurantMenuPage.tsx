@@ -70,7 +70,7 @@ export default function RestaurantMenuPage({
   };
 
   const handleDeleteMenuItem = async (id: string) => {
-    const response = await fetch(`/api/menu/${id}`, {
+    const response = await fetch(`/api/menuitem/${id}`, {
       method: "DELETE",
       credentials: "include",
     });
@@ -120,7 +120,7 @@ export default function RestaurantMenuPage({
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-black via-slate-900 to-black px-4 py-2 text-white">
-      <div className="mx-auto max-w-5xl space-y-8">
+      <div className="mx-auto max-w-7xl space-y-8">
 
         {/* Restaurant header */}
         <section className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-2xl shadow-black/30 backdrop-blur-sm">
@@ -161,17 +161,7 @@ export default function RestaurantMenuPage({
           <MealForm restaurantId={restaurantDetails.id} />
         </section>
 
-       
-        <section className="rounded-3xl border border-white/10 bg-black/20 p-6 backdrop-blur-sm">
-          <MyMenu
-            restaurantId={restaurantDetails.id}
-            menuItems={restaurantDetails.menuItems ?? []}
-            canManage
-            refreshKey={refreshKey}
-            onEdit={handleEditMenuItem}
-            onDelete={handleDeleteMenuItem}
-          />
-        </section>
+           
 
       </div>
     </div>

@@ -9,6 +9,10 @@ const mealSelect = {
   id: true,
   name: true,
   isAvailable: true,
+  // alwaysAvailable: true,
+  description: true,
+  openingTime: true,
+  closingTime: true,
   restaurantId: true,
   createdAt: true,
   updatedAt: true,
@@ -18,10 +22,16 @@ function parseRequiredString(value: unknown): string {
   return typeof value === "string" ? value.trim() : "";
 }
 
+
+
 function mapMeal(meal: {
   id: string;
   name: string;
   isAvailable: boolean;
+  // alwaysAvailable: boolean;
+  description: string | null;
+  openingTime: string  | null;
+  closingTime: string  | null;
   restaurantId: string;
   createdAt: Date;
   updatedAt: Date;
@@ -30,7 +40,11 @@ function mapMeal(meal: {
     id: meal.id,
     name: meal.name,
     isAvailable: meal.isAvailable,
+    description: meal.description,
+    openingTime: meal.openingTime,
+    closingTime: meal.closingTime,
     restaurantId: meal.restaurantId,
+    // alwaysAvailable: meal.alwaysAvailable,
     createdAt: meal.createdAt.toISOString(),
     updatedAt: meal.updatedAt.toISOString(),
   };
@@ -126,7 +140,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ meals: meals.map(mapMeal) });
   } catch (err) {
-    console.error("[GET /api/meal]", err);
+    
     return NextResponse.json(
       { error: "Unable to load meals." },
       { status: 500 },
@@ -135,7 +149,7 @@ export async function GET(request: Request) {
 }
 
 // POST /api/meal
-// Body: { name: string, restaurantId: string, isAvailable?: boolean }
+// Body: { name: string, restaurantId: string, isAvailable?: boolean, openingTime?: string, closingTime?: string }
 export async function POST(request: Request) {
   try {
     const user = await getSessionUser();
@@ -153,9 +167,16 @@ export async function POST(request: Request) {
 
     const body = (await request.json()) as Record<string, unknown>;
     const name = parseRequiredString(body.name);
+    const description = parseRequiredString(body.description) || "";  // default to empty string if not provided
     const restaurantId = parseRequiredString(body.restaurantId);
     const isAvailable =
       typeof body.isAvailable === "boolean" ? body.isAvailable : true;
+    // const alwaysAvailable =
+    //   typeof body.alwaysAvailable === "boolean" ? body.alwaysAvailable : false;
+    // const description =
+    //   typeof body.description === "string" ? body.description.trim() : "";
+    const openingTime = parseRequiredString(body.openingTime);
+    const closingTime = parseRequiredString(body.closingTime);
 
     if (!name) {
       return NextResponse.json(
@@ -180,13 +201,13 @@ export async function POST(request: Request) {
     }
 
     const meal = await prisma.meal.create({
-      data: { name, isAvailable, restaurantId },
+       data: { name, isAvailable, restaurantId , openingTime, closingTime, description},    //  alwaysAvailable,
       select: mealSelect,
     });
 
     return NextResponse.json({ meal: mapMeal(meal) }, { status: 201 });
   } catch (err) {
-    console.error("[POST /api/meal]", err);
+    
     return NextResponse.json(
       { error: "Unable to create meal." },
       { status: 500 },

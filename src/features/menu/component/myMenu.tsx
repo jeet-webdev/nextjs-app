@@ -9,6 +9,8 @@ type MyMenuProps = {
   onEdit?: (menuItem: MenuRecord) => void;
   onDelete?: (id: string) => Promise<void> | void;
   restaurantId: string;
+  mealId?: string;
+  categoryId?: string;
   localMenuItems?: MenuRecord[];
   canManage?: boolean;
   refreshKey?: number;
@@ -18,6 +20,8 @@ export default function MyMenu({
   menuItems,
   onEdit,
   onDelete,
+  mealId,
+  categoryId,
   restaurantId,
   canManage = false,
   refreshKey = 0,
@@ -32,8 +36,8 @@ export default function MyMenu({
     const loadMenuItem = async () => {
       try {
         const query = canManage
-          ? `/api/menu?restaurantId=${encodeURIComponent(restaurantId)}`
-          : `/api/menu?public=true&restaurantId=${encodeURIComponent(restaurantId)}`;
+          ? `/api/menuitem?restaurantId=${encodeURIComponent(restaurantId)}`
+          : `/api/menuitem?public=true&restaurantId=${encodeURIComponent(restaurantId)}`;
         const response = await fetch(query, canManage ? { credentials: "include" } : undefined);
 
         if (!response.ok) return;
@@ -42,7 +46,7 @@ export default function MyMenu({
         const allItems: MenuRecord[] = data.menuItems || [];
         setLocalMenuItems(allItems);
       } catch (error) {
-        console.error("Failed to load menu:", error);
+        
       } finally {
         setIsLoading(false);
       }
@@ -52,9 +56,9 @@ export default function MyMenu({
       void loadMenuItem();
     }
   }, [canManage, refreshKey, restaurantId]);
+
   return (
     <div className="">
-      {/* <h1 className="text-2xl font-bold text-white">All My Menu</h1> */}
       <p className="mt-20 text-gray-400">Manage your  items here.</p>
 
       {localMenuItems.length === 0 && !isLoading ? (

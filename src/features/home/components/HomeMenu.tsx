@@ -11,7 +11,7 @@ export default function HomeMenu() {
   useEffect(() => {
     const loadMenuItem = async () => {
       try {
-        const response = await fetch("/api/menu?public=true");
+        const response = await fetch("/api/menuitem?public=true");
         if (!response.ok) return;
 
         const data = await response.json();
