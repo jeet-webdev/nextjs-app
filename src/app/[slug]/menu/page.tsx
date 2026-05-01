@@ -84,7 +84,7 @@ useEffect(() => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-black via-slate-900 to-black px-4 py-24 text-white">
-      <div className="mx-auto max-w-5xl space-y-8">
+      <div className="mx-auto max-w-7xl space-y-8">
         
         <Link
           href={dashboardPath}

@@ -1,22 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { Loader2, Plus, X } from "lucide-react";
+import { Loader2, Pencil, Plus, Soup, Trash2, X } from "lucide-react";
 import { toast } from "react-toastify";
 
 import type { CategoryRecord } from "@/features/category/categoryForm";
 import { type MenuRecord } from "@/features/menu/types/menuTypes";
-import TextField from "@mui/material/TextField";
-import Checkbox from '@mui/material/Checkbox';
-import FormGroup from '@mui/material/FormGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import FormControl from '@mui/material/FormControl';
-import FormLabel from '@mui/material/FormLabel';
 
+import Image from "next/image";
 
 type MenuFormProps = {
   restaurantId: string;
   categories: CategoryRecord[];
-  menuItem?: MenuRecord | null;
+  mealId?: string;
+  categoryId?: string;
+  menuItems?: MenuRecord[];
   onSaved?: (menuItem: MenuRecord) => void;
+  onDeleted?: (id: string) => void;
   onCancelEdit?: () => void;
 };
 
@@ -24,28 +22,20 @@ type MenuFormState = {
   name: string;
   description: string;
   price: string;
-  discountedPrice: string;
   categoryId: string;
-  category: string;
-  subCategory: string;
   image: string;
   isAvailable: boolean;
-  preparationTime: string;
-  ingredients: string;
 };
 
 const EMPTY_MENU_FORM: MenuFormState = {
   name: "",
   description: "",
   price: "",
-  discountedPrice: "",
+
   categoryId: "",
-  category: "",
-  subCategory: "",
+
   image: "",
   isAvailable: true,
-  preparationTime: "",
-  ingredients: "",
 };
 
 function toFormState(menuItem?: MenuRecord | null): MenuFormState {
@@ -57,95 +47,100 @@ function toFormState(menuItem?: MenuRecord | null): MenuFormState {
     name: menuItem.name ?? "",
     description: menuItem.description ?? "",
     price: String(menuItem.price ?? ""),
-    discountedPrice:
-      menuItem.discountedPrice !== null &&
-      menuItem.discountedPrice !== undefined
-        ? String(menuItem.discountedPrice)
-        : "",
+
     categoryId: menuItem.categoryId ?? "",
-    category: menuItem.category ?? "",
-    subCategory: menuItem.subCategory ?? "",
+
     image: menuItem.image ?? "",
     isAvailable: Boolean(menuItem.isAvailable),
-    preparationTime: menuItem.preparationTime ?? "",
-    ingredients: menuItem.ingredients ?? "",
   };
 }
 
 export default function MenuForm({
   restaurantId,
+  mealId,
+  categoryId: lockedCategoryId,
   categories,
-  menuItem = null,
+  menuItems = [],
   onSaved,
+  onDeleted,
   onCancelEdit,
 }: MenuFormProps) {
   const [loading, setLoading] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [formData, setFormData] = useState<MenuFormState>(EMPTY_MENU_FORM);
-  const isEditing = Boolean(menuItem);
+  const [editingItem, setEditingItem] = useState<MenuRecord | null>(null);
+  const [showForm, setShowForm] = useState(false);
+  const isEditing = Boolean(editingItem);
 
   useEffect(() => {
-    setFormData(toFormState(menuItem));
-  }, [menuItem]);
-
-  useEffect(() => {
-    setFormData((current) => {
-      const selectedCategory = categories.find(
-        (category) => category.id === current.categoryId,
+    if (lockedCategoryId) {
+      setFormData((prev) => ({ ...prev, categoryId: lockedCategoryId }));
+      setShowForm(true);
+    } else if (categories.length > 0) {
+      setFormData((prev) =>
+        prev.categoryId ? prev : { ...prev, categoryId: categories[0].id },
       );
+    }
+  }, [lockedCategoryId, categories]);
 
-      if (selectedCategory) {
-        if (current.category === selectedCategory.name) {
-          return current;
-        }
-
-        return {
-          ...current,
-          category: selectedCategory.name,
-        };
-      }
-
-      if (categories.length === 0) {
-        return {
-          ...current,
-          categoryId: "",
-          category: "",
-        };
-      }
-
-      return {
-        ...current,
-        categoryId: categories[0].id,
-        category: categories[0].name,
-      };
-    });
-  }, [categories]);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >,
+  ) => {
+    const { name, value, type } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]:
+        type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
     }));
   };
 
+  const startEdit = (item: MenuRecord) => {
+    setEditingItem(item);
+    setFormData(toFormState(item));
+    setShowForm(true);
+  };
+
+  const cancelEdit = () => {
+    setEditingItem(null);
+    setShowForm(false);
+    setFormData(
+      lockedCategoryId
+        ? { ...EMPTY_MENU_FORM, categoryId: lockedCategoryId }
+        : EMPTY_MENU_FORM,
+    );
+    if (!lockedCategoryId) setShowForm(false);
+  };
+
+  // editing part
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!formData.name.trim()) return toast.error("Item Name is required");
+    if (!formData.categoryId) return toast.error("Category ID is required");
+
+    const price = parseFloat(formData.price);
+    if (isNaN(price) || price < 0)
+      return toast.error("Price must be a valid number");
+
     setLoading(true);
 
+    //payload sending multiple data with putting [] but now it show error
     const payload = {
-      ...formData,
-      restaurantId,
-      price: parseFloat(formData.price) || 0,
-      discountedPrice: formData.discountedPrice
-        ? parseFloat(formData.discountedPrice)
-        : null,
-      preparationTime: parseInt(formData.preparationTime) || 0,
-      dietary: { isVegetarian: true, isSpicy: false },
+      name: formData.name.trim(),
+      description: formData.description.trim() || "",
+      price: price,
+      categoryId: formData.categoryId,
+      image: formData.image.trim() || "",
+      isAvailable: formData.isAvailable,
+
+      ...(isEditing ? {} : { restaurantId, mealId }),
     };
 
     try {
-      const response = await fetch(
-        isEditing ? `/api/menuitem/${menuItem?.id}` : "/api/menuitem",
+      const res = await fetch(
+        isEditing ? `/api/menuitem/${editingItem!.id}` : "/api/menuitem",
         {
           method: isEditing ? "PATCH" : "POST",
           headers: { "Content-Type": "application/json" },
@@ -153,190 +148,285 @@ export default function MenuForm({
           body: JSON.stringify(payload),
         },
       );
-
-      const data = (await response.json().catch(() => null)) as {
+      const data = (await res.json().catch(() => null)) as {
         error?: string;
         menuItem?: MenuRecord;
       } | null;
 
-      if (!response.ok) {
+      if (!res.ok) {
         toast.error(
-          data?.error ??
-            `Unable to ${isEditing ? "update" : "create"} menu item.`,
+          data?.error ?? `unable to ${isEditing ? "update" : "create"} item`,
         );
         return;
       }
 
       toast.success(
-        isEditing
-          ? "Menu item updated successfully!"
-          : "Menu item created successfully!",
+        isEditing ? "Item updated successfully!" : "Item created successfully!",
       );
-      setFormData(EMPTY_MENU_FORM);
-      onSaved?.(data?.menuItem as MenuRecord);
-    } catch (error) {
-      
-      toast.error(`Unable to ${isEditing ? "update" : "create"} menu item.`);
+      onSaved?.(data!.menuItem as MenuRecord);
+      cancelEdit();
+    } catch {
+      toast.error("Network error. please try again");
     } finally {
       setLoading(false);
     }
   };
-  const [showMenuItemForm, setShowMenuItemForm] = useState(false);
-  const [menuItemFormData, setMenuItemFormData] =
-    useState<MenuFormState>(EMPTY_MENU_FORM);
+
+  // delete part
+
+  const handleDelete = async (item: MenuRecord) => {
+    if (!confirm(`Are you sure you want to delete ${item.name}`)) return;
+    setDeletingId(item.id);
+    try {
+      const res = await fetch(`/api/menuitem/${item.id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      const data = (await res.json().catch(() => null)) as {
+        error?: string;
+      } | null;
+
+      if (!res.ok) {
+        toast.error(data?.error ?? "Unable to delete item");
+        return;
+      }
+      toast.success(`${item.name} deleted successfully!`);
+      onDeleted?.(item.id);
+    } catch {
+      toast.error("Network error. please try again");
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   return (
-    <div className="rounded-2xl bg-white/[0.03] p-6 border border-white/5">
-      <div>
+    <div className="space-y-4">
+      {/* get the existing item  */}
+      {menuItems.length >= 1 && (
+        <div className="rounded-2xl bg-white/[0.03] border border-white/5 p-4 space-y-2">
+          <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
+            <Soup className="h-4 w-4 inline mr-2" /> Menu Items
+          </h3>
+          {menuItems.map((item) => (
+            <div
+              key={`${item.id}`} //{item.id}
+              className="flex items-center gap-3 p-3 rounded-xl bg-black/20 border border-white/5"
+            >
+              {item.image && (
+                <Image
+                  height={20}
+                  width={15}
+                  src={item.image}
+                  alt={item.name}
+                  className="w-10 h-10 rounded-lg object-cover flex-shrink-0"
+                />
+              )}
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-white truncate">
+                  {item.name}
+                </p>
+                <p className="text-xs text-gray-400">
+                  ${item.price}{" "}
+                  <span
+                    className={`ml-2 px-1.5 py-0.5 rounded text-xs ${
+                      item.isAvailable
+                        ? "bg-green-500/10 text-green-400"
+                        : "bg-gray-500/10 text-gray-500"
+                    }`}
+                  >
+                    {item.isAvailable ? "Available" : "Unavailable"}
+                  </span>
+                </p>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => startEdit(item)}
+                  className="p-1.5 rounded-lg border border-white/10 text-gray-400 hover:text-white hover:border-white/20 transition"
+                >
+                  <Pencil className="h-3.5 w-3.5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleDelete(item)}
+                  disabled={deletingId === item.id}
+                  className="p-1.5 rounded-lg border border-red-500/20 text-red-400 hover:bg-red-500/10 transition disabled:opacity-40"
+                >
+                  {deletingId === item.id ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <Trash2 className="h-3.5 w-3.5" />
+                  )}
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+      {/* show or hide form */}
+      {!showForm && (
         <button
           type="button"
-          onClick={() => {
-            setShowMenuItemForm((v) => !v);
-            setMenuItemFormData(EMPTY_MENU_FORM);
-          }}
-          className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-semibold transition-all duration-150 ${
-            showMenuItemForm
-              ? "border-white/10 bg-white/5 text-gray-400 hover:text-white"
-              : "border-sky-500/30 bg-sky-500/10 text-sky-400 hover:bg-sky-500/20 hover:text-sky-300"
-          }`}
+          onClick={() => setShowForm(true)}
+          className="flex items-center gap-1.5 rounded-lg border border-sky-500/30 bg-sky-500/10 text-sky-400 hover:bg-sky-500/20 hover:text-sky-300 px-3 py-1.5 text-xs font-semibold transition"
         >
-          {showMenuItemForm ? (
-            <>
-              <X className="h-3 w-3" /> Cancel
-            </>
-          ) : (
-            <>
-              <Plus className="h-3 w-3" /> Add Item
-            </>
-          )}
+          <Plus className="h-3 w-3" /> Add Item
         </button>
-      </div>
+      )}
 
-      <div className="mb-4 flex items-center justify-between gap-4">
-        <h2 className="text-lg font-semibold text-white">
-          {isEditing
-            ? `Edit ${menuItem?.name ?? "Menu Item"}`
-            : "Create Menu Item"}
-        </h2>
-        {isEditing && onCancelEdit ? (
-          <button
-            type="button"
-            onClick={onCancelEdit}
-            className="rounded-lg border border-white/10 px-3 py-2 text-sm text-gray-300 transition hover:border-white/20 hover:text-white"
-          >
-            Cancel edit
-          </button>
-        ) : null}
-      </div>
-
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border border-white/10 rounded-lg p-4 bg-black/20">
-          <div className="space-y-1">
-            <label className="text-xs text-gray-400 ml-1">Menu Name</label>
-            <input
-              name="name"
-              required
-              className="p-3 bg-black/40 border border-white/10 rounded-lg w-full text-white focus:border-sky-500 outline-none"
-              placeholder="ex. Paneer Tikka"
-              value={formData.name}
-              onChange={handleChange}
-            />
-          </div>
-          <input type="hidden" name="restaurantId" value={restaurantId} />
-          <div className="space-y-1">
-            <label className="text-xs text-gray-400 ml-1">Category</label>
-            <select
-              name="categoryId"
-              required
-              className="p-3 bg-black/40 border border-white/10 rounded-lg w-full text-white"
-              value={formData.categoryId}
-              onChange={(event) => {
-                const selectedCategory = categories.find(
-                  (category) => category.id === event.target.value,
-                );
-
-                setFormData((current) => ({
-                  ...current,
-                  categoryId: event.target.value,
-                  category: selectedCategory?.name ?? "",
-                }));
-              }}
+      {/* ── crud */}
+      {showForm && (
+        <div className="rounded-2xl bg-white/[0.03] p-6 border border-white/5">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-white">
+              {isEditing ? `Edit: ${editingItem?.name}` : "Add Menu Item"}
+            </h2>
+            <button
+              type="button"
+              onClick={cancelEdit}
+              className="rounded-lg border border-white/10 px-3 py-1.5 text-xs text-gray-300 hover:text-white transition"
             >
-              <option value="">Select a category</option>
-              {categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
+              <X className="h-3.5 w-3.5 inline mr-1" />
+              Cancel
+            </button>
           </div>
 
-          <div className="space-y-1">
-             <TextField
-              id="standard-password-input"
-              label="Price (USD)"
-              name="price"
-              type="number"
-              required
-              placeholder="299"
-              value={formData.price}
-              onChange={handleChange}
-              variant="standard"
-            />
-            <TextField
-              id="standard-password-input"
-              label="name"
-              name="name"
-              type="text"
-              required
-              placeholder="Paneer Tikka"
-              value={formData.name}
-              onChange={handleChange}
-              variant="standard"
-            />
-            <TextField
-              id="standard-password-input"
-              label="Description"
-              name="description"
-              type="text"
-              required
-              placeholder="Description ex. Grilled paneer with spices..."
-              value={formData.description}
-              onChange={handleChange}
-              variant="standard"
-            />
-          </div>
-           <FormControl component="fieldset">
-     
-      <FormGroup aria-label="position" row>
-        <FormControlLabel
-          value="end"
-          control={<Checkbox />}
-          label="Menu Available"
-          labelPlacement="end"
-          name="isAvailable"
-          checked={formData.isAvailable}
-          />
-      </FormGroup>
-    </FormControl>
-       
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Name */}
+              <div className="space-y-1">
+                <label className="text-xs text-gray-400">Name *</label>
+                <input
+                  name="name"
+                  // required
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="e.g. Paneer Tikka"
+                  className="w-full p-3 bg-black/40 border border-white/10 rounded-lg text-white focus:border-sky-500 outline-none text-sm"
+                />
+              </div>
+
+              {/* Price */}
+              <div className="space-y-1">
+                <label className="text-xs text-gray-400">Price *</label>
+                <input
+                  name="price"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                   // required
+                  value={formData.price}
+                  onChange={handleChange}
+                  placeholder="299.00"
+                  className="w-full p-3 bg-black/40 border border-white/10 rounded-lg text-white focus:border-sky-500 outline-none text-sm"
+                />
+              </div>
+
+              {/* Category */}
+              <div className=" hidden hiddenspace-y-1">
+                <label className="text-xs text-gray-400">Category *</label>
+                {lockedCategoryId ? (
+                  <div className="w-full p-3 bg-black/20 border border-white/5 rounded-lg text-gray-500 text-sm flex items-center gap-2">
+                    <span className="text-sky-400 text-xs">●</span>
+                    Pre-selected from category
+                    <input
+                      type="hidden"
+                      name="categoryId"
+                      value={lockedCategoryId}
+                    />
+                  </div>
+                ) : (
+                  <select
+                    name="categoryId"
+                    required
+                    value={formData.categoryId}
+                    onChange={handleChange}
+                    className="w-full p-3 bg-black/40 border border-white/10 rounded-lg text-white focus:border-sky-500 outline-none text-sm"
+                  >
+                    <option value="">Select category</option>
+                    {categories.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
+
+              {/* Image */}
+              <div className="space-y-1">
+                <label className="text-xs text-gray-400">Image URL</label>
+                <input
+                  name="image"
+                  type="url"
+                  value={formData.image}
+                  onChange={handleChange}
+                  placeholder="https://..."
+                  className="w-full p-3 bg-black/40 border border-white/10 rounded-lg text-white focus:border-sky-500 outline-none text-sm"
+                />
+              </div>
+
+              {/* Description */}
+              <div className="space-y-1">
+                <label className="text-xs text-gray-400">Description</label>
+                <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  rows={2}
+                  placeholder="Short description..."
+                  className="w-full p-3 bg-black/40 border border-white/10 rounded-lg text-white focus:border-sky-500 outline-none text-sm resize-none"
+                />
+              </div>
+
+              {/* isAvailable */}
+              <div className="sm:col-span-2">
+                <label className="flex items-center gap-2 cursor-pointer w-fit">
+                  <input
+                    type="checkbox"
+                    name="isAvailable"
+                    checked={formData.isAvailable}
+                    onChange={handleChange}
+                    className="w-4 h-4 rounded accent-sky-500"
+                  />
+                  <span className="text-sm text-gray-300">
+                    Available for ordering
+                  </span>
+                </label>
+              </div>
+            </div>
+            <div className="flex flex-row justify-end gap-5 pace-y-2">
+              <button className=" p-3 bg-sky-600 hover:bg-sky-700 text-white rounded-lg font-semibold transition flex justify-center items-center gap-2 disabled:opacity-50">
+                <Plus className="h-4 w-4" />
+                Add More
+              </button>
+              <button className=" p-3 bg-sky-600 hover:bg-sky-700 text-white rounded-lg font-semibold transition flex justify-center items-center gap-2 disabled:opacity-50">
+                <Plus className="h-4 w-4" />
+                5 Items
+              </button>
+              <button className="p-3 bg-sky-600 hover:bg-sky-700 text-white rounded-lg font-semibold transition flex justify-center items-center gap-2 disabled:opacity-50">
+                <Plus className="h-4 w-4" />
+                10 Items
+              </button>
+            </div>
+            <button
+              type="submit"
+              disabled={
+                loading || (!lockedCategoryId && categories.length === 0)
+              }
+              className="w-full p-3 bg-sky-600 hover:bg-sky-700 text-white rounded-lg font-semibold transition flex justify-center items-center gap-2 disabled:opacity-50"
+            >
+              {loading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Plus className="h-4 w-4" />
+              )}
+              {loading ? "Saving..." : isEditing ? "Update Item" : "Save Item"}
+            </button>
+          </form>
         </div>
-        <div className="mt-3 flex flex-row gap-5">
-          <button
-            type="submit"
-            disabled={loading || categories.length === 0}
-            className="w-full p-3 bg-sky-600 hover:bg-sky-700 text-white rounded-lg font-semibold transition-colors flex justify-center items-center gap-2"
-          >
-            {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-            {!loading ? <Plus className="h-4 w-4" /> : null}
-            {loading
-              ? "Saving..."
-              : isEditing
-                ? "Update Menu Item"
-                : "Save Menu Item"}
-          </button>
-        </div>
-      </form>
+      )}
     </div>
   );
 }

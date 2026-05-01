@@ -17,6 +17,8 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import dayjs from "dayjs";
+import { MenuRecord } from "../menu/types/menuTypes";
+import MenuForm from "../menu/component/MenuForm";
 
 export type CategoryRecord = {
   id: string;
@@ -34,6 +36,11 @@ export type CategoryRecord = {
 type CategoryFormProps = {
   restaurantId: string;
   mealId: string;
+  onAddItem?: (context: {
+    categoryId: string;
+    mealId: string;
+    restaurantId: string;
+  }) => void;
 };
 
 type CategoryFormState = {
@@ -54,6 +61,7 @@ const EMPTY: CategoryFormState = {
 export default function CategoryForm({
   restaurantId,
   mealId,
+  onAddItem,
 }: CategoryFormProps) {
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState<CategoryFormState>(EMPTY);
@@ -68,7 +76,14 @@ export default function CategoryForm({
   const [isSavingEdit, setIsSavingEdit] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  // ── Fetch ─────────────────────────────────────────────────────────────────
+  const [activeAddItemCatId, setActiveAddItemCatId] = useState<string | null>(
+    null,
+  );
+  const [catMenuItems, setCatMenuItems] = useState<
+    Record<string, MenuRecord[]>
+  >({});
+
+  // ── Fetch ─
   const fetchCategories = useCallback(async () => {
     if (!restaurantId || !mealId) return;
     setIsLoading(true);
@@ -91,7 +106,7 @@ export default function CategoryForm({
     void fetchCategories();
   }, [fetchCategories]);
 
-  // ── Create ────────────────────────────────────────────────────────────────
+  // ── Create ───────
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const name = formData.name.trim();
@@ -133,7 +148,7 @@ export default function CategoryForm({
     }
   };
 
-  // ── Edit ──────────────────────────────────────────────────────────────────
+  // ── Edit ─────────
   const startEdit = (cat: CategoryRecord) => {
     setEditingId(cat.id);
     setEditForm({
@@ -188,7 +203,7 @@ export default function CategoryForm({
     }
   };
 
-  // ── Delete ────────────────────────────────────────────────────────────────
+  // ── Delete ────
   const handleDelete = async (cat: CategoryRecord) => {
     if (!confirm(`Delete "${cat.name}"? This will also remove its menu items.`))
       return;
@@ -212,12 +227,34 @@ export default function CategoryForm({
     }
   };
 
-  const toggleOpen = (id: string) =>
-    setOpenIds((prev) => ({ ...prev, [id]: !prev[id] }));
+  
+ const fetchMenuItems = useCallback(async (restaurantId: string) => {
+    try {
+      const res = await fetch(`/api/menuitem?restaurantId=${restaurantId}`, {
+        credentials: "include",
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setCatMenuItems((prev) => ({
+          ...prev,
+          [restaurantId]: data.menuItems ?? [],
+        }));
+      }
+    } catch (error) {
+      
+    }
+  }, []);
+  const toggleOpen = (id: string) => {
+    const isOpening = !openIds[id];
+    setOpenIds((prev) => ({ ...prev, [id]: isOpening }));
+
+    if (isOpening) {
+      void fetchMenuItems(id);
+    }
+  };
 
   return (
     <div className="mt-3 space-y-3">
-      {/* ── Header row: label + Add button ── */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1.5 text-xs font-medium text-gray-500 uppercase tracking-widest">
           <FolderOpen className="h-3 w-3" />
@@ -563,10 +600,10 @@ export default function CategoryForm({
                     ) : (
                       <div className="flex items-center justify-between">
                         <span className="font-mono text-[9px] ">
-                          {/* {cat.id} */} {cat.openingTime} - {cat.closingTime}
+                          {cat.openingTime} - {cat.closingTime}
                         </span>
-                         <span className="font-mono text-[9px] ">
-                         {cat.description}
+                        <span className="font-mono text-[9px] ">
+                          {cat.description}
                         </span>
                         <div className="flex gap-1">
                           <button
@@ -589,12 +626,66 @@ export default function CategoryForm({
                             )}
                             Delete
                           </button>
-                          <button className="flex flex-row p-3 gap-1 rounded-md text-[12px] border-2 border-sky-800/30 bg-sky-500/10 text-sky-400 hover:bg-sky-500/20 hover:text-sky-300">
-                            <Plus className="h-3 w-3" /> Add Item
+                       
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setActiveAddItemCatId((prev) =>
+                                prev === cat.id ? null : cat.id,
+                              )
+                            }
+                            className={`flex flex-row items-center gap-1 p-2 rounded-md text-[12px] border-2 transition-all ${
+                              activeAddItemCatId === cat.id
+                                ? "border-white/10 bg-white/5 text-gray-400"
+                                : "border-sky-800/30 bg-sky-500/10 text-sky-400 hover:bg-sky-500/20 hover:text-sky-300"
+                            }`}
+                          >
+                            {activeAddItemCatId === cat.id ? (
+                              <>
+                                <X className="h-3 w-3" /> Close
+                              </>
+                            ) : (
+                              <>
+                                <Plus className="h-3 w-3" /> Add Item
+                              </>
+                            )}
                           </button>
                         </div>
                       </div>
                     )}
+                  </div>
+                )}
+               
+                {activeAddItemCatId === cat.id && (
+                  <div className="mt-3 border-t border-white/5 pt-3">
+                    <MenuForm
+                      restaurantId={restaurantId}
+                      mealId={mealId}
+                      categoryId={cat.id}
+                      categories={[]}
+                      // This ensures the list inside MenuForm shows the fetched items
+                      menuItems={catMenuItems[cat.id] ?? []}
+                      onSaved={(item) => {
+                        setCatMenuItems((prev) => {
+                          const existing = prev[cat.id] ?? [];
+                          const exists = existing.find((i) => i.id === item.id);
+                          const newList = exists
+                            ? existing.map((i) => (i.id === item.id ? item : i))
+                            : [item, ...existing];
+
+                          return { ...prev, [cat.id]: newList };
+                        });
+                      }}
+                      onDeleted={(id) => {
+                        setCatMenuItems((prev) => ({
+                          ...prev,
+                          [cat.id]: (prev[cat.id] ?? []).filter(
+                            (i) => i.id !== id,
+                          ),
+                        }));
+                      }}
+                    />
                   </div>
                 )}
               </div>

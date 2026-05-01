@@ -9,6 +9,8 @@ type MyMenuProps = {
   onEdit?: (menuItem: MenuRecord) => void;
   onDelete?: (id: string) => Promise<void> | void;
   restaurantId: string;
+  mealId?: string;
+  categoryId?: string;
   localMenuItems?: MenuRecord[];
   canManage?: boolean;
   refreshKey?: number;
@@ -18,6 +20,8 @@ export default function MyMenu({
   menuItems,
   onEdit,
   onDelete,
+  mealId,
+  categoryId,
   restaurantId,
   canManage = false,
   refreshKey = 0,
@@ -52,6 +56,7 @@ export default function MyMenu({
       void loadMenuItem();
     }
   }, [canManage, refreshKey, restaurantId]);
+
   return (
     <div className="">
       <p className="mt-20 text-gray-400">Manage your  items here.</p>

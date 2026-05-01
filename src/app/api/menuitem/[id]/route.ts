@@ -2,7 +2,6 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { JWT_COOKIE_NAME, verifyAuthToken } from "@/shared/lib/auth";
 import { prisma } from "@/shared/lib/prisma";
-// import { Decimal } from "@prisma/client/runtime/library";
 import { Decimal } from "@prisma/client/runtime/client";
 
 type SessionUser = { id: string; userType: string };
@@ -31,11 +30,8 @@ function mapMenuItem(item: {
   name: string;
   description: string | null;
   price: Decimal;
- 
   image: string | null;
- 
   isAvailable: boolean;
- 
   restaurantId: string;
   mealId: string;
   categoryId: string;
@@ -47,11 +43,8 @@ function mapMenuItem(item: {
     name: item.name,
     description: item.description,
     price: toDecimalString(item.price),
-  
     image: item.image,
-   
     isAvailable: item.isAvailable,
-  
     restaurantId: item.restaurantId,
     mealId: item.mealId,
     categoryId: item.categoryId,
@@ -83,18 +76,14 @@ async function getAccessibleMenuItem(id: string, currentUser: SessionUser) {
     },
   });
 
-  if (!item) {
-    return { error: "Menu item not found.", status: 404 } as const;
-  }
+  if (!item) return { error: "Menu item not found.", status: 404 } as const;
 
   const isAdmin = currentUser.userType === "ADMIN";
   const isOwner =
     currentUser.userType === "OWNER" &&
     item.restaurant.userId === currentUser.id;
 
-  if (!isAdmin && !isOwner) {
-    return { error: "Forbidden.", status: 403 } as const;
-  }
+  if (!isAdmin && !isOwner) return { error: "Forbidden.", status: 403 } as const;
 
   return { item };
 }
@@ -102,7 +91,7 @@ async function getAccessibleMenuItem(id: string, currentUser: SessionUser) {
 // GET /api/menuitem/[id]
 export async function GET(
   request: Request,
-  context: { params: Promise<{ id: string }> },
+  context: { params: Promise<{ id: string }> }
 ) {
   const { id } = await context.params;
   const { searchParams } = new URL(request.url);
@@ -116,10 +105,7 @@ export async function GET(
       });
 
       if (!item) {
-        return NextResponse.json(
-          { error: "Menu item not found." },
-          { status: 404 },
-        );
+        return NextResponse.json({ error: "Menu item not found." }, { status: 404 });
       }
 
       return NextResponse.json({ menuItem: mapMenuItem(item) });
@@ -132,28 +118,19 @@ export async function GET(
 
     const access = await getAccessibleMenuItem(id, user);
     if ("error" in access) {
-      return NextResponse.json(
-        { error: access.error },
-        { status: access.status },
-      );
+      return NextResponse.json({ error: access.error }, { status: access.status });
     }
 
     return NextResponse.json({ menuItem: mapMenuItem(access.item) });
-  } catch (err) {
-    
-    return NextResponse.json(
-      { error: "Unable to load menu item." },
-      { status: 500 },
-    );
+  } catch {
+    return NextResponse.json({ error: "Unable to load menu item." }, { status: 500 });
   }
 }
 
 // PATCH /api/menuitem/[id]
-// Body: any subset of { name, description, price, discountedPrice, currency,
-//                       image, dietary, isAvailable, preparationTime, ingredients, order, categoryId, mealId }
 export async function PATCH(
   request: Request,
-  context: { params: Promise<{ id: string }> },
+  context: { params: Promise<{ id: string }> }
 ) {
   const { id } = await context.params;
 
@@ -165,10 +142,7 @@ export async function PATCH(
 
     const access = await getAccessibleMenuItem(id, user);
     if ("error" in access) {
-      return NextResponse.json(
-        { error: access.error },
-        { status: access.status },
-      );
+      return NextResponse.json({ error: access.error }, { status: access.status });
     }
 
     const body = (await request.json()) as Record<string, unknown>;
@@ -177,10 +151,7 @@ export async function PATCH(
     if (body.name !== undefined) {
       const name = typeof body.name === "string" ? body.name.trim() : "";
       if (!name) {
-        return NextResponse.json(
-          { error: "name cannot be empty." },
-          { status: 400 },
-        );
+        return NextResponse.json({ error: "name cannot be empty." }, { status: 400 });
       }
       updateData.name = name;
     }
@@ -197,41 +168,34 @@ export async function PATCH(
       if (isNaN(price) || price < 0) {
         return NextResponse.json(
           { error: "price must be a non-negative number." },
-          { status: 400 },
+          { status: 400 }
         );
       }
       updateData.price = price;
     }
-
-  
 
     if (body.image !== undefined) {
       updateData.image =
         typeof body.image === "string" ? body.image.trim() || null : null;
     }
 
-  
-
     if (body.isAvailable !== undefined) {
       if (typeof body.isAvailable !== "boolean") {
         return NextResponse.json(
           { error: "isAvailable must be a boolean." },
-          { status: 400 },
+          { status: 400 }
         );
       }
       updateData.isAvailable = body.isAvailable;
     }
 
-   
-
-    // If moving to a different category, validate it belongs to the same restaurant
     if (body.categoryId !== undefined) {
       const categoryId =
         typeof body.categoryId === "string" ? body.categoryId.trim() : "";
       if (!categoryId) {
         return NextResponse.json(
           { error: "categoryId cannot be empty." },
-          { status: 400 },
+          { status: 400 }
         );
       }
 
@@ -251,11 +215,8 @@ export async function PATCH(
 
       if (!category) {
         return NextResponse.json(
-          {
-            error:
-              "Category not found or does not belong to this restaurant/meal.",
-          },
-          { status: 404 },
+          { error: "Category not found or does not belong to this restaurant/meal." },
+          { status: 404 }
         );
       }
 
@@ -268,7 +229,7 @@ export async function PATCH(
       if (!mealId) {
         return NextResponse.json(
           { error: "mealId cannot be empty." },
-          { status: 400 },
+          { status: 400 }
         );
       }
 
@@ -280,7 +241,7 @@ export async function PATCH(
       if (!meal) {
         return NextResponse.json(
           { error: "Meal not found in this restaurant." },
-          { status: 404 },
+          { status: 404 }
         );
       }
 
@@ -290,7 +251,7 @@ export async function PATCH(
     if (Object.keys(updateData).length === 0) {
       return NextResponse.json(
         { error: "No valid fields provided to update." },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -301,19 +262,15 @@ export async function PATCH(
     });
 
     return NextResponse.json({ menuItem: mapMenuItem(updated) });
-  } catch (err) {
-    
-    return NextResponse.json(
-      { error: "Unable to update menu item." },
-      { status: 500 },
-    );
+  } catch {
+    return NextResponse.json({ error: "Unable to update menu item." }, { status: 500 });
   }
 }
 
 // DELETE /api/menuitem/[id]
 export async function DELETE(
   _request: Request,
-  context: { params: Promise<{ id: string }> },
+  context: { params: Promise<{ id: string }> }
 ) {
   const { id } = await context.params;
 
@@ -325,20 +282,13 @@ export async function DELETE(
 
     const access = await getAccessibleMenuItem(id, user);
     if ("error" in access) {
-      return NextResponse.json(
-        { error: access.error },
-        { status: access.status },
-      );
+      return NextResponse.json({ error: access.error }, { status: access.status });
     }
 
     await prisma.menuItem.delete({ where: { id } });
 
     return NextResponse.json({ success: true });
-  } catch (err) {
-    
-    return NextResponse.json(
-      { error: "Unable to delete menu item." },
-      { status: 500 },
-    );
+  } catch {
+    return NextResponse.json({ error: "Unable to delete menu item." }, { status: 500 });
   }
 }
