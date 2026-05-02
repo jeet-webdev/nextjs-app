@@ -48,11 +48,11 @@ export default function HomeMenu() {
       <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4">
         <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
           <p className="text-xs uppercase tracking-[0.16em] text-gray-400">Active Menu</p>
-          <p className="mt-1 text-2xl font-black text-white">{menuItem?.length || 0}</p>
+          <p className="mt-1 text-2xl font-black text-white">{menuItem?.length || 12}</p>
         </div>
         <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
           <p className="text-xs uppercase tracking-[0.16em] text-gray-400">Total Menu</p>
-          <p className="mt-1 text-2xl font-black text-white">{menuItem?.length || 0}</p>
+          <p className="mt-1 text-2xl font-black text-white">{menuItem?.length ||110.3}</p>
         </div>
         <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
             <p className="text-xs uppercase tracking-[0.16em] text-gray-400">Top Menu</p>

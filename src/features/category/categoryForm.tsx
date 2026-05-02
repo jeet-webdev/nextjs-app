@@ -664,7 +664,7 @@ export default function CategoryForm({
                       mealId={mealId}
                       categoryId={cat.id}
                       categories={[]}
-                      // This ensures the list inside MenuForm shows the fetched items
+                     
                       menuItems={catMenuItems[cat.id] ?? []}
                       onSaved={(item) => {
                         setCatMenuItems((prev) => {

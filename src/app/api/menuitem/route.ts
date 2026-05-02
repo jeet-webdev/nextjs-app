@@ -141,6 +141,15 @@ export async function GET(request: Request) {
   }
 }
 
+
+//get /api/menuitem/categoryId    that will show items only a specific category
+
+//  http://localhost:3000/api/menuitem
+// ?restaurantId=__
+// &mealId=__
+// &categoryId=__
+
+
 // POST /api/menuitem
 export async function POST(request: Request) {
   try {
@@ -157,74 +166,85 @@ export async function POST(request: Request) {
       );
     }
 
-    const body = (await request.json()) as Record<string, unknown>;
+    const raw = await request.json();
 
-    const name = parseRequiredString(body.name);
-    const restaurantId = parseRequiredString(body.restaurantId);
-    const mealId = parseRequiredString(body.mealId);
-    const categoryId = parseRequiredString(body.categoryId);
+    const items = (Array.isArray(raw) ? raw : [raw]) as Record<string, unknown>[];
 
-
-
-    //error show from here
-    if (!name)
-      return NextResponse.json({ error: "name is required." }, { status: 400 });
-    if (!restaurantId)
-      return NextResponse.json({ error: "restaurantId is required." }, { status: 400 });
-    if (!mealId)
-      return NextResponse.json({ error: "mealId is required." }, { status: 400 });
-    if (!categoryId)
-      return NextResponse.json({ error: "categoryId is required." }, { status: 400 });
-
-    const price = Number(body.price);
-    if (isNaN(price) || price < 0) {
-      return NextResponse.json(
-        { error: "price must be a non-negative number." },
-        { status: 400 }
-      );
+    if (items.length === 0) {
+      return NextResponse.json({ error: "No items provided." }, { status: 400 });
     }
 
+    for (let i = 0; i < items.length; i++) {
+      const body = items[i];
+      const label = items.length > 1 ? `Item ${i + 1}: ` : "";
+
+      if (!parseRequiredString(body.name))
+        return NextResponse.json({ error: `${label}name is required.` }, { status: 400 });
+      if (!parseRequiredString(body.restaurantId))
+        return NextResponse.json({ error: `${label}restaurantId is required.` }, { status: 400 });
+      if (!parseRequiredString(body.mealId))
+        return NextResponse.json({ error: `${label}mealId is required.` }, { status: 400 });
+      if (!parseRequiredString(body.categoryId))
+        return NextResponse.json({ error: `${label}categoryId is required.` }, { status: 400 });
+
+      const price = Number(body.price);
+      if (isNaN(price) || price < 0)
+        return NextResponse.json({ error: `${label}price must be a non-negative number.` }, { status: 400 });
+    }
+
+    const restaurantId = parseRequiredString(items[0].restaurantId);
     const access = await assertRestaurantAccess(restaurantId, user);
     if ("error" in access) {
       return NextResponse.json({ error: access.error }, { status: access.status });
     }
 
-    const category = await prisma.category.findFirst({
-      where: { id: categoryId, restaurantId, mealId },
+    const mealId = parseRequiredString(items[0].mealId);
+    const categoryIds = [...new Set(items.map((b) => parseRequiredString(b.categoryId)))];
+    const validCategories = await prisma.category.findMany({
+      where: { id: { in: categoryIds }, restaurantId, mealId },
       select: { id: true },
     });
-
-    if (!category) {
-      return NextResponse.json(
-        { error: "Category not found or does not belong to the given restaurant and meal." },
-        { status: 404 }
-      );
+    const validCategoryIds = new Set(validCategories.map((c) => c.id));
+    for (const body of items) {
+      const cid = parseRequiredString(body.categoryId);
+      if (!validCategoryIds.has(cid)) {
+        return NextResponse.json(
+          { error: `Category "${cid}" not found or does not belong to this restaurant/meal.` },
+          { status: 404 }
+        );
+      }
     }
 
-    const menuItem = await prisma.menuItem.create({
-      data: {
-        name,
-        restaurantId,
-        mealId,
-        categoryId,
-        price,
-        description:
-          typeof body.description === "string"
-            ? body.description.trim() || null
-            : null,
-        image:
-          typeof body.image === "string" ? body.image.trim() || null : null,
-        isAvailable:
-          typeof body.isAvailable === "boolean" ? body.isAvailable : true,
-      },
-      select: menuItemSelect,
-    });
+    // Create all items
+    const created = await Promise.all(
+      items.map((body) =>
+        prisma.menuItem.create({
+          data: {
+            name: parseRequiredString(body.name),
+            restaurantId: parseRequiredString(body.restaurantId),
+            mealId: parseRequiredString(body.mealId),
+            categoryId: parseRequiredString(body.categoryId),
+            price: Number(body.price),
+            description: typeof body.description === "string" ? body.description.trim() || null : null,
+            image: typeof body.image === "string" ? body.image.trim() || null : null,
+            isAvailable: typeof body.isAvailable === "boolean" ? body.isAvailable : true,
+          },
+          select: menuItemSelect,
+        })
+      )
+    );
 
-    return NextResponse.json({ menuItem: mapMenuItem(menuItem) }, { status: 201 });
+    
+    if (created.length === 1) {
+      return NextResponse.json(
+        { menuItem: mapMenuItem(created[0]), menuItems: [mapMenuItem(created[0])] },
+        { status: 201 }
+      );
+    }
+    return NextResponse.json({ menuItems: created.map(mapMenuItem) }, { status: 201 });
+
   } catch {
     return NextResponse.json({ error: "Unable to create menu item." }, { status: 500 });
   }
 }
-
-
 
