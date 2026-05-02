@@ -51,7 +51,7 @@ export default function MenuCard({
   const content = compact ? (
     <div className="rounded-xl border border-white/10 bg-black/30 p-4 transition hover:bg-black/50 hover:border-sky-500/30">
       <p className="font-semibold text-white">{menuItem.name}</p>
-      <p className="mt-1 text-sm text-sky-300">{menuItem.category}</p>
+     
       <div className="mt-3 flex items-center justify-between text-xs text-gray-300">
         <span>${menuItem.price}</span>
         {statusBadge}
@@ -60,13 +60,11 @@ export default function MenuCard({
   ) : (
     <article className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 mb-4 backdrop-blur transition hover:-translate-y-1 hover:bg-white/[0.06] hover:border-sky-500/30">
       <h3 className="text-lg font-semibold text-white">{menuItem.name}</h3>
-      <p className="mt-2 text-sm text-sky-300">{menuItem.category}</p>
+     
       <div className="mt-4 flex flex-row items-center justify-between text-sm text-gray-300">
        <div className="flex gap-4">
           <span className="text-gray-100">Price: ${menuItem.price}</span>
-          {menuItem.discountedPrice && (
-             <span className="text-emerald-400">Discount: ${menuItem.discountedPrice}</span>
-          )}
+         
         </div>
         {statusBadge}
       </div>

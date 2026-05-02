@@ -39,7 +39,6 @@ model Restaurant {
   meals          Meal[]
 
   user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  tableBookings  TableBooking[]
 
   @@unique([userId, slug])
   @@index([createdAt])
@@ -128,35 +127,10 @@ model Modifier {
   @@map("modifiers")
 }
 
-model TableBooking {
-  id           String        @id @default(uuid())
-  restaurantId String
-  name         String
-  email        String?
-  phone        String?
-  date         String
-  time         String
-  guests       Int
-  message      String?
-  status       BookingStatus @default(PENDING)
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  restaurant   Restaurant    @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
-
-  @@index([restaurantId])
-  @@map("table_bookings")
-}
-
 enum UserType {
   OWNER
   CUSTOMER
   ADMIN
-}
-
-enum BookingStatus {
-  PENDING
-  CONFIRMED
-  CANCELLED
 }
 
 enum RestaurantStatus {
