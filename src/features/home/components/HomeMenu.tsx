@@ -60,7 +60,7 @@ export default function HomeMenu() {
         </div>
         <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
           <p className="text-xs uppercase tracking-[0.16em] text-gray-400">Top Category</p>
-          <p className="mt-1 text-2xl font-black text-white">{menuItem?.[Math.floor(Math.random() * menuItem.length)]?.category || "Pizza"}</p>
+          <p className="mt-1 text-2xl font-black text-white">{"Pizza"}</p>
         </div>
       </div>
 
